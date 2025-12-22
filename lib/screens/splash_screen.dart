@@ -1,8 +1,8 @@
+import 'package:fish_freshness_detection/screens/Main/main_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/colors.dart';
 import '../widgets/splash_loader.dart';
-import 'home/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 700),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
+        pageBuilder: (_, __, ___) => const MainScreen(),
         transitionsBuilder: (_, animation, __, child) {
           final slide = Tween(
             begin: const Offset(0, 0.1),
