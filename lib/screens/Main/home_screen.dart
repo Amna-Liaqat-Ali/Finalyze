@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../constants/colors.dart';
-import '../../widgets/custom_app_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,23 +9,24 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(title: "Finalyze", showSettings: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
 
-            /// Title
             const Text(
               "Fish Freshness Analysis",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textDark,
+              ),
             ),
             const SizedBox(height: 8),
 
-            /// Subtitle
             const Text(
               "AI-powered quality detection using image analysis",
               textAlign: TextAlign.center,
@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            /// Upload / Capture Box
+            //Upload box
             Container(
               height: 220,
               width: double.infinity,
@@ -47,32 +47,21 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Icon(Icons.camera_alt, size: 60, color: AppColors.primary),
+                  Icon(
+                    Icons.image_outlined,
+                    size: 60,
+                    color: AppColors.primary,
+                  ),
                   SizedBox(height: 10),
                   Text(
-                    "Tap to select an image for analysis",
+                    "Upload image for analysis",
                     style: TextStyle(color: AppColors.textLight, fontSize: 14),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 25),
-
-            /// Input Method Label
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Select Input Method",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textDark,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 12),
+            const SizedBox(height: 18),
 
             /// Camera Button
             ElevatedButton.icon(
@@ -112,7 +101,6 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            /// Info Note
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(

@@ -9,9 +9,9 @@ class AppColors {
   );
   static const Color accentGreen = Color(0xFFB6E700);
   // Splash-based theme
-  static const Color primary = Color(0xFF1E5FA3); // Deep Blue
-  static const Color secondary = Color(0xFF2ECC9A); // Mint Green
-  static const Color accent = Color(0xFF2BB0E6); // Sky Blue
+  static const Color primary = Color(0xFF1E5FA3);
+  static const Color secondary = Color(0xFF2ECC9A);
+  static const Color accent = Color(0xFF2BB0E6);
 
   static const Color background = Color(0xFFF5FAFF);
   static const Color card = Colors.white;
