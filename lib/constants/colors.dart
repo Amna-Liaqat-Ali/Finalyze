@@ -18,4 +18,7 @@ class AppColors {
 
   static const Color textDark = Color(0xFF1C1C1C);
   static const Color textLight = Color(0xFF7A8A99);
+
+  static const fresh = Color(0xFF4CAF50);
+  static const spoiled = Color(0xFFE53935);
 }
