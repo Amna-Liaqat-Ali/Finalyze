@@ -37,6 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Detect freshness
+  void _detectFreshness() {
+    /// Connect ML model here
+    debugPrint("Detecting freshness...");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,6 +143,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+
+            /// Detect freshness Button
+            if (_selectedImage != null) ...[
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _detectFreshness,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  minimumSize: const Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                child: const Text(
+                  "Analyze Freshness",
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
 
             //Camera and gallery options
             if (_selectedImage == null) ...[
