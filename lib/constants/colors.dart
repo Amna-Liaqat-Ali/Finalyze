@@ -21,4 +21,10 @@ class AppColors {
 
   static const fresh = Color(0xFF4CAF50);
   static const spoiled = Color(0xFFE53935);
+
+  static const blue = Color(0xFF2563EB);
+  static const teal = Color(0xFF0891B2);
+
+  static const white = Colors.white;
+  static const success = Color(0xFF22C55E);
 }

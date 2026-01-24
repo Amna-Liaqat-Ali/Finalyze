@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/bottom_bar.dart';
+import '../home/home_screen.dart';
 import 'guide_screen.dart';
 import 'history_screen.dart';
-import 'home_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
