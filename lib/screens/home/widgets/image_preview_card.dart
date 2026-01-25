@@ -39,7 +39,7 @@ class ImagePreviewCard extends StatelessWidget {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             child: Image.file(
               image,
-              height: 220,
+              height: 260,
               width: double.infinity,
               fit: BoxFit.cover,
             ),
