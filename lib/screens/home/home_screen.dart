@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../constants/colors.dart';
 import '../../utils/image_picker_helper.dart';
 import '../../widgets/change_image_sheet.dart';
+import '../Main/analyzing_screen.dart';
 import '../Main/history_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/home_app_bar.dart';
@@ -69,7 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _analyzeFreshness() {
-    debugPrint("Analyzing fish freshness...");
+    if (selectedImage == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AnalyzingScreen(image: selectedImage!)),
+    );
   }
 
   @override
@@ -128,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 20),
 
-                  // Action Buttons
                   Opacity(
                     opacity: selectedImage != null
                         ? 0.5

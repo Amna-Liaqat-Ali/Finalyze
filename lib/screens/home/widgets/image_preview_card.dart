@@ -8,7 +8,7 @@ class ImagePreviewCard extends StatelessWidget {
   final File image;
   final VoidCallback onAnalyze;
   final VoidCallback onChange;
-  final VoidCallback onRemove; // New remove callback
+  final VoidCallback onRemove;
 
   const ImagePreviewCard({
     super.key,
@@ -34,7 +34,6 @@ class ImagePreviewCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Image Preview
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             child: Image.file(
@@ -51,7 +50,6 @@ class ImagePreviewCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
             child: Column(
               children: [
-                // Start Analysis Button
                 SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -86,10 +84,8 @@ class ImagePreviewCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Horizontal Row for Change and Remove
                 Row(
                   children: [
-                    // Change Button
                     Expanded(
                       child: OutlinedButton(
                         onPressed: onChange,
@@ -114,7 +110,6 @@ class ImagePreviewCard extends StatelessWidget {
 
                     const SizedBox(width: 12),
 
-                    // Remove Button
                     Expanded(
                       child: OutlinedButton(
                         onPressed: onRemove,
