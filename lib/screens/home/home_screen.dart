@@ -69,13 +69,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _analyzeFreshness() {
+  void _analyzeFreshness() async {
     if (selectedImage == null) return;
 
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => AnalyzingScreen(image: selectedImage!)),
     );
+    setState(() {
+      selectedImage = null;
+    });
   }
 
   @override
