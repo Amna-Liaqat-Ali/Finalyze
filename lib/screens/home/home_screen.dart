@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../constants/colors.dart';
 import '../../utils/image_picker_helper.dart';
+import '../Main/history_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/recent_detection_tile.dart';
@@ -89,7 +90,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           label: "View History",
                           color: Colors.purple,
                           onTap: () {
-                            // Navigate to history
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HistoryScreen(),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -110,7 +116,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   const SizedBox(height: 12),
-                  const RecentDetectionTile(),
+                  RecentDetectionTile(
+                    isFresh: true,
+                    confidence: 95,
+                    time: "Today 09:30",
+                  ),
+                  RecentDetectionTile(
+                    isFresh: false,
+                    confidence: 35,
+                    time: "Today 06:00",
+                  ),
                 ],
               ),
             ),

@@ -36,7 +36,6 @@ class HomeAppBar extends StatelessWidget {
               ),
             ],
           ),
-          Icon(Icons.notifications_none, color: Colors.white, size: 28),
         ],
       ),
     );
