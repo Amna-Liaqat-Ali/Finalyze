@@ -12,7 +12,7 @@ class ScanCard extends StatelessWidget {
     return GestureDetector(
       onTap: onScan,
       child: Container(
-        height: 200,
+        height: 280,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
