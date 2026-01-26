@@ -6,7 +6,7 @@ import '../../constants/colors.dart';
 import '../../utils/image_picker_helper.dart';
 import '../../widgets/change_image_sheet.dart';
 import '../Main/analyzing_screen.dart';
-import '../Main/history_screen.dart';
+import '../history/history_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/image_preview_card.dart';
