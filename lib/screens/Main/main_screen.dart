@@ -1,3 +1,4 @@
+import 'package:fish_freshness_detection/screens/scan/scan_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/bottom_bar.dart';
@@ -17,6 +18,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = const [
     HomeScreen(),
+    ScanScreen(),
     HistoryScreen(),
     GuideScreen(),
   ];
