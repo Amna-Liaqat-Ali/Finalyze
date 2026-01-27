@@ -15,7 +15,7 @@ class StatusBadge extends StatelessWidget {
 
     switch (status) {
       case ScanStatus.fresh:
-        color = AppColors.success;
+        color = AppColors.fresh;
         text = "Fresh";
         break;
       case ScanStatus.moderate:

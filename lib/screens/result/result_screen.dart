@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fish_freshness_detection/screens/cook/recipe_screen.dart';
 import 'package:fish_freshness_detection/screens/result/widgets/action_buttons.dart';
 import 'package:fish_freshness_detection/screens/result/widgets/analysis_detail_card.dart';
 import 'package:fish_freshness_detection/screens/result/widgets/disclaimer.dart';
@@ -47,6 +48,9 @@ class ResultScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   const RecommendationCard(),
+                  const SizedBox(height: 10),
+                  _buildRecipeButton(context),
+
                   const SizedBox(height: 30),
 
                   const DisclaimerCard(),
@@ -61,4 +65,34 @@ class ResultScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildRecipeButton(BuildContext context) {
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 10),
+    child: ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        elevation: 2,
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => RecipeScreen()),
+        );
+      },
+      icon: const Icon(Icons.restaurant_menu_rounded),
+      label: const Text(
+        "Find Recipes for this Fish",
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
+      ),
+    ),
+  );
 }
