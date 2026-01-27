@@ -1,4 +1,4 @@
-import 'package:fish_freshness_detection/screens/Main/main_screen.dart';
+import 'package:fish_freshness_detection/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/colors.dart';
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 700),
-        pageBuilder: (_, __, ___) => const MainScreen(),
+        pageBuilder: (_, __, ___) => const OnboardingScreen(),
         transitionsBuilder: (_, animation, __, child) {
           final slide = Tween(
             begin: const Offset(0, 0.1),
