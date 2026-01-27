@@ -1,10 +1,10 @@
+import 'package:fish_freshness_detection/screens/guide/guide_screen.dart';
 import 'package:fish_freshness_detection/screens/scan/scan_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/bottom_bar.dart';
 import '../history/history_screen.dart';
 import '../home/home_screen.dart';
-import 'guide_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
