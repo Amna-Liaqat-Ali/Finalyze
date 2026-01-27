@@ -47,7 +47,7 @@ class BottomNav extends StatelessWidget {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Icon(Icons.camera_alt_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Scan',
           ),
@@ -62,7 +62,7 @@ class BottomNav extends StatelessWidget {
             label: 'Guide',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book_outlined),
+            icon: Icon(Icons.restaurant_menu_outlined),
             activeIcon: Icon(Icons.menu_book),
             label: 'Cook',
           ),

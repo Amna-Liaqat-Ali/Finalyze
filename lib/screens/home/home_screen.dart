@@ -85,20 +85,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const HomeAppBar(),
+      body: Column(
+        children: [
+          const HomeAppBar(),
 
-            Padding(
+          Expanded(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   // Stats Row
                   Opacity(
-                    opacity: selectedImage != null
-                        ? 0.5
-                        : 1.0, // fade if image selected
+                    opacity: selectedImage != null ? 0.5 : 1.0,
                     child: Row(
                       children: const [
                         Expanded(
@@ -138,9 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
 
                   Opacity(
-                    opacity: selectedImage != null
-                        ? 0.5
-                        : 1.0, // fade if image is selected
+                    opacity: selectedImage != null ? 0.5 : 1.0,
                     child: Row(
                       children: [
                         Expanded(
@@ -198,8 +194,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

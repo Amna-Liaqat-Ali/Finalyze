@@ -1,4 +1,4 @@
-import 'package:fish_freshness_detection/screens/home/home_screen.dart';
+import 'package:fish_freshness_detection/screens/Main/main_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/colors.dart';
@@ -56,7 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _finish() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const MainScreen()),
     );
   }
 
