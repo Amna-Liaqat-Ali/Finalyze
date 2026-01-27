@@ -1,3 +1,4 @@
+import 'package:fish_freshness_detection/screens/cook/recipe_screen.dart';
 import 'package:fish_freshness_detection/screens/guide/guide_screen.dart';
 import 'package:fish_freshness_detection/screens/scan/scan_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +17,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
+  final List<Widget> _screens = [
     HomeScreen(),
     ScanScreen(),
     HistoryScreen(),
     GuideScreen(),
+    RecipeScreen(),
   ];
 
   @override
