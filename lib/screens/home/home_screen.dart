@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 
 import '../../utils/image_picker_helper.dart';
 import '../../widgets/change_image_sheet.dart';
+import '../Blogs/widgets/blog_slider.dart';
 import '../Main/analyzing_screen.dart';
 import '../history/history_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/image_preview_card.dart';
 import 'widgets/scan_card.dart';
-import 'widgets/stat_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -104,30 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      // Stats Row
-                      Opacity(
-                        opacity: selectedImage != null ? 0.5 : 1.0,
-                        child: Row(
-                          children: const [
-                            Expanded(
-                              child: StatCard(
-                                value: "0",
-                                label: "Total Scans",
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(width: 15),
-                            Expanded(
-                              child: StatCard(
-                                value: "0",
-                                label: "Fresh Today",
-                                color: Color(0xFF00D2FF), // Neon Blue accent
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
                       const SizedBox(height: 25),
 
                       selectedImage == null
@@ -179,6 +155,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 20),
                       SpeciesSlider(),
+
+                      SizedBox(height: 20),
+                      YouTubeBlogSlider(),
                     ],
                   ),
                 ),
