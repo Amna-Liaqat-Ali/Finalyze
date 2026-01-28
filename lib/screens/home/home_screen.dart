@@ -80,7 +80,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  @override
   Widget build(BuildContext context) {
+    // Check if image is selected to disable other UI elements
+    bool isPreviewMode = selectedImage != null;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -97,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bottom: false,
           child: Column(
             children: [
+              // AppBar stays active
               const HomeAppBar(),
 
               Expanded(
@@ -104,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 25),
+                      const SizedBox(height: 15),
 
                       selectedImage == null
                           ? ScanCard(onScan: _openCamera)
@@ -120,44 +125,52 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () {},
                             ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 25),
 
-                      Opacity(
-                        opacity: selectedImage != null ? 0.5 : 1.0,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ActionCard(
-                                icon: Icons.upload,
-                                label: "Upload Image",
-                                color: Colors.white,
-                                onTap: _openGallery,
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: ActionCard(
-                                icon: Icons.history,
-                                label: "View History",
-                                color: const Color(0xFF74EBD5),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const HistoryScreen(),
+                      IgnorePointer(
+                        ignoring: isPreviewMode, // TRUE if image selected
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: isPreviewMode ? 0.3 : 1.0, // Dim if selected
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ActionCard(
+                                      icon: Icons.upload,
+                                      label: "Upload Image",
+                                      color: Colors.white,
+                                      onTap: _openGallery,
                                     ),
-                                  );
-                                },
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Expanded(
+                                    child: ActionCard(
+                                      icon: Icons.history,
+                                      label: "View History",
+                                      color: const Color(0xFF74EBD5),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const HistoryScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 20),
+                              const SpeciesSlider(),
+                              const SizedBox(height: 20),
+                              YouTubeBlogSlider(),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      SpeciesSlider(),
-
-                      SizedBox(height: 20),
-                      YouTubeBlogSlider(),
                     ],
                   ),
                 ),
