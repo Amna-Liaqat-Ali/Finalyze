@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:fish_freshness_detection/screens/species/widgets/species_slider.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/colors.dart';
 import '../../utils/image_picker_helper.dart';
 import '../../widgets/change_image_sheet.dart';
 import '../Main/analyzing_screen.dart';
@@ -10,7 +10,6 @@ import '../history/history_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/image_preview_card.dart';
-import 'widgets/recent_detection_tile.dart';
 import 'widgets/scan_card.dart';
 import 'widgets/stat_card.dart';
 
@@ -81,121 +80,112 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          const HomeAppBar(),
-
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Stats Row
-                  Opacity(
-                    opacity: selectedImage != null ? 0.5 : 1.0,
-                    child: Row(
-                      children: const [
-                        Expanded(
-                          child: StatCard(
-                            value: "1247",
-                            label: "Total Scans",
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        SizedBox(width: 15),
-                        Expanded(
-                          child: StatCard(
-                            value: "25",
-                            label: "Fresh Today",
-                            color: AppColors.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  selectedImage == null
-                      ? ScanCard(onScan: _openCamera)
-                      : ImagePreviewCard(
-                          image: selectedImage!,
-                          onAnalyze: _analyzeFreshness,
-                          onChange: _showChangeImageOptions,
-                          onRemove: () {
-                            setState(() {
-                              selectedImage = null;
-                            });
-                          },
-                        ),
-
-                  const SizedBox(height: 20),
-
-                  Opacity(
-                    opacity: selectedImage != null ? 0.5 : 1.0,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ActionCard(
-                            icon: Icons.upload,
-                            label: "Upload Image",
-                            color: AppColors.primary,
-                            onTap: _openGallery,
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: ActionCard(
-                            icon: Icons.history,
-                            label: "View History",
-                            color: Colors.purple,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const HistoryScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  Opacity(
-                    opacity: selectedImage != null ? 0.5 : 1.0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Recent Detection",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        RecentDetectionTile(
-                          isFresh: true,
-                          confidence: 95,
-                          time: "Today 09:30",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D2B45), Color(0xFF163E5F), Color(0xFF005C7A)],
+            stops: [0.1, 0.5, 0.9],
           ),
-        ],
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              const HomeAppBar(),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      // Stats Row
+                      Opacity(
+                        opacity: selectedImage != null ? 0.5 : 1.0,
+                        child: Row(
+                          children: const [
+                            Expanded(
+                              child: StatCard(
+                                value: "0",
+                                label: "Total Scans",
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 15),
+                            Expanded(
+                              child: StatCard(
+                                value: "0",
+                                label: "Fresh Today",
+                                color: Color(0xFF00D2FF), // Neon Blue accent
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      selectedImage == null
+                          ? ScanCard(onScan: _openCamera)
+                          : ImagePreviewCard(
+                              image: selectedImage!,
+                              onAnalyze: _analyzeFreshness,
+                              onChange: _showChangeImageOptions,
+                              onRemove: () {
+                                setState(() {
+                                  selectedImage = null;
+                                });
+                              },
+                              onTap: () {},
+                            ),
+
+                      const SizedBox(height: 20),
+
+                      Opacity(
+                        opacity: selectedImage != null ? 0.5 : 1.0,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ActionCard(
+                                icon: Icons.upload,
+                                label: "Upload Image",
+                                color: Colors.white,
+                                onTap: _openGallery,
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: ActionCard(
+                                icon: Icons.history,
+                                label: "View History",
+                                color: const Color(0xFF74EBD5),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const HistoryScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SpeciesSlider(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

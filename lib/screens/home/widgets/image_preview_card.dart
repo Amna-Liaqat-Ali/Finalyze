@@ -1,8 +1,7 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
-import '../../../constants/colors.dart';
 
 class ImagePreviewCard extends StatelessWidget {
   final File image;
@@ -16,125 +15,116 @@ class ImagePreviewCard extends StatelessWidget {
     required this.onAnalyze,
     required this.onChange,
     required this.onRemove,
+    required Null Function() onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 14,
-            offset: Offset(0, 8),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: Image.file(
-              image,
-              height: 260,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, AppColors.secondary],
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: onAnalyze,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: const Text(
-                        "Start Analysis",
-                        style: TextStyle(
-                          fontSize: 16.5,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.3,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
                 ),
-
-                const SizedBox(height: 12),
-
-                Row(
+                child: Image.file(
+                  image,
+                  height: 260,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onChange,
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: AppColors.textLight.withOpacity(0.4),
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF00B4D8), Color(0xFF0077B6)],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0077B6).withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
                           ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: onAnalyze,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                         child: const Text(
-                          "Change Image",
+                          "START ANALYSIS",
                           style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textDark,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
                           ),
                         ),
                       ),
                     ),
-
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onRemove,
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.red.withOpacity(0.6)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _btn(
+                            "Change",
+                            Icons.refresh,
+                            onChange,
+                            Colors.white70,
                           ),
                         ),
-                        child: const Text(
-                          "Remove",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.red,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _btn(
+                            "Remove",
+                            Icons.delete_outline,
+                            onRemove,
+                            Colors.redAccent,
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _btn(String txt, IconData icon, VoidCallback tap, Color clr) {
+    return TextButton.icon(
+      onPressed: tap,
+      icon: Icon(icon, size: 16, color: clr),
+      label: Text(
+        txt,
+        style: TextStyle(color: clr, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+      style: TextButton.styleFrom(
+        backgroundColor: Colors.white.withOpacity(0.05),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

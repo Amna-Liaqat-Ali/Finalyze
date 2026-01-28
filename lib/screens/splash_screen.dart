@@ -23,7 +23,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // 1. Initialize Video (Keep Background Running)
     _videoController =
         VideoPlayerController.asset("assets/videos/splash_video.mp4")
           ..initialize().then((_) {
@@ -33,16 +32,15 @@ class _SplashScreenState extends State<SplashScreen> {
             _videoController.play();
           });
 
-    // 2. Play Separate Background MP3
+    // Play Separate Background MP3
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
     _audioPlayer.setVolume(100.0);
     _audioPlayer.play(AssetSource('sounds/ocean_sound.mp3'));
-    // 3. Trigger Title Animation
+    // Trigger Title Animation
     Timer(const Duration(microseconds: 800), () {
       setState(() => _startAnimation = true);
     });
 
-    // 4. Navigate to MainScreen after 6 seconds
     Timer(const Duration(seconds: 8), () {
       _videoController.pause();
       _audioPlayer.stop();
@@ -69,10 +67,9 @@ class _SplashScreenState extends State<SplashScreen> {
           SizedBox.expand(
             child: _videoController.value.isInitialized
                 ? VideoPlayer(_videoController)
-                : Container(color: const Color(0xFF001F3F)), // Fallback color
+                : Container(color: const Color(0xFF001F3F)),
           ),
 
-          // Dark overlay to make text readable
           Container(color: Colors.black.withOpacity(0.2)),
 
           // Animated Title Layer
@@ -105,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "SMART SEAFOOD GUIDE",
+                      "SMART GUIDE TO FRESH SEAFOOD",
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.white.withOpacity(0.8),
