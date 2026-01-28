@@ -4,13 +4,11 @@ import 'package:fish_freshness_detection/screens/species/widgets/species_slider.
 import 'package:flutter/material.dart';
 
 import '../../utils/image_picker_helper.dart';
-import '../../widgets/change_image_sheet.dart';
 import '../Blogs/widgets/blog_slider.dart';
-import '../Main/analyzing_screen.dart';
 import '../history/history_screen.dart';
+import '../scan/scan_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/home_app_bar.dart';
-import 'widgets/image_preview_card.dart';
 import 'widgets/scan_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,70 +19,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  File? selectedImage;
+  void _navigateToReview(File image) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ScanScreen(image: image)),
+    );
+  }
 
   Future<void> _openCamera() async {
     final image = await ImagePickerHelper.pickFromCamera();
     if (image != null) {
-      setState(() {
-        selectedImage = image;
-      });
+      _navigateToReview(image);
     }
   }
 
   Future<void> _openGallery() async {
     final image = await ImagePickerHelper.pickFromGallery();
     if (image != null) {
-      setState(() {
-        selectedImage = image;
-      });
+      _navigateToReview(image);
     }
-  }
-
-  void _showChangeImageOptions() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return ChangeImageSheet(
-          onCamera: () async {
-            Navigator.pop(context);
-            final image = await ImagePickerHelper.pickFromCamera();
-            if (image != null) {
-              setState(() => selectedImage = image);
-            }
-          },
-          onGallery: () async {
-            Navigator.pop(context);
-            final image = await ImagePickerHelper.pickFromGallery();
-            if (image != null) {
-              setState(() => selectedImage = image);
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void _analyzeFreshness() async {
-    if (selectedImage == null) return;
-
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AnalyzingScreen(image: selectedImage!)),
-    );
-    setState(() {
-      selectedImage = null;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Check if image is selected to disable other UI elements
-    bool isPreviewMode = selectedImage != null;
-
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -101,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bottom: false,
           child: Column(
             children: [
-              // AppBar stays active
+              // 1. APP BAR
               const HomeAppBar(),
 
               Expanded(
@@ -111,66 +68,46 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const SizedBox(height: 15),
 
-                      selectedImage == null
-                          ? ScanCard(onScan: _openCamera)
-                          : ImagePreviewCard(
-                              image: selectedImage!,
-                              onAnalyze: _analyzeFreshness,
-                              onChange: _showChangeImageOptions,
-                              onRemove: () {
-                                setState(() {
-                                  selectedImage = null;
-                                });
-                              },
-                              onTap: () {},
-                            ),
+                      ScanCard(onScan: _openCamera),
 
                       const SizedBox(height: 25),
 
-                      IgnorePointer(
-                        ignoring: isPreviewMode, // TRUE if image selected
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 300),
-                          opacity: isPreviewMode ? 0.3 : 1.0, // Dim if selected
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ActionCard(
-                                      icon: Icons.upload,
-                                      label: "Upload Image",
-                                      color: Colors.white,
-                                      onTap: _openGallery,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 15),
-                                  Expanded(
-                                    child: ActionCard(
-                                      icon: Icons.history,
-                                      label: "View History",
-                                      color: const Color(0xFF74EBD5),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) =>
-                                                const HistoryScreen(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              const SpeciesSlider(),
-                              const SizedBox(height: 20),
-                              YouTubeBlogSlider(),
-                            ],
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ActionCard(
+                              icon: Icons.upload,
+                              label: "Upload Image",
+                              color: Colors.white,
+                              onTap: _openGallery,
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: ActionCard(
+                              icon: Icons.history,
+                              label: "View History",
+                              color: const Color(0xFF74EBD5),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const HistoryScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
+
+                      const SizedBox(height: 20),
+                      const SpeciesSlider(),
+
+                      const SizedBox(height: 20),
+                      YouTubeBlogSlider(),
+
+                      const SizedBox(height: 50),
                     ],
                   ),
                 ),
