@@ -175,9 +175,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   child: Ink(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, AppColors.secondary],
-                      ),
+                      color: Color(0xFF163E5F),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Center(

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:fish_freshness_detection/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 import '../result/models/analysis_result_model.dart';
@@ -82,19 +81,17 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
     final double progressValue = (_stepIndex + 1) / _progressSteps.length;
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: Color(0xFF0D2B45),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // --- Animated Circular Progress Section ---
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return Stack(
                   alignment: Alignment.center,
                   children: [
-                    // The glowing pulse behind the circle
                     Container(
                       height: 160,
                       width: 160,
@@ -105,7 +102,6 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                         ),
                       ),
                     ),
-                    // The Progress Ring
                     SizedBox(
                       height: 140,
                       width: 140,
@@ -121,7 +117,6 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                     ),
                     // The Rotating Fish
                     Transform.rotate(
-                      // Subtle tilt back and forth (-10 to +10 degrees)
                       angle: math.sin(_controller.value * 2 * math.pi) * 0.15,
                       child: const Text("🐟", style: TextStyle(fontSize: 55)),
                     ),
@@ -132,7 +127,6 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
 
             const SizedBox(height: 50),
 
-            // --- Text Content ---
             const Text(
               "Analyzing Fish...",
               style: TextStyle(
@@ -153,7 +147,6 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
 
             const SizedBox(height: 40),
 
-            // --- Status Step Indicator ---
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
