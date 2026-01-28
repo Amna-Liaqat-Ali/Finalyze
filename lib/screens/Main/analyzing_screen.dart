@@ -4,7 +4,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../result/models/analysis_result_model.dart';
 import '../result/result_screen.dart';
 
 class AnalyzingScreen extends StatefulWidget {
@@ -42,31 +41,17 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
   }
 
   Future<void> _startAnalysis() async {
+    // Simulate the 5 steps of analysis
     for (int i = 0; i < _progressSteps.length; i++) {
       await Future.delayed(const Duration(milliseconds: 1500));
       if (!mounted) return;
       setState(() => _stepIndex = i);
     }
 
-    final result = AnalysisResult(
-      isFresh: true,
-      freshnessScore: 95,
-      confidence: 98,
-      location: "Karachi Fish Harbor",
-      estimatedAge: "0–24 hours",
-      dateTime: DateTime.now(),
-    );
-
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => ResultScreen(
-          image: widget.image,
-          result: result,
-          dateTime: result.dateTime,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => ResultScreen(image: widget.image)),
     );
   }
 
@@ -81,17 +66,28 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
     final double progressValue = (_stepIndex + 1) / _progressSteps.length;
 
     return Scaffold(
-      backgroundColor: Color(0xFF0D2B45),
-      body: Center(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D2B45), Color(0xFF163E5F), Color(0xFF005C7A)],
+            stops: [0.1, 0.5, 0.9],
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // 1. ANIMATED LOADER
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return Stack(
                   alignment: Alignment.center,
                   children: [
+                    // Pulse Ring
                     Container(
                       height: 160,
                       width: 160,
@@ -111,14 +107,17 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                         strokeCap: StrokeCap.round,
                         backgroundColor: Colors.white.withOpacity(0.2),
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          Colors.white,
+                          Colors.cyanAccent, // Updated color to match theme
                         ),
                       ),
                     ),
-                    // The Rotating Fish
                     Transform.rotate(
                       angle: math.sin(_controller.value * 2 * math.pi) * 0.15,
-                      child: const Text("🐟", style: TextStyle(fontSize: 55)),
+                      child: const Icon(
+                        Icons.analytics_rounded,
+                        color: Colors.white,
+                        size: 50,
+                      ),
                     ),
                   ],
                 );
@@ -138,7 +137,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
             ),
             const SizedBox(height: 10),
             Text(
-              "Our AI is checking freshness",
+              "AI is detecting freshness features",
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white.withOpacity(0.8),
@@ -150,19 +149,22 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Small blinking dot
                 FadeTransition(
                   opacity: _controller,
                   child: Container(
                     width: 8,
                     height: 8,
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.cyanAccent,
                       shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: Colors.cyanAccent, blurRadius: 6),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
+                // Animated Text Step
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 400),
                   transitionBuilder: (child, animation) => FadeTransition(
@@ -178,7 +180,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                   child: Text(
                     _progressSteps[_stepIndex],
                     key: ValueKey(_progressSteps[_stepIndex]),
-                    style: const TextStyle(fontSize: 16, color: Colors.white70),
+                    style: const TextStyle(fontSize: 15, color: Colors.white70),
                   ),
                 ),
               ],
