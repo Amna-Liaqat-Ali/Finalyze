@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fish_freshness_detection/screens/Main/main_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,8 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
+
+  bool _animatePage = false;
 
   final List<Map<String, dynamic>> pages = [
     {
@@ -42,10 +46,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
   ];
 
+  @override
+  void initState() {
+    super.initState();
+
+    Timer(const Duration(milliseconds: 300), () {
+      setState(() => _animatePage = true);
+    });
+  }
+
   void _next() {
     if (_currentIndex < pages.length - 1) {
       _controller.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.easeOut,
       );
     } else {
@@ -56,7 +69,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _finish() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 800),
+        pageBuilder: (_, animation, secondaryAnimation) => const MainScreen(),
+        transitionsBuilder: (_, animation, secondaryAnimation, child) {
+          final fade = Tween<double>(begin: 0.0, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+          );
+
+          final slide =
+              Tween<Offset>(
+                begin: const Offset(0, 0.3),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+              );
+
+          return FadeTransition(
+            opacity: fade,
+            child: SlideTransition(position: slide, child: child),
+          );
+        },
+      ),
     );
   }
 
@@ -72,19 +106,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: TextButton(onPressed: _finish, child: const Text("Skip")),
             ),
 
-            /// Pages
             Expanded(
               child: PageView.builder(
                 controller: _controller,
                 itemCount: pages.length,
                 onPageChanged: (index) {
-                  setState(() => _currentIndex = index);
+                  setState(() {
+                    _currentIndex = index;
+                    _animatePage = false;
+                  });
+                  Timer(const Duration(milliseconds: 200), () {
+                    setState(() => _animatePage = true);
+                  });
                 },
                 itemBuilder: (_, index) {
-                  return OnboardingPage(
-                    icon: pages[index]["icon"],
-                    title: pages[index]["title"],
-                    description: pages[index]["desc"],
+                  return AnimatedOpacity(
+                    duration: const Duration(milliseconds: 600),
+                    opacity: _animatePage ? 1.0 : 0.0,
+                    curve: Curves.easeIn,
+                    child: AnimatedScale(
+                      duration: const Duration(milliseconds: 600),
+                      scale: _animatePage ? 1.0 : 0.8,
+                      curve: Curves.easeOutBack,
+                      child: OnboardingPage(
+                        icon: pages[index]["icon"],
+                        title: pages[index]["title"],
+                        description: pages[index]["desc"],
+                      ),
+                    ),
                   );
                 },
               ),
@@ -137,6 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ? "Get Started"
                             : "Next",
                         style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
