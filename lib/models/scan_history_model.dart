@@ -6,6 +6,7 @@ class ScanHistory {
   final DateTime dateTime;
   final ScanStatus status;
   final String image;
+  final int confidence;
 
   ScanHistory({
     required this.fishName,
@@ -13,5 +14,6 @@ class ScanHistory {
     required this.dateTime,
     required this.status,
     required this.image,
+    required this.confidence,
   });
 }

@@ -1,19 +1,19 @@
-enum ScanStatus { fresh, moderate, fair }
+enum ScanStatus { fresh, spoiled, moderate, fair }
 
 class ScanHistory {
-  final String location;
+  final String fishName;
+  final String source;
   final DateTime dateTime;
   final ScanStatus status;
-  final int freshness;
-  final int confidence;
   final String image;
+  final int confidence;
 
   ScanHistory({
-    required this.location,
+    required this.fishName,
+    required this.source,
     required this.dateTime,
     required this.status,
-    required this.freshness,
-    required this.confidence,
     required this.image,
+    required this.confidence,
   });
 }

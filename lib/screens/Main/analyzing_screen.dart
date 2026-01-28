@@ -49,9 +49,17 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
     }
 
     if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => ResultScreen(image: widget.image)),
+      MaterialPageRoute(
+        builder: (_) => ResultScreen(
+          image: widget.image,
+          freshnessScore: 95.0, // Example data
+          confidence: 98.0,
+          status: "Fresh",
+        ),
+      ),
     );
   }
 
@@ -80,14 +88,12 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 1. ANIMATED LOADER
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Pulse Ring
                     Container(
                       height: 160,
                       width: 160,
@@ -98,6 +104,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                         ),
                       ),
                     ),
+                    // Progress Indicator
                     SizedBox(
                       height: 140,
                       width: 140,
@@ -107,17 +114,13 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                         strokeCap: StrokeCap.round,
                         backgroundColor: Colors.white.withOpacity(0.2),
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          Colors.cyanAccent, // Updated color to match theme
+                          Colors.cyanAccent,
                         ),
                       ),
                     ),
                     Transform.rotate(
                       angle: math.sin(_controller.value * 2 * math.pi) * 0.15,
-                      child: const Icon(
-                        Icons.analytics_rounded,
-                        color: Colors.white,
-                        size: 50,
-                      ),
+                      child: const Text("🐟", style: TextStyle(fontSize: 55)),
                     ),
                   ],
                 );
@@ -164,7 +167,6 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Animated Text Step
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 400),
                   transitionBuilder: (child, animation) => FadeTransition(

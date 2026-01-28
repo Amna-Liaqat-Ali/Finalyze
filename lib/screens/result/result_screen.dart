@@ -302,7 +302,7 @@ class ResultScreen extends StatelessWidget {
             children: [
               Text(
                 "${freshnessScore.toInt()}",
-                style: GoogleFonts.bebasNeue(
+                style: GoogleFonts.staatliches(
                   fontSize: 80,
                   color: Colors.white,
                   height: 1,
