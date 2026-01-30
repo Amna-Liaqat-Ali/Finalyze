@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fish_freshness_detection/screens/home/widgets/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,7 +36,10 @@ class HomeAppBar extends StatelessWidget {
                       _buildAppBarButton(
                         icon: Icons.settings_outlined,
                         onTap: () {
-                          print("Settings Tapped");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => SettingsScreen()),
+                          );
                         },
                       ),
                       const SizedBox(width: 12),
