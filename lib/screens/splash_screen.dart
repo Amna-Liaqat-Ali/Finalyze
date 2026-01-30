@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:fish_freshness_detection/screens/onboarding/onboarding_screen.dart';
+import 'package:fish_freshness_detection/auth/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
@@ -41,12 +41,12 @@ class _SplashScreenState extends State<SplashScreen> {
       setState(() => _startAnimation = true);
     });
 
-    Timer(const Duration(seconds: 8), () {
+    Timer(const Duration(seconds: 5), () {
       _videoController.pause();
       _audioPlayer.stop();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
       );
     });
   }
