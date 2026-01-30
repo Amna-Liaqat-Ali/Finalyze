@@ -7,7 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class WelcomeScreen extends StatelessWidget {
   final VoidCallback onSignIn;
-  const WelcomeScreen({super.key, required this.onSignIn});
+  final VoidCallback onSignUp;
+
+  const WelcomeScreen({
+    super.key,
+    required this.onSignIn,
+    required this.onSignUp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,12 +100,7 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Center(
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => SignupScreen()),
-                        );
-                      },
+                      onTap: onSignUp,
                       child: Text(
                         "Create an account",
                         style: TextStyle(
@@ -129,17 +130,27 @@ class AuthWrapper extends StatefulWidget {
 class _AuthWrapperState extends State<AuthWrapper> {
   final PageController _controller = PageController();
 
-  void _nextPage() {
-    _controller.nextPage(
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOutQuart,
+  void _goToWelcome() {
+    _controller.animateToPage(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 
-  void _prevPage() {
-    _controller.previousPage(
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOutQuart,
+  void _goToLogin() {
+    _controller.animateToPage(
+      1,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _goToRegister() {
+    _controller.animateToPage(
+      2,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 
@@ -148,12 +159,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
     return Scaffold(
       body: PageView(
         controller: _controller,
-        scrollDirection: Axis.vertical, // This creates the "Go Up" effect
-        physics:
-            const NeverScrollableScrollPhysics(), // Only allows button-triggered transitions
+        scrollDirection: Axis.vertical,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
-          WelcomeScreen(onSignIn: _nextPage),
-          LoginScreen(onBack: _prevPage),
+          WelcomeScreen(onSignIn: _goToLogin, onSignUp: _goToRegister),
+
+          LoginScreen(onBack: _goToWelcome),
+
+          RegisterScreen(onBack: _goToWelcome, onLoginTap: _goToLogin),
         ],
       ),
     );
