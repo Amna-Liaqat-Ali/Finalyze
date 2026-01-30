@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../about/about_screen.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -53,6 +55,11 @@ class SettingsScreen extends StatelessWidget {
                       child: const CircleAvatar(
                         radius: 30,
                         backgroundColor: Colors.white10,
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.white54,
+                          size: 30,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -91,11 +98,13 @@ class SettingsScreen extends StatelessWidget {
                 Icons.person_outline,
                 "Edit Profile",
                 "Change your name & email",
+                onTap: () {},
               ),
               _buildSettingItem(
                 Icons.history,
                 "Scan History",
                 "Manage your past analyses",
+                onTap: () {},
               ),
             ]),
 
@@ -128,18 +137,29 @@ class SettingsScreen extends StatelessWidget {
                 Icons.help_outline,
                 "Help Center",
                 "FAQs and guides",
+                onTap: () {},
               ),
               _buildSettingItem(
                 Icons.info_outline,
                 "About Finalyze",
                 "Version 1.0.2",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AboutScreen(),
+                    ),
+                  );
+                },
               ),
             ]),
 
             const SizedBox(height: 20),
             Center(
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Logout Logic
+                },
                 child: const Text(
                   "Log Out",
                   style: TextStyle(
@@ -192,6 +212,7 @@ class SettingsScreen extends StatelessWidget {
     String title,
     String subtitle, {
     Widget? trailing,
+    VoidCallback? onTap,
   }) {
     return ListTile(
       leading: Container(
@@ -221,7 +242,7 @@ class SettingsScreen extends StatelessWidget {
             color: Colors.white.withOpacity(0.3),
             size: 18,
           ),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }
