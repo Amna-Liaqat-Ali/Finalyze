@@ -25,12 +25,11 @@ class RegisterScreen extends StatelessWidget {
           child: IntrinsicHeight(
             child: Stack(
               children: [
-                // 1. Cinematic Background
                 Positioned.fill(
                   child: Opacity(
                     opacity: 0.6,
                     child: Image.asset(
-                      'assets/images/welcome_bg.jpeg',
+                      'assets/images/bg1.jpeg',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -176,6 +175,46 @@ class RegisterScreen extends StatelessWidget {
                           ),
                         ),
 
+                        const SizedBox(height: 30),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.white.withOpacity(0.1),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              child: Text(
+                                "Or sign up with",
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.4),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.white.withOpacity(0.1),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildSocialButton(Icons.g_mobiledata),
+                            const SizedBox(width: 20),
+                            _buildSocialButton(Icons.apple),
+                            const SizedBox(width: 20),
+                            _buildSocialButton(Icons.facebook),
+                          ],
+                        ),
+
                         const Spacer(flex: 2),
 
                         Center(
@@ -225,6 +264,34 @@ class RegisterScreen extends StatelessWidget {
           border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton(IconData icon) {
+    return Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(50),
+          onTap: () {},
+          splashColor: Colors.cyanAccent.withOpacity(0.1),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
       ),
     );
   }

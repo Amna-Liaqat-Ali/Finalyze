@@ -5,7 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatelessWidget {
   final VoidCallback onBack;
-  const LoginScreen({super.key, required this.onBack});
+  final VoidCallback onRegisterTap;
+
+  const LoginScreen({
+    super.key,
+    required this.onBack,
+    required this.onRegisterTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +22,12 @@ class LoginScreen extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
+              // 1. Background Image
               Positioned.fill(
                 child: Opacity(
                   opacity: 0.6,
                   child: Image.asset(
-                    'assets/images/welcome_bg.jpeg',
+                    'assets/images/bg1.jpeg',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -63,7 +70,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        "Verify\n Freshness",
+                        "Verify\nFreshness",
                         style: GoogleFonts.poppins(
                           fontSize: 42,
                           color: Colors.white,
@@ -145,7 +152,6 @@ class LoginScreen extends StatelessWidget {
                                           style: GoogleFonts.lexend(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            // Text matches the glowing border
                                             color: Colors.cyanAccent,
                                             letterSpacing: 2,
                                           ),
@@ -160,18 +166,83 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
 
+                      const SizedBox(height: 30),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: Colors.white.withOpacity(0.1),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(
+                              "Or continue with",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.4),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: Colors.white.withOpacity(0.1),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildSocialButton(Icons.g_mobiledata), // Google
+                          const SizedBox(width: 20),
+                          _buildSocialButton(Icons.apple), // Apple
+                          const SizedBox(width: 20),
+                          _buildSocialButton(Icons.facebook), // Facebook
+                        ],
+                      ),
+
                       const Spacer(flex: 2),
 
                       Center(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            "Recover Credentials",
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.4),
-                              fontSize: 12,
+                        child: Column(
+                          children: [
+                            TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                "Recover Credentials",
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.4),
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
-                          ),
+                            TextButton(
+                              onPressed: onRegisterTap,
+                              child: RichText(
+                                text: TextSpan(
+                                  text: "Don't have an account? ",
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.4),
+                                    fontSize: 12,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: "Register",
+                                      style: TextStyle(
+                                        color: Colors.cyanAccent.withOpacity(
+                                          0.8,
+                                        ),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -197,6 +268,34 @@ class LoginScreen extends StatelessWidget {
           border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton(IconData icon) {
+    return Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(50),
+          onTap: () {},
+          splashColor: Colors.cyanAccent.withOpacity(0.1),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
       ),
     );
   }

@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/welcome_bg.jpeg'),
+                image: AssetImage('assets/images/bg1.jpeg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -164,8 +164,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         children: [
           WelcomeScreen(onSignIn: _goToLogin, onSignUp: _goToRegister),
 
-          LoginScreen(onBack: _goToWelcome),
-
+          LoginScreen(onBack: _goToWelcome, onRegisterTap: _goToRegister),
           RegisterScreen(onBack: _goToWelcome, onLoginTap: _goToLogin),
         ],
       ),
