@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:fish_freshness_detection/auth/screens/login_screen.dart';
+import 'package:fish_freshness_detection/auth/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+  final VoidCallback onSignIn;
+  const WelcomeScreen({super.key, required this.onSignIn});
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +18,7 @@ class WelcomeScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                  'assets/images/welcome_bg.jpeg',
-                ), // Your specific path
+                image: AssetImage('assets/images/welcome_bg.jpeg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -76,12 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         ),
                         child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => LoginScreen()),
-                            );
-                          },
+                          onTap: onSignIn,
                           child: Center(
                             child: Text(
                               "Sign in",
@@ -100,7 +95,10 @@ class WelcomeScreen extends StatelessWidget {
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        // Navigate to RegisterScreen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => SignupScreen()),
+                        );
                       },
                       child: Text(
                         "Create an account",
@@ -115,6 +113,47 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  final PageController _controller = PageController();
+
+  void _nextPage() {
+    _controller.nextPage(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutQuart,
+    );
+  }
+
+  void _prevPage() {
+    _controller.previousPage(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutQuart,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PageView(
+        controller: _controller,
+        scrollDirection: Axis.vertical, // This creates the "Go Up" effect
+        physics:
+            const NeverScrollableScrollPhysics(), // Only allows button-triggered transitions
+        children: [
+          WelcomeScreen(onSignIn: _nextPage),
+          LoginScreen(onBack: _prevPage),
         ],
       ),
     );

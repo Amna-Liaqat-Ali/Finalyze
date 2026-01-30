@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
       _audioPlayer.stop();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        MaterialPageRoute(builder: (context) => const AuthWrapper()),
       );
     });
   }
