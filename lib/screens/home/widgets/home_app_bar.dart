@@ -19,33 +19,33 @@ class HomeAppBar extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(30),
-              ),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
               color: Color(0xFF0D2B45),
             ),
           ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  // Notification Icon
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      _buildAppBarButton(
+                        icon: Icons.settings_outlined,
+                        onTap: () {
+                          print("Settings Tapped");
+                        },
                       ),
-                      child: const Icon(
-                        Icons.notifications_none_rounded,
-                        color: Colors.white,
+                      const SizedBox(width: 12),
+                      _buildAppBarButton(
+                        icon: Icons.notifications_none_rounded,
+                        onTap: () {
+                          print("Notifications Tapped");
+                        },
                       ),
-                    ),
+                    ],
                   ),
 
                   const Spacer(),
@@ -114,6 +114,23 @@ class HomeAppBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAppBarButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
       ),
     );
   }
