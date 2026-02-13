@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:fish_freshness_detection/screens/species/widgets/species_slider.dart';
+import 'package:Finalyze/screens/species/widgets/species_slider.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/image_picker_helper.dart';

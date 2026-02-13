@@ -1,4 +1,4 @@
-import 'package:fish_freshness_detection/screens/splash_screen.dart';
+import 'package:Finalyze/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:fish_freshness_detection/screens/home/widgets/settings_screen.dart';
+import 'package:Finalyze/screens/home/widgets/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

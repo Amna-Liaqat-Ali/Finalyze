@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:Finalyze/auth/screens/welcome_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:fish_freshness_detection/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
       _audioPlayer.stop();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+        MaterialPageRoute(builder: (context) => const AuthWrapper()),
       );
     });
   }

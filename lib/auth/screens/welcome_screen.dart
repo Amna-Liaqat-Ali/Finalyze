@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:fish_freshness_detection/auth/screens/login_screen.dart';
-import 'package:fish_freshness_detection/auth/screens/signup_screen.dart';
+import 'package:Finalyze/auth/screens/login_screen.dart';
+import 'package:Finalyze/auth/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

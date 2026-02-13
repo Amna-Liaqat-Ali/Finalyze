@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:fish_freshness_detection/screens/Main/main_screen.dart';
+import 'package:Finalyze/screens/Main/main_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/colors.dart';
