@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:Finalyze/auth/screens/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   final VoidCallback onBack;
   final VoidCallback onLoginTap;
 
@@ -12,6 +14,71 @@ class RegisterScreen extends StatelessWidget {
     required this.onBack,
     required this.onLoginTap,
   });
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  // logic to connect to Node.js backend
+  Future<void> _handleRegister() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      _showSnackBar("Please fill in all fields", Colors.orangeAccent);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await AuthService.register(name, email, password);
+
+      if (response.statusCode == 201) {
+        _showSnackBar(
+          "Registration successful! Please login.",
+          Colors.greenAccent,
+        );
+        // Navigate back to login screen after a short delay
+        Future.delayed(const Duration(seconds: 1), () => widget.onLoginTap());
+      } else {
+        final data = jsonDecode(response.body);
+        _showSnackBar(
+          data['message'] ?? "Registration failed",
+          Colors.redAccent,
+        );
+      }
+    } catch (e) {
+      _showSnackBar(
+        "Connection error. Is your server running?",
+        Colors.redAccent,
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +92,7 @@ class RegisterScreen extends StatelessWidget {
           child: IntrinsicHeight(
             child: Stack(
               children: [
+                // Background layers
                 Positioned.fill(
                   child: Opacity(
                     opacity: 0.6,
@@ -34,7 +102,6 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -57,10 +124,8 @@ class RegisterScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20),
-                        _buildBackButton(onBack),
-
+                        _buildBackButton(widget.onBack),
                         const Spacer(flex: 1),
-
                         Text(
                           "NEW MEMBER",
                           style: GoogleFonts.lexend(
@@ -80,9 +145,9 @@ class RegisterScreen extends StatelessWidget {
                             height: 1.1,
                           ),
                         ),
-
                         const SizedBox(height: 30),
 
+                        // Input Card
                         ClipRRect(
                           borderRadius: BorderRadius.circular(24),
                           child: BackdropFilter(
@@ -96,76 +161,65 @@ class RegisterScreen extends StatelessWidget {
                                   color: Colors.cyanAccent.withOpacity(0.15),
                                   width: 1,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 30,
-                                    spreadRadius: 5,
-                                  ),
-                                ],
                               ),
                               child: Column(
                                 children: [
                                   _buildDarkInput(
                                     "Full Name",
                                     Icons.person_outline_rounded,
+                                    _nameController,
                                   ),
                                   const SizedBox(height: 20),
                                   _buildDarkInput(
                                     "Email Address",
                                     Icons.alternate_email_rounded,
+                                    _emailController,
                                   ),
                                   const SizedBox(height: 20),
                                   _buildDarkInput(
                                     "Password",
                                     Icons.fingerprint_rounded,
+                                    _passwordController,
                                     isPassword: true,
                                   ),
-
                                   const SizedBox(height: 30),
 
-                                  Container(
-                                    width: double.infinity,
-                                    height: 55,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      color: Colors.white.withOpacity(0.05),
-                                      border: Border.all(
-                                        color: Colors.cyanAccent.withOpacity(
-                                          0.5,
-                                        ),
-                                        width: 1.5,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.cyanAccent.withOpacity(
-                                            0.15,
-                                          ),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
+                                  // Register Button
+                                  GestureDetector(
+                                    onTap: _isLoading ? null : _handleRegister,
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 55,
+                                      decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(16),
-                                        onTap: () {},
-                                        splashColor: Colors.cyanAccent
-                                            .withOpacity(0.2),
-                                        highlightColor: Colors.cyanAccent
-                                            .withOpacity(0.1),
-                                        child: Center(
-                                          child: Text(
-                                            "Register",
-                                            style: GoogleFonts.lexend(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.cyanAccent,
-                                              letterSpacing: 2,
-                                            ),
+                                        color: Colors.white.withOpacity(0.05),
+                                        border: Border.all(
+                                          color: Colors.cyanAccent.withOpacity(
+                                            0.5,
                                           ),
+                                          width: 1.5,
                                         ),
+                                      ),
+                                      child: Center(
+                                        child: _isLoading
+                                            ? const SizedBox(
+                                                height: 20,
+                                                width: 20,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      color: Colors.cyanAccent,
+                                                      strokeWidth: 2,
+                                                    ),
+                                              )
+                                            : Text(
+                                                "Register",
+                                                style: GoogleFonts.lexend(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.cyanAccent,
+                                                  letterSpacing: 2,
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ),
@@ -175,51 +229,10 @@ class RegisterScreen extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(height: 30),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Colors.white.withOpacity(0.1),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                              child: Text(
-                                "Or sign up with",
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.4),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.white.withOpacity(0.1),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildSocialButton(Icons.g_mobiledata),
-                            const SizedBox(width: 20),
-                            _buildSocialButton(Icons.apple),
-                            const SizedBox(width: 20),
-                            _buildSocialButton(Icons.facebook),
-                          ],
-                        ),
-
                         const Spacer(flex: 2),
-
                         Center(
                           child: TextButton(
-                            onPressed: onLoginTap,
+                            onPressed: widget.onLoginTap,
                             child: RichText(
                               text: TextSpan(
                                 text: "Already have an account? ",
@@ -253,6 +266,40 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDarkInput(
+    String hint,
+    IconData icon,
+    TextEditingController controller, {
+    bool isPassword = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword,
+        style: const TextStyle(color: Colors.white, fontSize: 15),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 18,
+          ),
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+          prefixIcon: Icon(
+            icon,
+            color: Colors.white.withOpacity(0.6),
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBackButton(VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -261,82 +308,9 @@ class RegisterScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
       ),
-    );
-  }
-
-  Widget _buildSocialButton(IconData icon) {
-    return Container(
-      height: 50,
-      width: 50,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(50),
-          onTap: () {},
-          splashColor: Colors.cyanAccent.withOpacity(0.1),
-          child: Icon(icon, color: Colors.white, size: 24),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDarkInput(
-    String hint,
-    IconData icon, {
-    bool isPassword = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
-          ),
-          child: TextField(
-            obscureText: isPassword,
-            style: const TextStyle(color: Colors.white, fontSize: 15),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 18,
-              ),
-              hintText: hint,
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-              prefixIcon: Icon(
-                icon,
-                color: Colors.white.withOpacity(0.6),
-                size: 20,
-              ),
-              suffixIcon: isPassword
-                  ? Icon(
-                      Icons.remove_red_eye_outlined,
-                      color: Colors.white.withOpacity(0.2),
-                      size: 18,
-                    )
-                  : null,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
