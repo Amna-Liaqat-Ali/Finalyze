@@ -5,14 +5,18 @@ import 'package:Finalyze/auth/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../screens/onboarding/onboarding_screen.dart';
+
 class WelcomeScreen extends StatelessWidget {
   final VoidCallback onSignIn;
   final VoidCallback onSignUp;
+  final VoidCallback onGuest;
 
   const WelcomeScreen({
     super.key,
     required this.onSignIn,
     required this.onSignUp,
+    required this.onGuest,
   });
 
   @override
@@ -110,6 +114,20 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 15),
+                  Center(
+                    child: GestureDetector(
+                      onTap: onGuest,
+                      child: Text(
+                        "Continue without an account",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -154,6 +172,17 @@ class _AuthWrapperState extends State<AuthWrapper> {
     );
   }
 
+  void _goToGuest() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, animation, __) => const OnboardingScreen(),
+        transitionsBuilder: (_, animation, __, child) =>
+            FadeTransition(opacity: animation, child: child),
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,7 +191,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
         scrollDirection: Axis.vertical,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          WelcomeScreen(onSignIn: _goToLogin, onSignUp: _goToRegister),
+          WelcomeScreen(
+            onSignIn: _goToLogin,
+            onSignUp: _goToRegister,
+            onGuest: _goToGuest,
+          ),
 
           LoginScreen(onBack: _goToWelcome, onRegisterTap: _goToRegister),
           RegisterScreen(onBack: _goToWelcome, onLoginTap: _goToLogin),
