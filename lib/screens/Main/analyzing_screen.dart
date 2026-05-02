@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../result/result_screen.dart';
 
@@ -21,11 +21,11 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
   int _stepIndex = 0;
 
   final List<String> _progressSteps = const [
-    "Preparing image",
-    "Extracting visual features",
-    "Running AI freshness model",
-    "Calculating confidence score",
-    "Finalizing result",
+    "Preparing image...",
+    "Extracting visual features...",
+    "Running AI freshness model...",
+    "Calculating confidence score...",
+    "Finalizing result...",
   ];
 
   @override
@@ -34,16 +34,15 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat();
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true); // Pulse effect
 
     _startAnalysis();
   }
 
   Future<void> _startAnalysis() async {
-    // Simulate the 5 steps of analysis
     for (int i = 0; i < _progressSteps.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1200));
       if (!mounted) return;
       setState(() => _stepIndex = i);
     }
@@ -55,8 +54,8 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
       MaterialPageRoute(
         builder: (_) => ResultScreen(
           image: widget.image,
-          freshnessScore: 95.0, // Example data
-          confidence: 98.0,
+          freshnessScore: 95.0,
+          confidence: 98.4,
           status: "Fresh",
         ),
       ),
@@ -72,123 +71,136 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
   @override
   Widget build(BuildContext context) {
     final double progressValue = (_stepIndex + 1) / _progressSteps.length;
+    const primaryBlue = Color(0xFF1A5694);
+    const accentTeal = Color(0xFF2CB88E);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0D2B45), Color(0xFF163E5F), Color(0xFF005C7A)],
-            stops: [0.1, 0.5, 0.9],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
+      backgroundColor: Colors.white,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return Stack(
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      height: 160,
-                      width: 160,
+                      height: 180,
+                      width: 180,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(
+                        color: accentTeal.withOpacity(
                           0.05 + (_controller.value * 0.05),
                         ),
                       ),
                     ),
-                    // Progress Indicator
                     SizedBox(
-                      height: 140,
-                      width: 140,
+                      height: 160,
+                      width: 160,
                       child: CircularProgressIndicator(
                         value: progressValue,
                         strokeWidth: 8,
                         strokeCap: StrokeCap.round,
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        backgroundColor: Colors.grey.shade100,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          Colors.cyanAccent,
+                          accentTeal,
                         ),
                       ),
                     ),
-                    Transform.rotate(
-                      angle: math.sin(_controller.value * 2 * math.pi) * 0.15,
-                      child: const Text("🐟", style: TextStyle(fontSize: 55)),
+                    Container(
+                      height: 110,
+                      width: 110,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 15,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Transform.scale(
+                          scale: 1.0 + (_controller.value * 0.1),
+                          child: const Text(
+                            "🐟",
+                            style: TextStyle(fontSize: 50),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 );
               },
             ),
+          ),
 
-            const SizedBox(height: 50),
+          const SizedBox(height: 50),
 
-            const Text(
-              "Analyzing Fish...",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
+          Text(
+            "Analyzing Freshness",
+            style: GoogleFonts.poppins(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: primaryBlue,
             ),
-            const SizedBox(height: 10),
-            Text(
-              "AI is detecting freshness features",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withOpacity(0.8),
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Our AI is inspecting details...",
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.blueGrey.shade300,
             ),
+          ),
 
-            const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.grey.shade100),
+            ),
+            child: Row(
               children: [
-                FadeTransition(
-                  opacity: _controller,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.cyanAccent,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: Colors.cyanAccent, blurRadius: 6),
-                      ],
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(accentTeal),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Text(
+                    _progressSteps[_stepIndex],
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: primaryBlue.withOpacity(0.7),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  transitionBuilder: (child, animation) => FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.2),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  ),
-                  child: Text(
-                    _progressSteps[_stepIndex],
-                    key: ValueKey(_progressSteps[_stepIndex]),
-                    style: const TextStyle(fontSize: 15, color: Colors.white70),
+                Text(
+                  "${(progressValue * 100).toInt()}%",
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: accentTeal,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

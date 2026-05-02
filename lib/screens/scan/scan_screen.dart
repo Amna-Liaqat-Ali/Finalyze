@@ -1,492 +1,310 @@
 import 'dart:io';
-import 'dart:ui';
 
+import 'package:Finalyze/screens/home/widgets/settings_screen.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// --- IMPORTS ---
-import '../../utils/image_picker_helper.dart';
-import '../Main/analyzing_screen.dart'; // Import the Analyze Screen
+import '../result/review_screen.dart';
 
 class ScanScreen extends StatefulWidget {
-  final File? image;
-
-  const ScanScreen({super.key, this.image});
+  final List<CameraDescription> cameras;
+  const ScanScreen({super.key, required this.cameras});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen> {
-  File? _displayImage;
-  bool isEnhancing = false;
+class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
+  CameraController? _controller;
+  bool _isInitialized = false;
+  bool _isFlashOn = false;
 
   @override
   void initState() {
     super.initState();
-    _displayImage = widget.image;
+    WidgetsBinding.instance.addObserver(this);
+    if (widget.cameras.isNotEmpty) {
+      _initCamera(widget.cameras.first);
+    }
   }
 
-  Future<void> _launchCamera() async {
-    final pickedFile = await ImagePickerHelper.pickFromCamera();
-    if (pickedFile != null) {
-      setState(() {
-        _displayImage = pickedFile;
-      });
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final CameraController? cameraController = _controller;
+    if (cameraController == null || !cameraController.value.isInitialized)
+      return;
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      cameraController.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      _initCamera(cameraController.description);
+    }
+  }
+
+  Future<void> _initCamera(CameraDescription cameraDescription) async {
+    if (_controller != null) await _controller!.dispose();
+    _controller = CameraController(
+      cameraDescription,
+      ResolutionPreset.high,
+      enableAudio: false,
+    );
+    try {
+      await _controller!.initialize();
+    } catch (e) {
+      debugPrint('Camera init error: $e');
+    }
+    if (!mounted) return;
+    setState(() => _isInitialized = _controller!.value.isInitialized);
+  }
+
+  Future<void> _takePicture() async {
+    if (_controller == null ||
+        !_controller!.value.isInitialized ||
+        _controller!.value.isTakingPicture)
+      return;
+
+    try {
+      final XFile photo = await _controller!.takePicture();
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ReviewScreen(image: File(photo.path)),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Capture Error: $e");
+    }
+  }
+
+  Future<void> _toggleFlash() async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
+    try {
+      if (_isFlashOn) {
+        await _controller!.setFlashMode(FlashMode.off);
+      } else {
+        await _controller!.setFlashMode(FlashMode.torch);
+      }
+      setState(() => _isFlashOn = !_isFlashOn);
+    } catch (e) {
+      debugPrint("Flash Mode Error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_displayImage == null) {
-      return _buildEmptyScanState();
-    }
-
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            if (widget.image != null && Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              setState(() {
-                _displayImage = null;
-              });
-            }
-          },
+      backgroundColor: Colors.black,
+      appBar: _buildDecentAppBar(),
+      body: Stack(
+        children: [
+          _isInitialized
+              ? SizedBox.expand(child: CameraPreview(_controller!))
+              : const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+
+          _buildViewFinderOverlay(),
+          _buildBottomControls(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildViewFinderOverlay() {
+    final frameSize = MediaQuery.of(context).size.width * 0.75;
+    const tealFrameColor = Color(0xFF4EE3AA);
+
+    return Center(
+      child: SizedBox(
+        width: frameSize,
+        height: frameSize,
+        child: Stack(
+          children: [
+            _corner(top: 0, left: 0, rot: 0, color: tealFrameColor),
+            _corner(top: 0, right: 0, rot: 1.57, color: tealFrameColor),
+            _corner(bottom: 0, left: 0, rot: 4.71, color: tealFrameColor),
+            _corner(bottom: 0, right: 0, rot: 3.14, color: tealFrameColor),
+
+            Center(
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: tealFrameColor.withOpacity(0.8),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: tealFrameColor.withOpacity(0.5),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-        title: Text(
-          "Review Capture",
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+      ),
+    );
+  }
+
+  Widget _buildBottomControls() {
+    return Positioned(
+      bottom: 40,
+      left: 0,
+      right: 0,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: _toggleFlash,
+                child: _controlIcon(
+                  _isFlashOn ? Icons.flash_on : Icons.flash_off,
+                  isActive: _isFlashOn,
+                ),
+              ),
+              const SizedBox(width: 20),
+              _statusChip("AI READY"),
+              const SizedBox(width: 20),
+              _controlIcon(Icons.hd),
+            ],
           ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
-            onPressed: () {},
+          const SizedBox(height: 30),
+          GestureDetector(
+            onTap: _takePicture,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 80,
+              width: 80,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF006D77),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+            ),
           ),
         ],
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0D2B45), Color(0xFF163E5F), Color(0xFF005C7A)],
-            stops: [0.1, 0.5, 0.9],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-
-              // 1. IMAGE PREVIEW
-              Expanded(
-                flex: 5,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 25,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.file(_displayImage!, fit: BoxFit.cover),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: 100,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.8),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 20,
-                          left: 20,
-                          child: _glassBadge(Icons.hd_rounded, "High Res"),
-                        ),
-                        Positioned(
-                          top: 20,
-                          right: 20,
-                          child: _glassBadge(
-                            Icons.data_usage_rounded,
-                            "2.4 MB",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // 2. TOOLS PANEL (Scrollable)
-              Expanded(
-                flex: 4,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0D2B45).withOpacity(0.8),
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(30),
-                    ),
-                    border: Border(
-                      top: BorderSide(color: Colors.white.withOpacity(0.1)),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Quality Indicators
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _qualityIndicator(
-                              "Lighting",
-                              "Good",
-                              Colors.greenAccent,
-                            ),
-                            _verticalDivider(),
-                            _qualityIndicator(
-                              "Focus",
-                              "Sharp",
-                              Colors.greenAccent,
-                            ),
-                            _verticalDivider(),
-                            _qualityIndicator(
-                              "Glare",
-                              "None",
-                              Colors.cyanAccent,
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-                        Divider(color: Colors.white.withOpacity(0.1)),
-                        const SizedBox(height: 16),
-
-                        // Tools
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _toolButton(Icons.crop_rotate_rounded, "Crop"),
-                            _toolButton(Icons.tune_rounded, "Adjust"),
-                            _toolButton(
-                              Icons.auto_fix_high_rounded,
-                              "Enhance",
-                              isActive: isEnhancing,
-                              onTap: () =>
-                                  setState(() => isEnhancing = !isEnhancing),
-                            ),
-                            _toolButton(
-                              Icons.delete_outline_rounded,
-                              "Discard",
-                              isDestructive: true,
-                              onTap: () {
-                                if (widget.image != null &&
-                                    Navigator.canPop(context)) {
-                                  Navigator.pop(context);
-                                } else {
-                                  setState(() => _displayImage = null);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 30),
-
-                        // Action Buttons
-                        Row(
-                          children: [
-                            // RETAKE BUTTON
-                            Expanded(
-                              flex: 1,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  if (widget.image != null &&
-                                      Navigator.canPop(context)) {
-                                    Navigator.pop(context);
-                                  } else {
-                                    _launchCamera();
-                                  }
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  side: BorderSide(
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                child: Text(
-                                  "Retake",
-                                  style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-
-                            // ANALYZE BUTTON (Updated)
-                            Expanded(
-                              flex: 2,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFF00B4D8),
-                                      Color(0xFF0077B6),
-                                    ],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFF00B4D8,
-                                      ).withOpacity(0.4),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Navigate to Analyzing Screen
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => AnalyzingScreen(
-                                          image: _displayImage!,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.analytics_outlined,
-                                        color: Colors.white,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        "Start Analysis",
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
-  // Helper Widgets (Same as before)
-  Widget _buildEmptyScanState() {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D2B45),
-      body: Center(
-        child: GestureDetector(
-          onTap: _launchCamera,
-          child: Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              color: const Color(0xFF163E5F),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF00B4D8).withOpacity(0.3),
-                  blurRadius: 40,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.camera_alt_rounded,
-                  color: Colors.white,
-                  size: 60,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  "Tap to Scan",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
+  PreferredSizeWidget _buildDecentAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.settings_outlined),
+        color: const Color(0xFF1A5694),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
+          );
+        },
+      ),
+      title: Text(
+        "Finalyze",
+        style: GoogleFonts.poppins(
+          color: const Color(0xFF1A5694),
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
         ),
       ),
-    );
-  }
-
-  Widget _glassBadge(IconData icon, String text) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: Colors.white70, size: 14),
-              const SizedBox(width: 6),
-              Text(
-                text,
-                style: GoogleFonts.poppins(color: Colors.white, fontSize: 11),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _qualityIndicator(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            color: color,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: GoogleFonts.poppins(color: Colors.white60, fontSize: 11),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_none_outlined),
+          color: const Color(0xFF1A5694),
+          onPressed: () {},
         ),
       ],
     );
   }
 
-  Widget _verticalDivider() =>
-      Container(height: 25, width: 1, color: Colors.white.withOpacity(0.1));
-
-  Widget _toolButton(
-    IconData icon,
-    String label, {
-    bool isDestructive = false,
-    bool isActive = false,
-    VoidCallback? onTap,
+  Widget _corner({
+    double? top,
+    double? bottom,
+    double? left,
+    double? right,
+    required double rot,
+    required Color color,
   }) {
-    final color = isDestructive
-        ? Colors.redAccent
-        : (isActive ? Colors.cyanAccent : Colors.white);
-    return InkWell(
-      onTap: onTap ?? () {},
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? Colors.cyanAccent.withOpacity(0.2)
-                  : Colors.white.withOpacity(0.05),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isActive ? Colors.cyanAccent : Colors.transparent,
-              ),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              color: color.withOpacity(0.8),
-              fontSize: 11,
+    return Positioned(
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
+      child: Transform.rotate(
+        angle: rot,
+        child: Container(
+          width: 35,
+          height: 35,
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: color, width: 4),
+              left: BorderSide(color: color, width: 4),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
+
+  Widget _controlIcon(IconData icon, {bool isActive = false}) => Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: isActive ? Colors.white.withOpacity(0.3) : Colors.black26,
+      shape: BoxShape.circle,
+      border: Border.all(color: Colors.white24),
+    ),
+    child: Icon(icon, color: Colors.white, size: 20),
+  );
+
+  Widget _statusChip(String text) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+      color: Colors.black26,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white24),
+    ),
+    child: Row(
+      children: [
+        const CircleAvatar(backgroundColor: Color(0xFF4EE3AA), radius: 4),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    ),
+  );
 }

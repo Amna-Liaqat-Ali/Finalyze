@@ -8,9 +8,9 @@ class AppColors {
     colors: [Color(0xFF1E5FA3), Color(0xFF0891B2), Color(0xFF2ECC9A)],
   );
   static const Color accentGreen = Color(0xFFB6E700);
-  static const Color primary = Color(0xFF1E5FA3);
-  static const Color secondary = Color(0xFF2ECC9A);
-  static const Color accent = Color(0xFF2BB0E6);
+  static const primary = Color(0xFF1E5FA3);
+  static const secondary = Color(0xFF2BB0E6);
+  static const accent = Color(0xFF2ECC9A);
 
   static const Color background = Color(0xFFF5FAFF);
   static const Color card = Colors.white;
@@ -28,4 +28,15 @@ class AppColors {
 
   static const white = Colors.white;
   static const success = Color(0xFF22C55E);
+
+  static const textPrimary = Color(0xFF1A1A1A);
+  static const textSecondary = Color(0xFF6B7280);
+
+  static const border = Color(0xFFE5E7EB);
+
+  static const gradient = LinearGradient(
+    colors: [accent, primary],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

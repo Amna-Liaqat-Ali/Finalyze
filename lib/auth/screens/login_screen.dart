@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:Finalyze/auth/screens/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../auth/screens/services/auth_service.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,7 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  // Logic to handle authentication with Node.js
+  static const primaryBlue = Color(0xFF1A5694);
+
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -42,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await AuthService.login(email, password);
-      final data = jsonDecode(response.body);
+      final Map<String, dynamic> data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         if (!mounted) return;
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Login Successful!"),
-            backgroundColor: Colors.green,
+            backgroundColor: Color(0xFF2CB88E),
             duration: Duration(milliseconds: 800),
           ),
         );
@@ -88,25 +89,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF05111A),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              // Background Image
               Positioned.fill(
                 child: Opacity(
-                  opacity: 0.6,
+                  opacity: 0.85,
                   child: Image.asset(
                     'assets/images/bg1.jpeg',
                     fit: BoxFit.cover,
@@ -114,16 +107,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              // Gradient Overlay
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
+                      stops: const [0.0, 0.8],
                       colors: [
-                        Colors.black.withOpacity(0.3),
-                        const Color(0xFF05111A).withOpacity(0.9),
+                        Colors.transparent,
+                        Colors.white.withOpacity(0.6),
                       ],
                     ),
                   ),
@@ -145,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         "FINALYZE",
                         style: GoogleFonts.lexend(
                           fontSize: 14,
-                          color: Colors.cyanAccent,
+                          color: primaryBlue,
                           letterSpacing: 8,
                           fontWeight: FontWeight.w600,
                         ),
@@ -155,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         "Verify\nFreshness",
                         style: GoogleFonts.poppins(
                           fontSize: 42,
-                          color: Colors.white,
+                          color: primaryBlue,
                           fontWeight: FontWeight.bold,
                           height: 1.1,
                         ),
@@ -163,39 +156,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 40),
 
-                      // Glassmorphism Login Card
                       ClipRRect(
                         borderRadius: BorderRadius.circular(24),
                         child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                           child: Container(
                             padding: const EdgeInsets.all(28),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0D2B45).withOpacity(0.4),
+                              color: Colors.white.withOpacity(
+                                0.3,
+                              ), // Lowered opacity
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
-                                color: Colors.cyanAccent.withOpacity(0.15),
-                                width: 1,
+                                color: Colors.white.withOpacity(0.4),
+                                width: 1.5,
                               ),
                             ),
                             child: Column(
                               children: [
-                                _buildDarkInput(
+                                _buildLightInput(
                                   "Email Address",
                                   Icons.alternate_email_rounded,
                                   _emailController,
                                 ),
                                 const SizedBox(height: 20),
-                                _buildDarkInput(
+                                _buildLightInput(
                                   "Password",
                                   Icons.fingerprint_rounded,
                                   _passwordController,
                                   isPassword: true,
                                 ),
-
                                 const SizedBox(height: 30),
 
-                                // Updated Login Button with Loading State
                                 InkWell(
                                   onTap: _isLoading ? null : _handleLogin,
                                   borderRadius: BorderRadius.circular(16),
@@ -204,13 +196,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 55,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(16),
-                                      color: Colors.white.withOpacity(0.05),
-                                      border: Border.all(
-                                        color: Colors.cyanAccent.withOpacity(
-                                          0.5,
+                                      color: primaryBlue,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryBlue.withOpacity(0.2),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
                                         ),
-                                        width: 1.5,
-                                      ),
+                                      ],
                                     ),
                                     child: Center(
                                       child: _isLoading
@@ -218,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               height: 20,
                                               width: 20,
                                               child: CircularProgressIndicator(
-                                                color: Colors.cyanAccent,
+                                                color: Colors.white,
                                                 strokeWidth: 2,
                                               ),
                                             )
@@ -227,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               style: GoogleFonts.lexend(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.cyanAccent,
+                                                color: Colors.white,
                                                 letterSpacing: 2,
                                               ),
                                             ),
@@ -243,32 +236,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Spacer(flex: 2),
 
                       Center(
-                        child: Column(
-                          children: [
-                            TextButton(
-                              onPressed: widget.onRegisterTap,
-                              child: RichText(
-                                text: TextSpan(
-                                  text: "Don't have an account? ",
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.4),
-                                    fontSize: 12,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: "Register",
-                                      style: TextStyle(
-                                        color: Colors.cyanAccent.withOpacity(
-                                          0.8,
-                                        ),
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                        child: TextButton(
+                          onPressed: widget.onRegisterTap,
+                          child: RichText(
+                            text: TextSpan(
+                              text: "Don't have an account? ",
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.7),
+                                fontSize: 13,
                               ),
+                              children: const [
+                                TextSpan(
+                                  text: "Register",
+                                  style: TextStyle(
+                                    color: primaryBlue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -289,16 +276,16 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withOpacity(0.4),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withOpacity(0.3)),
         ),
-        child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+        child: const Icon(Icons.arrow_back, color: primaryBlue, size: 20),
       ),
     );
   }
 
-  Widget _buildDarkInput(
+  Widget _buildLightInput(
     String hint,
     IconData icon,
     TextEditingController controller, {
@@ -306,14 +293,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.white.withOpacity(0.6),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withOpacity(0.4)),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword ? _obscurePassword : false,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
+        style: const TextStyle(color: primaryBlue, fontSize: 15),
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -321,17 +308,13 @@ class _LoginScreenState extends State<LoginScreen> {
             vertical: 18,
           ),
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-          prefixIcon: Icon(
-            icon,
-            color: Colors.white.withOpacity(0.6),
-            size: 20,
-          ),
+          hintStyle: TextStyle(color: primaryBlue.withOpacity(0.4)),
+          prefixIcon: Icon(icon, color: primaryBlue.withOpacity(0.7), size: 20),
           suffixIcon: isPassword
               ? IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.white.withOpacity(0.2),
+                    color: primaryBlue.withOpacity(0.4),
                     size: 18,
                   ),
                   onPressed: () =>

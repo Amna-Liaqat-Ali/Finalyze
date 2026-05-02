@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:Finalyze/screens/Main/main_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/colors.dart';
+import '../Main/MainScreen.dart';
 import 'onboarding_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -16,7 +16,6 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
-
   bool _animatePage = false;
 
   final List<Map<String, dynamic>> pages = [
@@ -49,9 +48,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-
     Timer(const Duration(milliseconds: 300), () {
-      setState(() => _animatePage = true);
+      if (mounted) setState(() => _animatePage = true);
     });
   }
 
@@ -69,28 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _finish() {
     Navigator.pushReplacement(
       context,
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 800),
-        pageBuilder: (_, animation, secondaryAnimation) => const MainScreen(),
-        transitionsBuilder: (_, animation, secondaryAnimation, child) {
-          final fade = Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-          );
-
-          final slide =
-              Tween<Offset>(
-                begin: const Offset(0, 0.3),
-                end: Offset.zero,
-              ).animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-              );
-
-          return FadeTransition(
-            opacity: fade,
-            child: SlideTransition(position: slide, child: child),
-          );
-        },
-      ),
+      MaterialPageRoute(builder: (context) => const MainScreen()),
     );
   }
 
@@ -103,9 +80,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Align(
               alignment: Alignment.topRight,
-              child: TextButton(onPressed: _finish, child: const Text("Skip")),
+              child: TextButton(
+                onPressed: _finish,
+                child: const Text("Skip", style: TextStyle(color: Colors.grey)),
+              ),
             ),
-
             Expanded(
               child: PageView.builder(
                 controller: _controller,
@@ -116,7 +95,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _animatePage = false;
                   });
                   Timer(const Duration(milliseconds: 200), () {
-                    setState(() => _animatePage = true);
+                    if (mounted) setState(() => _animatePage = true);
                   });
                 },
                 itemBuilder: (_, index) {
@@ -126,7 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     curve: Curves.easeIn,
                     child: AnimatedScale(
                       duration: const Duration(milliseconds: 600),
-                      scale: _animatePage ? 1.0 : 0.8,
+                      scale: _animatePage ? 1.0 : 0.9,
                       curve: Curves.easeOutBack,
                       child: OnboardingPage(
                         icon: pages[index]["icon"],
@@ -138,7 +117,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -150,16 +128,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: _currentIndex == index ? 24 : 8,
                   decoration: BoxDecoration(
                     color: _currentIndex == index
-                        ? AppColors.primary
+                        ? const Color(0xFF163E5F)
                         : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: SizedBox(
@@ -168,33 +144,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ElevatedButton(
                   onPressed: _next,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF163E5F),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: EdgeInsets.zero,
                   ),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      color: Color(0xFF163E5F),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _currentIndex == pages.length - 1
-                            ? "Get Started"
-                            : "Next",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  child: Text(
+                    _currentIndex == pages.length - 1 ? "Get Started" : "Next",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
             ),
-
             const SizedBox(height: 30),
           ],
         ),

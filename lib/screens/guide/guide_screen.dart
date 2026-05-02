@@ -1,244 +1,170 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'models/manual_model.dart';
-import 'models/step_model.dart';
-
 class GuideScreen extends StatelessWidget {
   const GuideScreen({super.key});
 
-  List<StepModel> get aiSteps => [
-    StepModel(
-      icon: Icons.wb_sunny_rounded,
-      title: 'Lighting',
-      description: 'Use bright, natural light. No shadows.',
-      color: const Color(0xFF00E676),
-    ),
-    StepModel(
-      icon: Icons.center_focus_strong_rounded,
-      title: 'Focus',
-      description: 'Tap to focus. Ensure details are sharp.',
-      color: const Color(0xFF00B4D8),
-    ),
-    StepModel(
-      icon: Icons.crop_free_rounded,
-      title: 'Framing',
-      description: 'Fill the frame. Fish should be centered.',
-      color: const Color(0xFFFFAB00),
-    ),
-    StepModel(
-      icon: Icons.cleaning_services_rounded,
-      title: 'Clean BG',
-      description: 'Place on a plain, solid surface.',
-      color: const Color(0xFFFF1744),
-    ),
-  ];
-
-  List<ManualModel> get manualMethods => [
-    ManualModel(
-      emoji: '👃',
-      method: 'Smell Test',
-      description: 'Sea smell is good. Ammonia is bad.',
-    ),
-    ManualModel(
-      emoji: '👀',
-      method: 'Clear Eyes',
-      description: 'Bulging & clear. Sunken is old.',
-    ),
-    ManualModel(
-      emoji: '🩸',
-      method: 'Red Gills',
-      description: 'Bright red is fresh. Brown is old.',
-    ),
-    ManualModel(
-      emoji: '✋',
-      method: 'Firm Flesh',
-      description: 'Bounces back when pressed.',
-    ),
-  ];
+  // --- Theme Constants ---
+  static const primaryBlue = Color(0xFF1A5694);
+  static const lightBlueBg = Color(0xFFE8F1FF);
+  static const accentTeal = Color(0xFF2CB88E);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D2B45), // Deep Navy Theme
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D2B45),
+        backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
-          "SCAN GUIDE",
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.0,
+          "Scan Guide",
+          style: GoogleFonts.poppins(
+            color: primaryBlue,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 18,
-              color: Colors.white,
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        actions: const [],
       ),
-      body: Stack(
-        children: [
-          // Content
-          SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(
-              24,
-              10,
-              24,
-              100,
-            ), // Bottom padding for button
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 1. HERO HEADER
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF00B4D8).withOpacity(0.2),
-                        const Color(0xFF00B4D8).withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFF00B4D8).withOpacity(0.3),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeroCard(),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 32),
+
+                  _buildSectionHeader("Scanning Best Practices", "Pro Guide"),
+                  const SizedBox(height: 20),
+
+                  _buildStepCard(
+                    number: "1",
+                    icon: Icons.wb_sunny_outlined,
+                    title: "Lighting",
+                    desc:
+                        "Use natural, diffused light. Avoid direct harsh sunlight or heavy shadows on the specimen.",
+                  ),
+                  _buildStepCard(
+                    number: "2",
+                    icon: Icons.center_focus_strong_outlined,
+                    title: "Focus",
+                    desc:
+                        "Ensure the lens is clean and the subject is in sharp focus. Tap the screen to lock focus on the center.",
+                  ),
+                  _buildStepCard(
+                    number: "3",
+                    icon: Icons.crop_free_outlined,
+                    title: "Framing",
+                    desc:
+                        "Keep the entire specimen within the guide lines. Maintain a distance of roughly 15-20cm.",
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  Text(
+                    "Manual Verification",
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                  child: Row(
+                  const SizedBox(height: 20),
+
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.85,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Get 100% Accuracy",
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Follow these guidelines to ensure the AI detects freshness correctly.",
-                              style: GoogleFonts.inter(
-                                color: Colors.white70,
-                                fontSize: 13,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
+                      _buildManualCard(
+                        icon: Icons.air,
+                        title: "Smell Test",
+                        desc:
+                            "Should have a clean, oceanic scent; never ammonia-like.",
                       ),
-                      const SizedBox(width: 16),
-                      const Icon(
-                        Icons.verified_rounded,
-                        color: Color(0xFF00B4D8),
-                        size: 40,
+                      _buildManualCard(
+                        icon: Icons.visibility_outlined,
+                        title: "Clear Eyes",
+                        desc:
+                            "Look for bright, bulging eyes. Cloudiness indicates age.",
+                      ),
+                      _buildManualCard(
+                        icon: Icons.water_drop_outlined,
+                        title: "Red Gills",
+                        desc:
+                            "Fresh specimens display vivid red or deep pink gills.",
+                      ),
+                      _buildManualCard(
+                        icon: Icons.back_hand_outlined,
+                        title: "Firm Flesh",
+                        desc:
+                            "Meat should spring back instantly when pressed gently.",
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                const SizedBox(height: 32),
-
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      color: const Color(0xFF00B4D8),
-                    ), // Cyan Accent
-                    const SizedBox(width: 12),
-                    Text(
-                      "SCANNING BEST PRACTICES",
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // 3. HORIZONTAL STEP CARDS
-                SizedBox(
-                  height: 150,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: aiSteps.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (context, index) =>
-                        _StepCard(step: aiSteps[index], number: index + 1),
+  Widget _buildHeroCard() {
+    return Container(
+      margin: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: lightBlueBg,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: primaryBlue,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.verified_user_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Get 100% Accuracy",
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: primaryBlue,
                   ),
                 ),
-
-                const SizedBox(height: 32),
-
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      color: const Color(0xFF00E676),
-                    ), // Green Accent
-                    const SizedBox(width: 12),
-                    Text(
-                      "MANUAL VERIFICATION",
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: manualMethods.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.4, // Wider cards
-                  ),
-                  itemBuilder: (context, index) =>
-                      _ManualCard(model: manualMethods[index]),
-                ),
-
-                const SizedBox(height: 24),
-
-                Center(
-                  child: Text(
-                    "Combine AI results with manual checks for safety.",
-                    style: GoogleFonts.inter(
-                      color: Colors.white38,
-                      fontSize: 12,
-                    ),
+                const SizedBox(height: 8),
+                Text(
+                  "Follow these scientific protocols to ensure the highest fidelity in AI fresh-ness analysis.",
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: primaryBlue.withOpacity(0.8),
+                    height: 1.5,
                   ),
                 ),
               ],
@@ -248,109 +174,148 @@ class GuideScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class _StepCard extends StatelessWidget {
-  final StepModel step;
-  final int number;
-
-  const _StepCard({required this.step, required this.number});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 130,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF173652), // Lighter Navy
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(step.icon, color: const Color(0xFF00B4D8), size: 24),
-              Container(
-                width: 20,
-                height: 20,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  "$number",
-                  style: GoogleFonts.inter(
-                    color: Colors.white70,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+  Widget _buildSectionHeader(String title, String badge) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-          const Spacer(),
-          Text(
-            step.title,
-            style: GoogleFonts.inter(
-              color: Colors.white,
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: lightBlueBg,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            badge,
+            style: GoogleFonts.poppins(
+              color: primaryBlue,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
-              fontSize: 15,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            step.description,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(
-              color: Colors.white54,
-              fontSize: 11,
-              height: 1.3,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepCard({
+    required String number,
+    required IconData icon,
+    required String title,
+    required String desc,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: lightBlueBg,
+            child: Text(
+              number,
+              style: GoogleFonts.poppins(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 20, color: primaryBlue),
+                    const SizedBox(width: 8),
+                    Text(
+                      title,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  desc,
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey.shade600,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _ManualCard extends StatelessWidget {
-  final ManualModel model;
-
-  const _ManualCard({required this.model});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildManualCard({
+    required IconData icon,
+    required String title,
+    required String desc,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF173652), // Lighter Navy
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: lightBlueBg.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: lightBlueBg),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(model.emoji, style: const TextStyle(fontSize: 24)),
-          const Spacer(),
-          Text(
-            model.method,
-            style: GoogleFonts.inter(
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(
               color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: accentTeal, size: 24),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
               fontSize: 15,
-              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            model.description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(color: Colors.white54, fontSize: 11),
+            desc,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: Colors.grey.shade600,
+              fontSize: 12,
+              height: 1.4,
+            ),
           ),
         ],
       ),

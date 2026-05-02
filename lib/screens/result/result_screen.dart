@@ -1,420 +1,367 @@
 import 'dart:io';
-import 'dart:ui'; // Required for ImageFilter
 
+import 'package:Finalyze/screens/cook/recipe_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../cook/recipe_screen.dart';
+import 'package:intl/intl.dart'; // Ensure intl is in your pubspec.yaml
 
 class ResultScreen extends StatelessWidget {
-  final File? image;
+  final File image;
   final double freshnessScore;
   final double confidence;
-  final String status;
+  final String status; // Fresh, Moderate, or Spoiled
+  final String species; // Pomfret, Surmai
+  final String scanArea;
 
   const ResultScreen({
     super.key,
-    this.image,
-    this.freshnessScore = 95.0,
-    this.confidence = 98.0,
-    this.status = "Fresh",
+    required this.image,
+    required this.freshnessScore,
+    required this.confidence,
+    required this.status,
+    this.species = "Pomfret",
+    this.scanArea = "Eye & Gills",
   });
-
-  Color get statusColor {
-    if (freshnessScore > 80) return const Color(0xFF00E676); // Neon Green
-    if (freshnessScore > 50) return const Color(0xFFFFAB00); // Amber
-    return const Color(0xFFFF1744); // Neon Red
-  }
 
   @override
   Widget build(BuildContext context) {
+    const primaryBlue = Color(0xFF1A5694);
+    const accentTeal = Color(0xFF2CB88E);
+    const softBg = Color(0xFFF8FAFC);
+
+    final String scanDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
+    final String scanTime = DateFormat('hh:mm a').format(DateTime.now());
+
+    Color statusColor = status.toLowerCase() == 'fresh'
+        ? accentTeal
+        : (status.toLowerCase() == 'moderate'
+              ? Colors.orange
+              : Colors.redAccent);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D2B45), // Deep Navy Base
-      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true,
-        title: Text(
-          "Analysis Result",
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 18,
-              color: Colors.white,
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share_rounded, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Background
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFF0D2B45), const Color(0xFF102030)],
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: TextButton.icon(
+              onPressed: () =>
+                  Navigator.popUntil(context, (route) => route.isFirst),
+              icon: const Icon(Icons.refresh, size: 20, color: primaryBlue),
+              label: Text(
+                "Rescan",
+                style: GoogleFonts.poppins(
+                  color: primaryBlue,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
                 ),
               ),
             ),
           ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              height: 240,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 25,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Image.file(image, fit: BoxFit.cover),
+              ),
+            ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              physics: const BouncingScrollPhysics(),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  _buildScanDetails(scanDate, scanTime, scanArea),
 
-                  _buildFuturisticGauge(),
+                  const SizedBox(height: 24),
 
-                  const SizedBox(height: 40),
+                  Row(
+                    children: [
+                      _buildChip(
+                        species,
+                        primaryBlue.withOpacity(0.08),
+                        primaryBlue,
+                      ),
+                      const SizedBox(width: 10),
+                      _buildChip(
+                        status.toUpperCase(),
+                        statusColor.withOpacity(0.12),
+                        statusColor,
+                      ),
+                    ],
+                  ),
 
-                  _buildGlassPill(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "DETECTED SPECIES",
-                              style: GoogleFonts.oswald(
-                                color: Colors.white38,
-                                fontSize: 10,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Red Snapper",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: statusColor.withOpacity(0.5),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: statusColor.withOpacity(0.2),
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            status.toUpperCase(),
-                            style: GoogleFonts.oswald(
-                              color: statusColor,
-                              fontSize: 14,
-                              letterSpacing: 1,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 24),
+
+                  Text(
+                    "$status Freshness",
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: primaryBlue,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "Our AI model has analyzed the biological markers of the $species. The visual data indicates a $status state.",
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      color: Colors.blueGrey.shade600,
+                      height: 1.6,
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
+
+                  Row(
+                    children: [
+                      _buildMetricCard(
+                        "Freshness",
+                        "${freshnessScore.toInt()}%",
+                        accentTeal,
+                      ),
+                      const SizedBox(width: 16),
+                      _buildMetricCard(
+                        "Confidence",
+                        "${confidence.toInt()}%",
+                        primaryBlue,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  Text(
+                    "Storage Advisory",
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: primaryBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: softBg,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.blueGrey.shade50),
+                    ),
+                    child: Text(
+                      status.toLowerCase() == 'fresh'
+                          ? "Optimal for consumption. Store at 0-2°C in a sealed container."
+                          : "Signs of degradation detected. Use immediately for cooked dishes only.",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.blueGrey.shade800,
+                        height: 1.6,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
 
                   Row(
                     children: [
                       Expanded(
-                        child: _buildGlassTile(
-                          Icons.analytics_outlined,
-                          "Confidence",
-                          "${confidence.toInt()}%",
+                        child: _actionButton(
+                          label: "SAVE REPORT",
+                          icon: Icons.assignment_turned_in_outlined,
+                          color: primaryBlue,
+                          onTap: () {},
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
-                        child: _buildGlassTile(
-                          Icons.access_time_filled_outlined,
-                          "Est. Age",
-                          "< 24h",
+                        child: _actionButton(
+                          label: "VIEW RECIPES",
+                          icon: Icons.restaurant_menu_rounded,
+                          color: accentTeal,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RecipeScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  _buildGlassTile(
-                    Icons.location_on_outlined,
-                    "Origin Source",
-                    "Karachi Fish Harbor, Dock 4",
-                    isWide: true,
-                  ),
 
-                  const SizedBox(height: 30),
-
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "AI RECOMMENDATIONS",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white54,
-                        fontSize: 14,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 12),
-                  _buildRecItem("Perfect for raw dishes (Sushi/Sashimi)"),
-                  _buildRecItem("Keep refrigerated at 0-4°C"),
-                  _buildRecItem("Consume within 24 hours for best taste"),
 
-                  const SizedBox(height: 40),
-
-                  Container(
+                  SizedBox(
                     width: double.infinity,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF00B4D8), Color(0xFF0077B6)],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF00B4D8).withOpacity(0.4),
-                          blurRadius: 20,
-                          offset: const Offset(0, 5),
+                    height: 55,
+                    child: TextButton(
+                      onPressed: () =>
+                          Navigator.popUntil(context, (route) => route.isFirst),
+                      child: Text(
+                        "DISMISS",
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecipeScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.restaurant_menu,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            "View Recipes",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFuturisticGauge() {
-    return SizedBox(
-      height: 200,
-      width: 200,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Track Ring
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: CircularProgressIndicator(
-              value: 0.75,
-              strokeWidth: 2,
-              color: Colors.white.withOpacity(0.1),
-              strokeCap: StrokeCap.round,
-            ),
-          ),
-          // Value Ring
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: CircularProgressIndicator(
-              value: (freshnessScore / 100) * 0.75,
-              strokeWidth: 8,
-              color: statusColor,
-              backgroundColor: Colors.transparent,
-              strokeCap: StrokeCap.round,
-            ),
-          ),
-          // Text Content
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "${freshnessScore.toInt()}",
-                style: GoogleFonts.staatliches(
-                  fontSize: 80,
-                  color: Colors.white,
-                  height: 1,
-                  shadows: [
-                    Shadow(color: statusColor.withOpacity(0.6), blurRadius: 20),
-                  ],
-                ),
-              ),
-              Text(
-                "FRESHNESS SCORE",
-                style: GoogleFonts.oswald(
-                  fontSize: 12,
-                  color: statusColor,
-                  letterSpacing: 2,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGlassPill({required Widget child}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
-          ),
-          child: child,
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildGlassTile(
-    IconData icon,
-    String label,
-    String value, {
-    bool isWide = false,
-  }) {
+  Widget _buildScanDetails(String date, String time, String area) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF142A40),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        mainAxisAlignment: isWide
-            ? MainAxisAlignment.start
-            : MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF00B4D8).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: const Color(0xFF00B4D8), size: 20),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.oswald(
-                  color: Colors.white38,
-                  fontSize: 10,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Text(
-                value,
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
+          _infoColumn("DATE", date),
+          _infoColumn("TIME", time),
+          _infoColumn("AREA", area),
         ],
       ),
     );
   }
 
-  Widget _buildRecItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Icon(
-            Icons.check_circle_outline_rounded,
-            color: statusColor,
-            size: 20,
+  Widget _infoColumn(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey.shade500,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(color: Colors.white70, fontSize: 13),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Color(0xFF1A5694),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChip(String label, Color bg, Color text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          color: text,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _actionButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      height: 55,
+      child: ElevatedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 18, color: Colors.white),
+        label: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetricCard(String title, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: color.withOpacity(0.15)),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.blueGrey.shade400,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -51,31 +51,6 @@ class SpeciesSlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Discover Species",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "View All",
-                  style: TextStyle(color: Colors.cyanAccent),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
         SizedBox(
           height: 240,
           child: ListView.builder(

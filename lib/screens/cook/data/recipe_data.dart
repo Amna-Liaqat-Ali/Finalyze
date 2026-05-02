@@ -1,4 +1,4 @@
-import '../models/recipe.dart'; // Import your Recipe class
+import '../models/recipe.dart';
 
 class RecipeMockData {
   static List<Recipe> getRecipes() {

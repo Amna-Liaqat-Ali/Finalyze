@@ -25,8 +25,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
+  static const primaryBlue = Color(0xFF1A5694);
 
-  // logic to connect to Node.js backend
   Future<void> _handleRegister() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
@@ -45,9 +45,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (response.statusCode == 201) {
         _showSnackBar(
           "Registration successful! Please login.",
-          Colors.greenAccent,
+          const Color(0xFF2CB88E), // Project Teal
         );
-        // Navigate back to login screen after a short delay
         Future.delayed(const Duration(seconds: 1), () => widget.onLoginTap());
       } else {
         final data = jsonDecode(response.body);
@@ -67,9 +66,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -83,190 +86,187 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF05111A),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: IntrinsicHeight(
-            child: Stack(
-              children: [
-                // Background layers
-                Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Image.asset(
-                      'assets/images/bg1.jpeg',
-                      fit: BoxFit.cover,
-                    ),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.85,
+                  child: Image.asset(
+                    'assets/images/bg1.jpeg',
+                    fit: BoxFit.cover,
                   ),
                 ),
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.3),
-                          const Color(0xFF05111A).withOpacity(0.9),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              ),
 
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        _buildBackButton(widget.onBack),
-                        const Spacer(flex: 1),
-                        Text(
-                          "NEW MEMBER",
-                          style: GoogleFonts.lexend(
-                            fontSize: 14,
-                            color: Colors.cyanAccent,
-                            letterSpacing: 8,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Create\nAccount",
-                          style: GoogleFonts.poppins(
-                            fontSize: 42,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            height: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-
-                        // Input Card
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: Container(
-                              padding: const EdgeInsets.all(28),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF0D2B45).withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: Colors.cyanAccent.withOpacity(0.15),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  _buildDarkInput(
-                                    "Full Name",
-                                    Icons.person_outline_rounded,
-                                    _nameController,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  _buildDarkInput(
-                                    "Email Address",
-                                    Icons.alternate_email_rounded,
-                                    _emailController,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  _buildDarkInput(
-                                    "Password",
-                                    Icons.fingerprint_rounded,
-                                    _passwordController,
-                                    isPassword: true,
-                                  ),
-                                  const SizedBox(height: 30),
-
-                                  // Register Button
-                                  GestureDetector(
-                                    onTap: _isLoading ? null : _handleRegister,
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 55,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        color: Colors.white.withOpacity(0.05),
-                                        border: Border.all(
-                                          color: Colors.cyanAccent.withOpacity(
-                                            0.5,
-                                          ),
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: _isLoading
-                                            ? const SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      color: Colors.cyanAccent,
-                                                      strokeWidth: 2,
-                                                    ),
-                                              )
-                                            : Text(
-                                                "Register",
-                                                style: GoogleFonts.lexend(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.cyanAccent,
-                                                  letterSpacing: 2,
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const Spacer(flex: 2),
-                        Center(
-                          child: TextButton(
-                            onPressed: widget.onLoginTap,
-                            child: RichText(
-                              text: TextSpan(
-                                text: "Already have an account? ",
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.4),
-                                  fontSize: 12,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: "Login",
-                                    style: TextStyle(
-                                      color: Colors.cyanAccent.withOpacity(0.8),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0.0, 0.8],
+                      colors: [
+                        Colors.transparent,
+                        Colors.white.withOpacity(0.6),
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildBackButton(widget.onBack),
+                      const Spacer(flex: 1),
+
+                      Text(
+                        "NEW MEMBER",
+                        style: GoogleFonts.lexend(
+                          fontSize: 14,
+                          color: primaryBlue,
+                          letterSpacing: 8,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "Create\nAccount",
+                        style: GoogleFonts.poppins(
+                          fontSize: 42,
+                          color: primaryBlue,
+                          fontWeight: FontWeight.bold,
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(28),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.4),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildLightInput(
+                                  "Full Name",
+                                  Icons.person_outline_rounded,
+                                  _nameController,
+                                ),
+                                const SizedBox(height: 20),
+                                _buildLightInput(
+                                  "Email Address",
+                                  Icons.alternate_email_rounded,
+                                  _emailController,
+                                ),
+                                const SizedBox(height: 20),
+                                _buildLightInput(
+                                  "Password",
+                                  Icons.fingerprint_rounded,
+                                  _passwordController,
+                                  isPassword: true,
+                                ),
+                                const SizedBox(height: 30),
+
+                                InkWell(
+                                  onTap: _isLoading ? null : _handleRegister,
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 55,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: primaryBlue,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryBlue.withOpacity(0.2),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: _isLoading
+                                          ? const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : Text(
+                                              "Register",
+                                              style: GoogleFonts.lexend(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                letterSpacing: 2,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const Spacer(flex: 2),
+                      Center(
+                        child: TextButton(
+                          onPressed: widget.onLoginTap,
+                          child: RichText(
+                            text: TextSpan(
+                              text: "Already have an account? ",
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.7),
+                                fontSize: 13,
+                              ),
+                              children: const [
+                                TextSpan(
+                                  text: "Login",
+                                  style: TextStyle(
+                                    color: primaryBlue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDarkInput(
+  Widget _buildLightInput(
     String hint,
     IconData icon,
     TextEditingController controller, {
@@ -274,14 +274,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.white.withOpacity(0.6),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withOpacity(0.4)),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
+        style: const TextStyle(color: primaryBlue, fontSize: 15),
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -289,12 +289,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             vertical: 18,
           ),
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-          prefixIcon: Icon(
-            icon,
-            color: Colors.white.withOpacity(0.6),
-            size: 20,
-          ),
+          hintStyle: TextStyle(color: primaryBlue.withOpacity(0.4)),
+          prefixIcon: Icon(icon, color: primaryBlue.withOpacity(0.7), size: 20),
         ),
       ),
     );
@@ -306,10 +302,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withOpacity(0.4),
           shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withOpacity(0.3)),
         ),
-        child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+        child: const Icon(Icons.arrow_back, color: primaryBlue, size: 20),
       ),
     );
   }
