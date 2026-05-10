@@ -7,7 +7,6 @@ import '../Main/analyzing_screen.dart';
 
 class ReviewScreen extends StatefulWidget {
   final File? image;
-
   const ReviewScreen({super.key, required this.image});
 
   @override
@@ -22,7 +21,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     const primaryBlue = Color(0xFF1A5694);
-    const accentTeal = Color(0xFF2CB88E);
     const infoBg = Color(0xFFF0F4F8);
 
     return Scaffold(
@@ -40,13 +38,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
             fontSize: 18,
           ),
         ),
-        actions: [
-          if (!_isCropMode)
-            IconButton(
-              icon: const Icon(Icons.more_vert, color: primaryBlue),
-              onPressed: () {},
-            ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -54,84 +45,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
           children: [
             const SizedBox(height: 10),
 
-            GestureDetector(
-              onTap: () {
-                if (_isCropMode) setState(() => _isCropMode = false);
-              },
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.35,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ColorFiltered(
-                        colorFilter: ColorFilter.matrix(_calculateMatrix()),
-                        child: widget.image != null
-                            ? Image.file(widget.image!, fit: BoxFit.contain)
-                            : const Icon(
-                                Icons.image,
-                                size: 50,
-                                color: Colors.grey,
-                              ),
-                      ),
-
-                      if (_isCropMode)
-                        Container(
-                          margin: const EdgeInsets.all(30),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF4EE3AA),
-                              width: 3,
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Stack(
-                            children: [
-                              _corner(0, 0, 0),
-                              _corner(0, null, 1.57, right: 0),
-                              _corner(null, 0, 4.71, left: 0),
-                              _corner(null, 0, 3.14, right: 0),
-                            ],
-                          ),
-                        ),
-
-                      Positioned(
-                        top: 15,
-                        right: 15,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Icon(
-                            Icons.hd_outlined,
-                            size: 18,
-                            color: primaryBlue,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Image Display
+            _buildImageCard(),
 
             const SizedBox(height: 25),
 
+            // Tool Icons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -161,119 +80,183 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
             const SizedBox(height: 30),
 
-            Container(
-              width: double.infinity,
-              height: 55,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4EE3AA), Color(0xFF1E88E5)],
-                ),
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (widget.image != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AnalyzingScreen(image: widget.image!),
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.biotech_outlined, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      "START ANALYSIS",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // START ANALYSIS BUTTON
+            _buildPrimaryButton(context),
 
             const SizedBox(height: 12),
 
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.refresh, size: 20),
-                label: const Text("Retake Photo"),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: primaryBlue,
-                  side: BorderSide(color: Colors.grey.shade200),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              ),
-            ),
+            // RETAKE BUTTON
+            _buildSecondaryButton(context, primaryBlue),
 
             const SizedBox(height: 25),
 
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: infoBg,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.info_outline, color: primaryBlue, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Good Lighting Detected",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "AI has confirmed the lighting is sufficient for analysis. Proceed with 'Start Analysis'.",
-                          style: GoogleFonts.poppins(
-                            color: Colors.blueGrey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // AI Information Footer
+            _buildInfoFooter(infoBg, primaryBlue),
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImageCard() {
+    return GestureDetector(
+      onTap: () {
+        if (_isCropMode) setState(() => _isCropMode = false);
+      },
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.35,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              ColorFiltered(
+                colorFilter: ColorFilter.matrix(_calculateMatrix()),
+                child: widget.image != null
+                    ? Image.file(widget.image!, fit: BoxFit.contain)
+                    : const Icon(Icons.image, size: 50, color: Colors.grey),
+              ),
+              if (_isCropMode) _buildCropOverlay(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPrimaryButton(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 55,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4EE3AA), Color(0xFF1E88E5)],
+        ),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          if (widget.image != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AnalyzingScreen(image: widget.image!),
+              ),
+            );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.biotech_outlined, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              "START ANALYSIS",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton(BuildContext context, Color primaryBlue) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: OutlinedButton.icon(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(Icons.refresh, size: 20),
+        label: const Text("Retake Photo"),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryBlue,
+          side: BorderSide(color: Colors.grey.shade200),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoFooter(Color bg, Color primary) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, color: primary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "AI Ready",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    color: primary,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Ensure the fish eye or gills are centered for the most accurate results.",
+                  style: GoogleFonts.poppins(
+                    color: Colors.blueGrey,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCropOverlay() {
+    return Container(
+      margin: const EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFF4EE3AA), width: 3),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Stack(
+        children: [
+          _corner(0, 0, 0),
+          _corner(0, null, 1.57, right: 0),
+          _corner(null, 0, 4.71, left: 0),
+          _corner(null, 0, 3.14, right: 0),
+        ],
       ),
     );
   }
@@ -282,7 +265,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
     double brightness = _brightnessLevel;
     double saturation = _isEnhanced ? 1.4 : 1.0;
     double contrast = _isEnhanced ? 1.2 : 1.0;
-
     return [
       contrast * brightness,
       0,
@@ -315,44 +297,38 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? const Color(0xFF4EE3AA).withOpacity(0.1)
+                  : Colors.transparent,
+              shape: BoxShape.circle,
+              border: Border.all(
                 color: isActive
-                    ? const Color(0xFF4EE3AA).withOpacity(0.1)
-                    : Colors.transparent,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isActive
-                      ? const Color(0xFF4EE3AA)
-                      : Colors.grey.shade200,
-                ),
-              ),
-              child: Icon(
-                icon,
-                color: isActive
-                    ? const Color(0xFF2CB88E)
-                    : const Color(0xFF1A5694),
-                size: 24,
+                    ? const Color(0xFF4EE3AA)
+                    : Colors.grey.shade200,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isActive ? const Color(0xFF2CB88E) : Colors.grey,
-                fontSize: 12,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              ),
+            child: Icon(
+              icon,
+              color: isActive
+                  ? const Color(0xFF2CB88E)
+                  : const Color(0xFF1A5694),
+              size: 24,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? const Color(0xFF2CB88E) : Colors.grey,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }

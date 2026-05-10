@@ -25,8 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(source: source);
-
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1000, // Resize before sending to AI
+        maxHeight: 1000,
+        imageQuality: 85, // Compress slightly
+      );
       if (image == null) return;
 
       if (!mounted) return;

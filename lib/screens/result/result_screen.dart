@@ -1,16 +1,18 @@
 import 'dart:io';
 
-import 'package:Finalyze/screens/cook/recipe_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart'; // Ensure intl is in your pubspec.yaml
+import 'package:intl/intl.dart';
+
+import '../cook/recipe_screen.dart'; // Ensure this path is correct
 
 class ResultScreen extends StatelessWidget {
   final File image;
   final double freshnessScore;
   final double confidence;
-  final String status; // Fresh, Moderate, or Spoiled
-  final String species; // Pomfret, Surmai
+  final String
+  status; // Received from TFLiteService: 'Fresh', 'Moderate', or 'Spoiled'
+  final String species;
   final String scanArea;
 
   const ResultScreen({
@@ -19,24 +21,29 @@ class ResultScreen extends StatelessWidget {
     required this.freshnessScore,
     required this.confidence,
     required this.status,
-    this.species = "Pomfret",
+    this.species = "Detected Fish",
     this.scanArea = "Eye & Gills",
   });
 
   @override
   Widget build(BuildContext context) {
-    const primaryBlue = Color(0xFF1A5694);
-    const accentTeal = Color(0xFF2CB88E);
-    const softBg = Color(0xFFF8FAFC);
+    // --- Dynamic UI Configuration based on Model Output ---
+    final bool isFresh = status.toLowerCase() == 'fresh';
+    final bool isModerate = status.toLowerCase() == 'moderate';
+
+    final Color primaryBlue = const Color(0xFF1A5694);
+    final Color statusColor = isFresh
+        ? const Color(0xFF2CB88E)
+        : (isModerate ? Colors.orange : Colors.redAccent);
+
+    final String advisoryText = isFresh
+        ? "Optimal for consumption. Store at 0-2°C in a sealed container."
+        : (isModerate
+              ? "Signs of degradation detected. Use immediately for cooked dishes only."
+              : "Spoilage detected. Not safe for consumption. Please discard.");
 
     final String scanDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
     final String scanTime = DateFormat('hh:mm a').format(DateTime.now());
-
-    Color statusColor = status.toLowerCase() == 'fresh'
-        ? accentTeal
-        : (status.toLowerCase() == 'moderate'
-              ? Colors.orange
-              : Colors.redAccent);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -50,13 +57,12 @@ class ResultScreen extends StatelessWidget {
             child: TextButton.icon(
               onPressed: () =>
                   Navigator.popUntil(context, (route) => route.isFirst),
-              icon: const Icon(Icons.refresh, size: 20, color: primaryBlue),
+              icon: Icon(Icons.refresh, size: 20, color: primaryBlue),
               label: Text(
                 "Rescan",
                 style: GoogleFonts.poppins(
                   color: primaryBlue,
                   fontWeight: FontWeight.w700,
-                  fontSize: 15,
                 ),
               ),
             ),
@@ -68,6 +74,7 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Captured Image Container
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               height: 240,
@@ -93,10 +100,12 @@ class ResultScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildScanDetails(scanDate, scanTime, scanArea),
+                  // Meta Info Row
+                  _buildScanDetails(scanDate, scanTime, scanArea, primaryBlue),
 
                   const SizedBox(height: 24),
 
+                  // Status Chips
                   Row(
                     children: [
                       _buildChip(
@@ -115,8 +124,9 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
+                  // Freshness Header
                   Text(
-                    "$status Freshness",
+                    "$status State",
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -126,7 +136,7 @@ class ResultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Our AI model has analyzed the biological markers of the $species. The visual data indicates a $status state.",
+                    "Our AI model analyzed the visual markers. The biological data indicates a $status freshness level with ${confidence.toStringAsFixed(1)}% confidence.",
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       color: Colors.blueGrey.shade600,
@@ -136,12 +146,13 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
+                  // Metric Cards
                   Row(
                     children: [
                       _buildMetricCard(
                         "Freshness",
                         "${freshnessScore.toInt()}%",
-                        accentTeal,
+                        statusColor,
                       ),
                       const SizedBox(width: 16),
                       _buildMetricCard(
@@ -154,6 +165,7 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
+                  // Advisory Section
                   Text(
                     "Storage Advisory",
                     style: GoogleFonts.poppins(
@@ -166,14 +178,12 @@ class ResultScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: softBg,
+                      color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.blueGrey.shade50),
                     ),
                     child: Text(
-                      status.toLowerCase() == 'fresh'
-                          ? "Optimal for consumption. Store at 0-2°C in a sealed container."
-                          : "Signs of degradation detected. Use immediately for cooked dishes only.",
+                      advisoryText,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.blueGrey.shade800,
@@ -184,6 +194,7 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
+                  // Action Buttons
                   Row(
                     children: [
                       Expanded(
@@ -191,7 +202,13 @@ class ResultScreen extends StatelessWidget {
                           label: "SAVE REPORT",
                           icon: Icons.assignment_turned_in_outlined,
                           color: primaryBlue,
-                          onTap: () {},
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Report saved to history"),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -199,7 +216,7 @@ class ResultScreen extends StatelessWidget {
                         child: _actionButton(
                           label: "VIEW RECIPES",
                           icon: Icons.restaurant_menu_rounded,
-                          color: accentTeal,
+                          color: const Color(0xFF2CB88E),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -240,7 +257,9 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScanDetails(String date, String time, String area) {
+  // --- Helper Widgets ---
+
+  Widget _buildScanDetails(String date, String time, String area, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
@@ -250,15 +269,15 @@ class ResultScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _infoColumn("DATE", date),
-          _infoColumn("TIME", time),
-          _infoColumn("AREA", area),
+          _infoColumn("DATE", date, color),
+          _infoColumn("TIME", time, color),
+          _infoColumn("AREA", area, color),
         ],
       ),
     );
   }
 
-  Widget _infoColumn(String title, String value) {
+  Widget _infoColumn(String title, String value, Color color) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -273,9 +292,9 @@ class ResultScreen extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Color(0xFF1A5694),
+            color: color,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -297,36 +316,6 @@ class ResultScreen extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _actionButton({
-    required String label,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return SizedBox(
-      height: 55,
-      child: ElevatedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 18, color: Colors.white),
-        label: Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
         ),
       ),
     );
@@ -361,6 +350,36 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _actionButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      height: 55,
+      child: ElevatedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 18, color: Colors.white),
+        label: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );

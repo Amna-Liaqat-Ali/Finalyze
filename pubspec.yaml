@@ -20,6 +20,8 @@ dependencies:
   http: ^1.1.0
   camera: ^0.11.0
   path_provider: ^2.1.2
+  tflite_v2: ^1.0.0
+  image: ^4.0.17
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +29,8 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^5.0.0
   rename: ^3.1.0
+
+
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -43,3 +47,5 @@ flutter:
     - assets/sounds/
     - assets/videos/splash_video.mp4
     - assets/icon/app_icon.png
+    - assets/model/fish_model_update.tflite
+    - assets/model/labels.txt
