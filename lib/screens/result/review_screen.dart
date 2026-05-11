@@ -45,12 +45,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
           children: [
             const SizedBox(height: 10),
 
-            // Image Display
             _buildImageCard(),
 
             const SizedBox(height: 25),
 
-            // Tool Icons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -80,17 +78,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
             const SizedBox(height: 30),
 
-            // START ANALYSIS BUTTON
             _buildPrimaryButton(context),
 
             const SizedBox(height: 12),
 
-            // RETAKE BUTTON
             _buildSecondaryButton(context, primaryBlue),
 
             const SizedBox(height: 25),
 
-            // AI Information Footer
             _buildInfoFooter(infoBg, primaryBlue),
             const SizedBox(height: 20),
           ],

@@ -27,9 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final XFile? image = await _picker.pickImage(
         source: source,
-        maxWidth: 1000, // Resize before sending to AI
+        maxWidth: 1000, //Resize
         maxHeight: 1000,
-        imageQuality: 85, // Compress slightly
+        imageQuality: 85, //Compress
       );
       if (image == null) return;
 
@@ -55,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

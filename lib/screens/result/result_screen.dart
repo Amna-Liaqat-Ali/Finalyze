@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../cook/recipe_screen.dart'; // Ensure this path is correct
+import '../cook/recipe_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final File image;
   final double freshnessScore;
   final double confidence;
-  final String
-  status; // Received from TFLiteService: 'Fresh', 'Moderate', or 'Spoiled'
+  final String status;
   final String species;
   final String scanArea;
 
@@ -27,7 +26,6 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // --- Dynamic UI Configuration based on Model Output ---
     final bool isFresh = status.toLowerCase() == 'fresh';
     final bool isModerate = status.toLowerCase() == 'moderate';
 
@@ -74,7 +72,6 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Captured Image Container
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               height: 240,
@@ -100,12 +97,10 @@ class ResultScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Meta Info Row
                   _buildScanDetails(scanDate, scanTime, scanArea, primaryBlue),
 
                   const SizedBox(height: 24),
 
-                  // Status Chips
                   Row(
                     children: [
                       _buildChip(
@@ -124,7 +119,6 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Freshness Header
                   Text(
                     "$status State",
                     style: GoogleFonts.poppins(
@@ -146,7 +140,6 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // Metric Cards
                   Row(
                     children: [
                       _buildMetricCard(
@@ -165,7 +158,6 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // Advisory Section
                   Text(
                     "Storage Advisory",
                     style: GoogleFonts.poppins(
@@ -194,7 +186,6 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
-                  // Action Buttons
                   Row(
                     children: [
                       Expanded(
@@ -256,8 +247,6 @@ class ResultScreen extends StatelessWidget {
       ),
     );
   }
-
-  // --- Helper Widgets ---
 
   Widget _buildScanDetails(String date, String time, String area, Color color) {
     return Container(
