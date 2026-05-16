@@ -47,5 +47,5 @@ flutter:
     - assets/sounds/
     - assets/videos/splash_video.mp4
     - assets/icon/app_icon.png
-    - assets/model/fish_model_update.tflite
+    - assets/model/fish_file_11.tflite
     - assets/model/labels.txt

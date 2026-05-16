@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../services/tflite_service.dart'; // Ensure this path is correct
+import '../../services/tflite_service.dart';
 import '../result/result_screen.dart';
 
 class AnalyzingScreen extends StatefulWidget {
@@ -47,39 +47,48 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
       await _tfLiteService.loadModel();
       await Future.delayed(const Duration(milliseconds: 800));
 
-      // Step 1 & 2: Image Processing
+      // Step 1: Pre-processing
       if (!mounted) return;
       setState(() => _stepIndex = 1);
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Step 3: Run the Model (Actual Inference)
+      // Step 2: Run the Model (Actual Inference)
       setState(() => _stepIndex = 2);
+      // 'result' should contain {'label': 'pomfret_fresh', 'score': 0.85}
       final result = await _tfLiteService.predictFreshness(widget.image);
 
-      // Step 4: Logic Processing
+      // Step 3: Logic Processing
       setState(() => _stepIndex = 3);
       await Future.delayed(const Duration(milliseconds: 600));
 
-      // Step 5: Wrap up
+      // Step 4: Finalizing
       setState(() => _stepIndex = 4);
       await Future.delayed(const Duration(milliseconds: 400));
 
       if (!mounted) return;
 
-      // Navigate with REAL data from model
+      // NAVIGATE TO RESULT SCREEN
+      // We pass the raw label and score. ResultScreen handles the splitting/invalid check.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => ResultScreen(
             image: widget.image,
-            status: result['status'], // "Fresh", "Moderate", etc.
-            confidence: result['score'], // Confidence %
-            freshnessScore: result['freshness'], // Score %
+            detectedLabel: result['label'] ?? "invalid_data",
+            confidence: result['score'] ?? 0.0,
+            scanArea: "Eye & Gills", // You can customize this per fish
           ),
         ),
       );
     } catch (e) {
       debugPrint("Analysis Error: $e");
-      if (mounted) Navigator.pop(context); // Go back on error
+      // If error occurs, go back with a snackbar message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Analysis failed. Please try again.")),
+        );
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -100,65 +109,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      height: 180,
-                      width: 180,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: accentTeal.withOpacity(
-                          0.05 + (_controller.value * 0.05),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 160,
-                      width: 160,
-                      child: CircularProgressIndicator(
-                        value: progressValue,
-                        strokeWidth: 8,
-                        strokeCap: StrokeCap.round,
-                        backgroundColor: Colors.grey.shade100,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          accentTeal,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 110,
-                      width: 110,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 15,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Transform.scale(
-                          scale: 1.0 + (_controller.value * 0.1),
-                          child: const Text(
-                            "🐟",
-                            style: TextStyle(fontSize: 50),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
+          _buildAnimatedLoader(_controller, progressValue, accentTeal),
           const SizedBox(height: 50),
           Text(
             "Analyzing Freshness",
@@ -179,6 +130,65 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
           const SizedBox(height: 40),
           _buildProgressTile(primaryBlue, accentTeal, progressValue),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedLoader(
+    AnimationController controller,
+    double progress,
+    Color accent,
+  ) {
+    return Center(
+      child: AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                height: 180,
+                width: 180,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: accent.withOpacity(0.05 + (controller.value * 0.05)),
+                ),
+              ),
+              SizedBox(
+                height: 160,
+                width: 160,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 8,
+                  strokeCap: StrokeCap.round,
+                  backgroundColor: Colors.grey.shade100,
+                  valueColor: AlwaysStoppedAnimation<Color>(accent),
+                ),
+              ),
+              Container(
+                height: 110,
+                width: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Transform.scale(
+                    scale: 1.0 + (controller.value * 0.1),
+                    child: const Text("🐟", style: TextStyle(fontSize: 50)),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

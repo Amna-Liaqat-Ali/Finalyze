@@ -6,10 +6,11 @@ import 'package:tflite_v2/tflite_v2.dart';
 class TFLiteService {
   bool _isModelLoaded = false;
 
-  static const String modelPath = 'assets/model/fish_model_update.tflite';
+  static const String modelPath = 'assets/model/fish_file_11.tflite';
   static const String labelPath = 'assets/model/labels.txt';
 
   Future<void> loadModel() async {
+    if (_isModelLoaded) return;
     try {
       String? res = await Tflite.loadModel(
         model: modelPath,
@@ -19,7 +20,7 @@ class TFLiteService {
         useGpuDelegate: false,
       );
       _isModelLoaded = res != null;
-      debugPrint("Model loaded: $res");
+      debugPrint("Model loaded successfully");
     } catch (e) {
       debugPrint("Error loading model: $e");
     }
@@ -31,32 +32,28 @@ class TFLiteService {
     try {
       var recognitions = await Tflite.runModelOnImage(
         path: imageFile.path,
-        numResults: 3,
-        threshold: 0.05,
-        imageMean: 127.5,
-        imageStd: 127.5,
+        numResults: 1,
+        threshold: 0.1,
+        imageMean: 0,
+        imageStd: 255.0,
         asynch: true,
       );
 
-      print("AI Raw Output: $recognitions");
+      debugPrint("AI Raw Output: $recognitions");
 
       if (recognitions == null || recognitions.isEmpty) {
-        throw Exception("AI returned no results");
+        return {"label": "data_invalid", "score": 0.0};
       }
 
       var bestMatch = recognitions[0];
-      String label = bestMatch['label'];
-      double confidence = (bestMatch['confidence'] as double) * 100;
-      int index = bestMatch['index'];
 
       return {
-        "status": label,
-        "score": confidence,
-        "freshness": index == 0 ? 95.0 : (index == 1 ? 60.0 : 20.0),
+        "label": bestMatch['label'] ?? "invalid_data",
+        "score": (bestMatch['confidence'] as double),
       };
     } catch (e) {
       debugPrint("Inference Error: $e");
-      return {"status": "Error", "score": 0.0, "freshness": 0.0};
+      return {"label": "data_invalid", "score": 0.0};
     }
   }
 

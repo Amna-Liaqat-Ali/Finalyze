@@ -8,24 +8,28 @@ import '../cook/recipe_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final File image;
-  final double freshnessScore;
+  final String detectedLabel;
   final double confidence;
-  final String status;
-  final String species;
   final String scanArea;
 
   const ResultScreen({
     super.key,
     required this.image,
-    required this.freshnessScore,
+    required this.detectedLabel,
     required this.confidence,
-    required this.status,
-    this.species = "Detected Fish",
     this.scanArea = "Eye & Gills",
   });
 
   @override
   Widget build(BuildContext context) {
+    if (detectedLabel == "data_invalid" || confidence < 0.4) {
+      return _buildInvalidScanUI(context);
+    }
+
+    List<String> parts = detectedLabel.split('_');
+    String species = parts.isNotEmpty ? parts[0].toUpperCase() : "UNKNOWN";
+    String status = parts.length > 1 ? parts[1].toUpperCase() : "UNKNOWN";
+
     final bool isFresh = status.toLowerCase() == 'fresh';
     final bool isModerate = status.toLowerCase() == 'moderate';
 
@@ -34,73 +38,26 @@ class ResultScreen extends StatelessWidget {
         ? const Color(0xFF2CB88E)
         : (isModerate ? Colors.orange : Colors.redAccent);
 
-    final String advisoryText = isFresh
-        ? "Optimal for consumption. Store at 0-2°C in a sealed container."
-        : (isModerate
-              ? "Signs of degradation detected. Use immediately for cooked dishes only."
-              : "Spoilage detected. Not safe for consumption. Please discard.");
-
     final String scanDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
     final String scanTime = DateFormat('hh:mm a').format(DateTime.now());
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: TextButton.icon(
-              onPressed: () =>
-                  Navigator.popUntil(context, (route) => route.isFirst),
-              icon: Icon(Icons.refresh, size: 20, color: primaryBlue),
-              label: Text(
-                "Rescan",
-                style: GoogleFonts.poppins(
-                  color: primaryBlue,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context, primaryBlue),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              height: 240,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 25,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: Image.file(image, fit: BoxFit.cover),
-              ),
-            ),
-
+            _buildImageHeader(),
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildScanDetails(scanDate, scanTime, scanArea, primaryBlue),
-
                   const SizedBox(height: 24),
 
+                  // Species & Status Chips
                   Row(
                     children: [
                       _buildChip(
@@ -110,7 +67,7 @@ class ResultScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       _buildChip(
-                        status.toUpperCase(),
+                        status,
                         statusColor.withOpacity(0.12),
                         statusColor,
                       ),
@@ -118,19 +75,17 @@ class ResultScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 24),
-
                   Text(
-                    "$status State",
+                    "$species: $status",
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: primaryBlue,
-                      letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Our AI model analyzed the visual markers. The biological data indicates a $status freshness level with ${confidence.toStringAsFixed(1)}% confidence.",
+                    "Our AI identified this as $species. The biological markers in the $scanArea indicate a $status state with ${(confidence * 100).toStringAsFixed(1)}% confidence.",
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       color: Colors.blueGrey.shade600,
@@ -139,106 +94,25 @@ class ResultScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 32),
-
                   Row(
                     children: [
                       _buildMetricCard(
                         "Freshness",
-                        "${freshnessScore.toInt()}%",
+                        status == "FRESH" ? "90%+" : "Low",
                         statusColor,
                       ),
                       const SizedBox(width: 16),
                       _buildMetricCard(
                         "Confidence",
-                        "${confidence.toInt()}%",
+                        "${(confidence * 100).toInt()}%",
                         primaryBlue,
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 32),
-
-                  Text(
-                    "Storage Advisory",
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: primaryBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.blueGrey.shade50),
-                    ),
-                    child: Text(
-                      advisoryText,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.blueGrey.shade800,
-                        height: 1.6,
-                      ),
-                    ),
-                  ),
-
                   const SizedBox(height: 40),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _actionButton(
-                          label: "SAVE REPORT",
-                          icon: Icons.assignment_turned_in_outlined,
-                          color: primaryBlue,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Report saved to history"),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _actionButton(
-                          label: "VIEW RECIPES",
-                          icon: Icons.restaurant_menu_rounded,
-                          color: const Color(0xFF2CB88E),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RecipeScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: TextButton(
-                      onPressed: () =>
-                          Navigator.popUntil(context, (route) => route.isFirst),
-                      child: Text(
-                        "DISMISS",
-                        style: GoogleFonts.poppins(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildActionRow(context, primaryBlue),
+                  _buildDismissButton(context),
                 ],
               ),
             ),
@@ -248,21 +122,118 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScanDetails(String date, String time, String area, Color color) {
+  //Screen for Invalid objects
+  Widget _buildInvalidScanUI(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        padding: const EdgeInsets.all(40),
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.no_photography_outlined,
+                size: 80,
+                color: Colors.redAccent,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              "Invalid Object!",
+              style: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1A5694),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Text(
+              "We couldn't identify a fish in this image. Please take a clear photo of Surmai or Pomfret fish focusing on the eyes and gills.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                color: Colors.blueGrey,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1A5694),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  "TRY AGAIN",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context, Color primaryBlue) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      actions: [
+        TextButton.icon(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: primaryBlue),
+          label: Text(
+            "Back",
+            style: GoogleFonts.poppins(
+              color: primaryBlue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const Spacer(),
+      ],
+    );
+  }
+
+  Widget _buildImageHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      height: 220,
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(28),
+        image: DecorationImage(image: FileImage(image), fit: BoxFit.cover),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _infoColumn("DATE", date, color),
-          _infoColumn("TIME", time, color),
-          _infoColumn("AREA", area, color),
-        ],
-      ),
+    );
+  }
+
+  Widget _buildScanDetails(String date, String time, String area, Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _infoColumn("DATE", date, color),
+        _infoColumn("TIME", time, color),
+        _infoColumn("TARGET", area, color),
+      ],
     );
   }
 
@@ -272,19 +243,18 @@ class ResultScreen extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 10,
-            color: Colors.grey.shade500,
             fontWeight: FontWeight.bold,
+            color: Colors.grey,
           ),
         ),
-        const SizedBox(height: 2),
         Text(
           value,
           style: TextStyle(
             fontSize: 12,
-            color: color,
             fontWeight: FontWeight.bold,
+            color: color,
           ),
         ),
       ],
@@ -293,10 +263,10 @@ class ResultScreen extends StatelessWidget {
 
   Widget _buildChip(String label, Color bg, Color text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label,
@@ -304,7 +274,6 @@ class ResultScreen extends StatelessWidget {
           color: text,
           fontSize: 12,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
         ),
       ),
     );
@@ -313,30 +282,24 @@ class ResultScreen extends StatelessWidget {
   Widget _buildMetricCard(String title, String value, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withOpacity(0.15)),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.2)),
         ),
         child: Column(
           children: [
             Text(
               value,
               style: GoogleFonts.poppins(
-                fontSize: 34,
-                fontWeight: FontWeight.w800,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
                 color: color,
               ),
             ),
-            const SizedBox(height: 4),
             Text(
               title,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: Colors.blueGrey.shade400,
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.poppins(fontSize: 12, color: Colors.blueGrey),
             ),
           ],
         ),
@@ -344,31 +307,48 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _actionButton({
-    required String label,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return SizedBox(
-      height: 55,
-      child: ElevatedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 18, color: Colors.white),
-        label: Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+  Widget _buildActionRow(BuildContext context, Color primaryBlue) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryBlue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text("SAVE", style: TextStyle(color: Colors.white)),
           ),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RecipeScreen()),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2CB88E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text("RECIPES", style: TextStyle(color: Colors.white)),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDismissButton(BuildContext context) {
+    return Center(
+      child: TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(
+          "DISMISS",
+          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
         ),
       ),
     );

@@ -1,3 +1,7 @@
-Fresh
-Moderate
-Spoiled
+data_invalid
+pomfret_fresh
+pomfret_moderate
+pomfret_spoiled
+surmai_fresh
+surmai_moderate
+surmai_spoiled
