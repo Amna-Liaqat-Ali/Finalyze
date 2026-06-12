@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await AuthService.login(email, password);
       final Map<String, dynamic> data = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(

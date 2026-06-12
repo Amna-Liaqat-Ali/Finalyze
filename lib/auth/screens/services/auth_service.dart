@@ -6,11 +6,15 @@ import '../../../core/api_config.dart';
 
 class AuthService {
   static Future<http.Response> login(String email, String password) async {
-    return await http.post(
-      Uri.parse(ApiConfig.login),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "password": password}),
-    );
+    try {
+      return await http.post(
+        Uri.parse(ApiConfig.login),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "password": password}),
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<http.Response> register(
@@ -18,14 +22,18 @@ class AuthService {
     String email,
     String password,
   ) async {
-    return await http.post(
-      Uri.parse(ApiConfig.register),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "fullName": name,
-        "email": email,
-        "password": password,
-      }),
-    );
+    try {
+      return await http.post(
+        Uri.parse(ApiConfig.register),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "fullName": name,
+          "email": email,
+          "password": password,
+        }),
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 }
