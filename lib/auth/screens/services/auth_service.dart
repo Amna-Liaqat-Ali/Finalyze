@@ -17,11 +17,14 @@ class AuthService {
     }
   }
 
-  static Future<http.Response> register(
-    String name,
-    String email,
-    String password,
-  ) async {
+  static Future<http.Response> register({
+    required String name,
+    required String email,
+    required String password,
+    required String userRole,
+    required String region,
+    required String organization,
+  }) async {
     try {
       return await http.post(
         Uri.parse(ApiConfig.register),
@@ -30,6 +33,8 @@ class AuthService {
           "fullName": name,
           "email": email,
           "password": password,
+          "userRole": userRole,
+          "region": region,
         }),
       );
     } catch (e) {
