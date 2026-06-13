@@ -34,6 +34,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '',
         trim: true
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+    otpHash: {
+        type: String
+    },
+    otpExpiresAt: {
+        type: Date
     }
 }, { timestamps: true });
 

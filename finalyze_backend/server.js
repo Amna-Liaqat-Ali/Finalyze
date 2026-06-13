@@ -1,10 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const authRoutes = require('./routes/auth');
 const scanRoutes = require('./routes/scan');
+const { verifyEmailConnection } = require('./services/emailService');
 
 const app = express();
 
@@ -15,8 +17,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/scan', scanRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
+  .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
+
+verifyEmailConnection().catch((err) => {
+  console.error('[EMAIL] SMTP verification failed:', err.message);
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {

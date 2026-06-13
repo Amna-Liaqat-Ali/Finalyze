@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../auth/screens/otp_verification_screen.dart';
 import '../../auth/screens/services/auth_service.dart';
 import '../../core/user_session.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
@@ -77,6 +78,26 @@ class _LoginScreenState extends State<LoginScreen> {
             transitionDuration: const Duration(milliseconds: 500),
           ),
           (route) => false,
+        );
+      } else if (response.statusCode == 403 &&
+          data['requiresVerification'] == true) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              data['message'] ?? 'Please verify your email with the OTP sent.',
+            ),
+            backgroundColor: Colors.orangeAccent,
+          ),
+        );
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => OtpVerificationScreen(
+              email: data['email']?.toString() ?? email,
+            ),
+          ),
         );
       } else {
         _showError(data['message'] ?? "Invalid credentials");

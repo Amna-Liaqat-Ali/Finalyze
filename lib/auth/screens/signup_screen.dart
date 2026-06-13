@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:Finalyze/auth/screens/otp_verification_screen.dart';
 import 'package:Finalyze/auth/screens/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -69,13 +70,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
             : "",
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final registeredEmail = data['email']?.toString() ?? email;
+
+        if (!mounted) return;
+
         _showSnackBar(
-          "Registration successful! Please login.",
+          data['message'] ?? 'OTP sent to your email.',
           const Color(0xFF2CB88E),
         );
-        _orgController.clear();
-        Future.delayed(const Duration(seconds: 1), () => widget.onLoginTap());
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => OtpVerificationScreen(email: registeredEmail),
+          ),
+        );
       } else {
         final data = jsonDecode(response.body);
         _showSnackBar(

@@ -9,8 +9,8 @@ class AuthService {
     try {
       return await http.post(
         Uri.parse(ApiConfig.login),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
       );
     } catch (e) {
       rethrow;
@@ -28,17 +28,37 @@ class AuthService {
     try {
       return await http.post(
         Uri.parse(ApiConfig.register),
-        headers: {"Content-Type": "application/json"},
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "fullName": name,
-          "email": email,
-          "password": password,
-          "userRole": userRole,
-          "region": region,
+          'fullName': name,
+          'email': email,
+          'password': password,
+          'userRole': userRole,
+          'region': region,
+          'organization': organization,
         }),
       );
     } catch (e) {
       rethrow;
     }
+  }
+
+  static Future<http.Response> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    return http.post(
+      Uri.parse(ApiConfig.verifyOtp),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'otp': otp}),
+    );
+  }
+
+  static Future<http.Response> resendOtp({required String email}) async {
+    return http.post(
+      Uri.parse(ApiConfig.resendOtp),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
   }
 }
