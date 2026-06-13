@@ -17,6 +17,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  final GlobalKey<HistoryScreenState> _historyKey = GlobalKey();
 
   late final List<Widget> _screens;
 
@@ -26,8 +27,11 @@ class _MainScreenState extends State<MainScreen> {
 
     _screens = [
       const HomeScreen(),
-      ScanScreen(cameras: cameras),
-      HistoryScreen(userId: ''),
+      ScanScreen(
+        cameras: cameras,
+        onScanCompleted: () => _historyKey.currentState?.refreshHistory(),
+      ),
+      HistoryScreen(key: _historyKey, userId: ''),
       const GuideScreen(),
       const RecipeScreen(),
     ];
@@ -37,6 +41,9 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 2) {
+      _historyKey.currentState?.refreshHistory();
+    }
   }
 
   @override

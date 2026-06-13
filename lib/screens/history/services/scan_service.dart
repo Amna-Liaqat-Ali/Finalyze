@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../core/api_config.dart';
+import '../../../core/user_session.dart';
 
 class ScanService {
   static Future<http.StreamedResponse> saveScanResult({
@@ -43,6 +46,58 @@ class ScanService {
       return await request.send();
     } catch (e) {
       rethrow;
+    }
+  }
+
+  static Future<bool> saveScanFromAnalysis({
+    required File imageFile,
+    required String detectedLabel,
+    required double confidence,
+    required String scanArea,
+  }) async {
+    if (!UserSession.isLoggedIn) return false;
+
+    final normalizedLabel = detectedLabel.toLowerCase();
+    if (normalizedLabel == 'data_invalid' ||
+        normalizedLabel == 'invalid_data' ||
+        confidence < 0.4) {
+      return false;
+    }
+
+    final parts = detectedLabel.split('_');
+    final species = parts.isNotEmpty ? parts[0].toUpperCase() : 'UNKNOWN';
+    final status = parts.length > 1 ? parts[1].toUpperCase() : 'UNKNOWN';
+
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd').format(now);
+    final formattedTime = DateFormat('hh:mm:ss a').format(now);
+
+    try {
+      if (!await imageFile.exists()) {
+        debugPrint('[ScanService] Image file missing: ${imageFile.path}');
+        return false;
+      }
+
+      final response = await saveScanResult(
+        userId: UserSession.userId!,
+        imageFile: imageFile,
+        fishName: species,
+        category: status,
+        percentage: confidence * 100,
+        area: scanArea,
+        date: formattedDate,
+        time: formattedTime,
+      );
+
+      final body = await response.stream.bytesToString();
+      debugPrint(
+        '[ScanService] Save response ${response.statusCode}: $body',
+      );
+
+      return response.statusCode == 201;
+    } catch (e) {
+      debugPrint('[ScanService] Save failed: $e');
+      return false;
     }
   }
 

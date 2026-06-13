@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../auth/screens/services/auth_service.dart';
+import '../../core/user_session.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -47,6 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (!mounted) return;
+
+        UserSession.initialize(
+          id: data['userId'].toString(),
+          userToken: data['token'].toString(),
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

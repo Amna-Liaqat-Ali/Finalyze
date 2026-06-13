@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/api_config.dart';
+import '../../core/user_session.dart';
 import 'services/scan_service.dart';
 
 enum ScanStatus { fresh, fair, moderate, spoiled }
@@ -69,25 +70,42 @@ class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key, required this.userId});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  State<HistoryScreen> createState() => HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+// Named state made public so external parent tab containers can call refreshState() manually via Keys
+class HistoryScreenState extends State<HistoryScreen> {
   bool isGalleryView = true;
   ScanHistory? selectedItem;
   late Future<List<ScanHistory>> _historyFuture;
 
   static const primaryBlue = Color(0xFF1A5694);
 
+  // Read active target User Identity safely from whichever variable contains information
+  String get effectiveUserId => (widget.userId.isNotEmpty)
+      ? widget.userId
+      : (UserSession.userId ?? '');
+
   @override
   void initState() {
     super.initState();
-    _refreshHistory();
+    refreshHistory();
   }
 
-  void _refreshHistory() {
+  @override
+  void didUpdateWidget(covariant HistoryScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Auto query backend records if host configuration framework shifts parent trees
+    refreshHistory();
+  }
+
+  void refreshHistory() {
+    if (!mounted) return;
     setState(() {
-      _historyFuture = ScanService.getUserScanHistory(widget.userId)
+      debugPrint(
+        ">>>> [HISTORY VIEW]: Re-querying backend scan indices for: $effectiveUserId",
+      );
+      _historyFuture = ScanService.getUserScanHistory(effectiveUserId)
           .then((rawData) {
             if (rawData == null || rawData is! List) {
               return <ScanHistory>[];
@@ -99,7 +117,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 .toList();
           })
           .catchError((error) {
-            print("Caught history loading exception thread: $error");
+            debugPrint("Caught history loading exception thread: $error");
             return <ScanHistory>[];
           });
     });
@@ -143,7 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: primaryBlue),
-            onPressed: _refreshHistory,
+            onPressed: refreshHistory,
           ),
         ],
       ),
@@ -268,24 +286,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildGalleryView(List<ScanHistory> items) {
-    return SingleChildScrollView(
+    return GridView.builder(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: items.map((item) => _buildGridItem(item)).toList(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.74,
       ),
+      itemCount: items.length,
+      itemBuilder: (context, index) => _buildGridItem(items[index]),
     );
   }
 
   Widget _buildGridItem(ScanHistory item) {
-    double itemWidth = (MediaQuery.of(context).size.width - 32 - 24) / 3;
     return GestureDetector(
       onTap: () => setState(() => selectedItem = item),
       child: Container(
-        width: itemWidth,
-        height: itemWidth * 1.35,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -297,20 +315,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(15),
-                    ),
-                    child: Image.network(
-                      _getAbsoluteImageUrl(item.image),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorBuilder: (c, e, s) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.broken_image,
-                          color: Colors.grey,
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(15),
+                      ),
+                      child: Image.network(
+                        _getAbsoluteImageUrl(item.image),
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) => Container(
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),

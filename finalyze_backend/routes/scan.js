@@ -1,12 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const Scan = require('../models/Scan');
 
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); 
+        cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}_${path.basename(file.originalname)}`);
@@ -34,7 +40,7 @@ router.post('/save-scan', upload.single('fishImage'), async (req, res) => {
 
         const newScan = new Scan({
             userId,
-            imagePath: req.file.path, 
+            imagePath: `uploads/${req.file.filename}`,
             fishName,
             category,
             percentage: parseFloat(percentage),

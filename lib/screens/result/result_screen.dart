@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/user_session.dart';
 import '../cook/recipe_screen.dart';
+import '../history/services/scan_service.dart';
 
-class ResultScreen extends StatelessWidget {
+enum _SaveStatus { saving, saved, failed, skipped }
+
+class ResultScreen extends StatefulWidget {
   final File image;
   final String detectedLabel;
   final double confidence;
   final String scanArea;
+  final VoidCallback? onSaved;
 
   const ResultScreen({
     super.key,
@@ -18,22 +23,58 @@ class ResultScreen extends StatelessWidget {
     required this.detectedLabel,
     required this.confidence,
     this.scanArea = "Eye & Gills",
+    this.onSaved,
   });
 
   @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  _SaveStatus _saveStatus = _SaveStatus.saving;
+
+  @override
+  void initState() {
+    super.initState();
+    _saveToHistory();
+  }
+
+  Future<void> _saveToHistory() async {
+    if (!UserSession.isLoggedIn) {
+      if (mounted) setState(() => _saveStatus = _SaveStatus.skipped);
+      return;
+    }
+
+    final saved = await ScanService.saveScanFromAnalysis(
+      imageFile: widget.image,
+      detectedLabel: widget.detectedLabel,
+      confidence: widget.confidence,
+      scanArea: widget.scanArea,
+    );
+
+    if (!mounted) return;
+
+    setState(() => _saveStatus = saved ? _SaveStatus.saved : _SaveStatus.failed);
+
+    if (saved) {
+      widget.onSaved?.call();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (detectedLabel == "data_invalid" || confidence < 0.4) {
+    if (widget.detectedLabel == "data_invalid" || widget.confidence < 0.4) {
       return _buildInvalidScanUI(context);
     }
 
-    List<String> parts = detectedLabel.split('_');
+    List<String> parts = widget.detectedLabel.split('_');
     String species = parts.isNotEmpty ? parts[0].toUpperCase() : "UNKNOWN";
     String status = parts.length > 1 ? parts[1].toUpperCase() : "UNKNOWN";
 
     final bool isFresh = status.toLowerCase() == 'fresh';
     final bool isModerate = status.toLowerCase() == 'moderate';
 
-    final Color primaryBlue = const Color(0xFF1A5694);
+    const Color primaryBlue = Color(0xFF1A5694);
     final Color statusColor = isFresh
         ? const Color(0xFF2CB88E)
         : (isModerate ? Colors.orange : Colors.redAccent);
@@ -54,10 +95,10 @@ class ResultScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildScanDetails(scanDate, scanTime, scanArea, primaryBlue),
+                  _buildScanDetails(scanDate, scanTime, widget.scanArea, primaryBlue),
+                  const SizedBox(height: 20),
+                  _buildSaveStatusBanner(primaryBlue),
                   const SizedBox(height: 24),
-
-                  // Species & Status Chips
                   Row(
                     children: [
                       _buildChip(
@@ -73,7 +114,6 @@ class ResultScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 24),
                   Text(
                     "$species: $status",
@@ -85,14 +125,13 @@ class ResultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Our AI identified this as $species. The biological markers in the $scanArea indicate a $status state with ${(confidence * 100).toStringAsFixed(1)}% confidence.",
+                    "Our AI identified this as $species. The biological markers in the ${widget.scanArea} indicate a $status state with ${(widget.confidence * 100).toStringAsFixed(1)}% confidence.",
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       color: Colors.blueGrey.shade600,
                       height: 1.6,
                     ),
                   ),
-
                   const SizedBox(height: 32),
                   Row(
                     children: [
@@ -104,12 +143,11 @@ class ResultScreen extends StatelessWidget {
                       const SizedBox(width: 16),
                       _buildMetricCard(
                         "Confidence",
-                        "${(confidence * 100).toInt()}%",
+                        "${(widget.confidence * 100).toInt()}%",
                         primaryBlue,
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 40),
                   _buildActionRow(context, primaryBlue),
                   _buildDismissButton(context),
@@ -122,7 +160,76 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  //Screen for Invalid objects
+  Widget _buildSaveStatusBanner(Color primaryBlue) {
+    late final Color bgColor;
+    late final Color borderColor;
+    late final Color iconColor;
+    late final IconData icon;
+    late final String message;
+
+    switch (_saveStatus) {
+      case _SaveStatus.saving:
+        bgColor = primaryBlue.withOpacity(0.08);
+        borderColor = primaryBlue.withOpacity(0.2);
+        iconColor = primaryBlue;
+        icon = Icons.cloud_upload_rounded;
+        message = "Saving scan to your history...";
+      case _SaveStatus.saved:
+        bgColor = const Color(0xFF2CB88E).withOpacity(0.08);
+        borderColor = const Color(0xFF2CB88E).withOpacity(0.2);
+        iconColor = const Color(0xFF2CB88E);
+        icon = Icons.cloud_done_rounded;
+        message = "Scan saved to your history.";
+      case _SaveStatus.failed:
+        bgColor = Colors.redAccent.withOpacity(0.08);
+        borderColor = Colors.redAccent.withOpacity(0.2);
+        iconColor = Colors.redAccent;
+        icon = Icons.cloud_off_rounded;
+        message = "Could not save to history. Check your connection.";
+      case _SaveStatus.skipped:
+        bgColor = Colors.orange.withOpacity(0.08);
+        borderColor = Colors.orange.withOpacity(0.2);
+        iconColor = Colors.orange;
+        icon = Icons.info_outline_rounded;
+        message = "Log in to save scans to your history.";
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          if (_saveStatus == _SaveStatus.saving)
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: iconColor,
+              ),
+            )
+          else
+            Icon(icon, color: iconColor, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: GoogleFonts.poppins(
+                color: primaryBlue,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInvalidScanUI(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -155,7 +262,7 @@ class ResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             Text(
-              "We couldn't identify a fish in this image. Please take a clear photo of Surmai or Pomfret fish focusing on the eyes and gills.",
+              "We couldn't identify a fish in this image. Please take a clear photo focusing on the eyes and gills.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 15,
@@ -221,7 +328,10 @@ class ResultScreen extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        image: DecorationImage(image: FileImage(image), fit: BoxFit.cover),
+        image: DecorationImage(
+          image: FileImage(widget.image),
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
@@ -312,19 +422,6 @@ class ResultScreen extends StatelessWidget {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryBlue,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text("SAVE", style: TextStyle(color: Colors.white)),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton(
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const RecipeScreen()),
@@ -335,7 +432,13 @@ class ResultScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text("RECIPES", style: TextStyle(color: Colors.white)),
+            child: const Text(
+              "VIEW RECIPES",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ],

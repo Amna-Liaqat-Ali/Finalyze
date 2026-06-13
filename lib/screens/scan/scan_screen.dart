@@ -1,15 +1,18 @@
 import 'dart:io';
 
-import 'package:Finalyze/screens/home/widgets/settings_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../result/review_screen.dart';
+import '../home/widgets/settings_screen.dart';
+import '../Main/analyzing_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
-  const ScanScreen({super.key, required this.cameras});
+  final VoidCallback?
+  onScanCompleted; // Callback to notify history screen container wrapper to refresh tabs
+
+  const ScanScreen({super.key, required this.cameras, this.onScanCompleted});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -19,6 +22,9 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   CameraController? _controller;
   bool _isInitialized = false;
   bool _isFlashOn = false;
+  bool _isProcessing = false;
+
+  static const primaryBlue = Color(0xFF1A5694);
 
   @override
   void initState() {
@@ -69,22 +75,34 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   Future<void> _takePicture() async {
     if (_controller == null ||
         !_controller!.value.isInitialized ||
-        _controller!.value.isTakingPicture)
+        _controller!.value.isTakingPicture ||
+        _isProcessing)
       return;
 
+    setState(() => _isProcessing = true);
+
     try {
+      debugPrint(">>>> [STEP 1]: Initiating hardware camera capture frame...");
       final XFile photo = await _controller!.takePicture();
+      final File imageFile = File(photo.path);
+      debugPrint(">>>> [STEP 2]: Picture written to disk path cache: ${imageFile.path}");
 
       if (mounted) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ReviewScreen(image: File(photo.path)),
+            builder: (_) => AnalyzingScreen(image: imageFile),
           ),
-        );
+        ).then((_) {
+          if (widget.onScanCompleted != null) {
+            widget.onScanCompleted!();
+          }
+        });
       }
-    } catch (e) {
-      debugPrint("Capture Error: $e");
+    } catch (cameraHardwareException) {
+      debugPrint(">>>> ❌ [HARDWARE CAPTURE ERROR]: $cameraHardwareException");
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -114,9 +132,15 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
               : const Center(
                   child: CircularProgressIndicator(color: Colors.white),
                 ),
-
           _buildViewFinderOverlay(),
           _buildBottomControls(),
+          if (_isProcessing)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF4EE3AA)),
+              ),
+            ),
         ],
       ),
     );
@@ -136,7 +160,6 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
             _corner(top: 0, right: 0, rot: 1.57, color: tealFrameColor),
             _corner(bottom: 0, left: 0, rot: 4.71, color: tealFrameColor),
             _corner(bottom: 0, right: 0, rot: 3.14, color: tealFrameColor),
-
             Center(
               child: Container(
                 width: 12,
@@ -219,7 +242,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.settings_outlined),
-        color: const Color(0xFF1A5694),
+        color: primaryBlue,
         onPressed: () {
           Navigator.push(
             context,
@@ -230,7 +253,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       title: Text(
         "Finalyze",
         style: GoogleFonts.poppins(
-          color: const Color(0xFF1A5694),
+          color: primaryBlue,
           fontWeight: FontWeight.bold,
           fontSize: 20,
         ),
@@ -239,7 +262,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_none_outlined),
-          color: const Color(0xFF1A5694),
+          color: primaryBlue,
           onPressed: () {},
         ),
       ],

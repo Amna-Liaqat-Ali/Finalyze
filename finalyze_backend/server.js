@@ -6,13 +6,19 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth'); 
 const scanRoutes = require('./routes/scan');
 
+const fs = require('fs');
 const path = require('path');
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/scan', scanRoutes);
