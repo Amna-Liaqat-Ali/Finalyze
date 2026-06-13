@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:Finalyze/auth/screens/welcome_screen.dart';
+import 'package:Finalyze/core/user_session.dart'; // Imported to check session
+import 'package:Finalyze/screens/Main/MainScreen.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,27 +30,46 @@ class _SplashScreenState extends State<SplashScreen> {
           ..initialize().then((_) {
             setState(() {});
             _videoController.setLooping(true);
-            _videoController.setVolume(0.0); // Mute video to use separate MP3
+            _videoController.setVolume(0.0);
             _videoController.play();
           });
 
-    // Play Separate Background MP3
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
     _audioPlayer.setVolume(100.0);
     _audioPlayer.play(AssetSource('sounds/ocean_sound.mp3'));
-    // Trigger Title Animation
+
     Timer(const Duration(microseconds: 800), () {
       setState(() => _startAnimation = true);
     });
 
-    Timer(const Duration(seconds: 5), () {
-      _videoController.pause();
-      _audioPlayer.stop();
+    _kickstartSessionAndRoute();
+  }
+
+  //  load data quietly while splash plays
+  Future<void> _kickstartSessionAndRoute() async {
+    // Read the disk storage check while the video plays backgrounded
+    await UserSession.loadSession();
+
+    // Allow splash screen to show for at least 5 seconds total runtime
+    await Future.delayed(const Duration(seconds: 5));
+
+    if (!mounted) return;
+
+    _videoController.pause();
+    _audioPlayer.stop();
+
+    // Conditional navigation based on login status evaluation
+    if (UserSession.isLoggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    } else {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const AuthWrapper()),
       );
-    });
+    }
   }
 
   @override
@@ -63,16 +84,12 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Video Layer
           SizedBox.expand(
             child: _videoController.value.isInitialized
                 ? VideoPlayer(_videoController)
                 : Container(color: const Color(0xFF001F3F)),
           ),
-
           Container(color: Colors.black.withOpacity(0.2)),
-
-          // Animated Title Layer
           Center(
             child: AnimatedOpacity(
               duration: const Duration(seconds: 2),

@@ -20,8 +20,10 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   bool _isVerifying = false;
@@ -92,7 +94,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        UserSession.initialize(
+        await UserSession.initialize(
           id: data['userId'].toString(),
           userToken: data['token'].toString(),
         );
@@ -208,7 +210,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.4),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                        ),
                       ),
                       child: const Icon(
                         Icons.arrow_back,

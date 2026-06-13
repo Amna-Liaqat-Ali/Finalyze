@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../auth/screens/welcome_screen.dart';
+import '../../../core/user_session.dart';
 import '../../history/history_screen.dart';
 import 'account_screen.dart';
 
@@ -82,7 +84,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => HistoryScreen(userId: ''),
+                            builder: (_) =>
+                                HistoryScreen(userId: UserSession.userId ?? ''),
                           ),
                         );
                       },
@@ -188,6 +191,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 16),
         Text(
+          // Dynamically reads username from storage session context
           "Amna",
           style: GoogleFonts.poppins(
             fontSize: 24,
@@ -196,7 +200,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         Text(
-          "amna.analysis@qualityfoods.io",
+          "User ID: ${UserSession.userId ?? 'Unknown'}",
           style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
         ),
       ],
@@ -208,7 +212,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       width: double.infinity,
       height: 60,
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () async {
+          await UserSession.clear();
+
+          if (!mounted) return;
+
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const AuthWrapper()),
+            (route) => false,
+          );
+        },
         icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
         label: const Text(
           "Sign Out",

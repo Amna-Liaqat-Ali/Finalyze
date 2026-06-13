@@ -51,11 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (!mounted) return;
 
-        UserSession.initialize(
+        await UserSession.initialize(
           id: data['userId'].toString(),
           userToken: data['token'].toString(),
         );
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Login Successful!"),
@@ -222,8 +221,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (_) => ForgotPasswordScreen(
-                                            initialEmail:
-                                                _emailController.text.trim(),
+                                            initialEmail: _emailController.text
+                                                .trim(),
                                           ),
                                         ),
                                       );

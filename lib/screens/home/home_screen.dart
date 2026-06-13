@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        'Good Morning, Amna',
+                        'Good Morning',
                         style: TextStyle(color: Colors.grey[700], fontSize: 16),
                       ),
                     ],
