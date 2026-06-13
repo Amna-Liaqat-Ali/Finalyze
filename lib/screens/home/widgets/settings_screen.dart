@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../constants/history_data.dart';
 import '../../history/history_screen.dart';
 import 'account_screen.dart';
 
@@ -83,8 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                HistoryScreen(historyItems: historyData),
+                            builder: (_) => HistoryScreen(userId: ''),
                           ),
                         );
                       },

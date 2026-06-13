@@ -8,7 +8,6 @@ import 'package:Finalyze/screens/species/widgets/species_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../constants/history_data.dart';
 import '../result/review_screen.dart';
 import 'widgets/stat_card.dart';
 
@@ -162,8 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              HistoryScreen(historyItems: historyData),
+                          builder: (context) => HistoryScreen(userId: ''),
                         ),
                       );
                     }),

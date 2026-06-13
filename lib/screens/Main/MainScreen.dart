@@ -1,7 +1,6 @@
 import 'package:Finalyze/screens/Main/bottom_nav.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/history_data.dart';
 import '../../main.dart';
 import '../cook/recipe_screen.dart';
 import '../guide/guide_screen.dart';
@@ -28,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
     _screens = [
       const HomeScreen(),
       ScanScreen(cameras: cameras),
-      HistoryScreen(historyItems: historyData),
+      HistoryScreen(userId: ''),
       const GuideScreen(),
       const RecipeScreen(),
     ];

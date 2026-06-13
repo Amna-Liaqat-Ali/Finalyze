@@ -3,4 +3,5 @@ class ApiConfig {
 
   static String get login => '$baseUrl/auth/signin';
   static String get register => '$baseUrl/auth/signup';
+  static String get saveScan => '$baseUrl/scan/save-scan';
 }
