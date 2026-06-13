@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../auth/screens/forgot_password_screen.dart';
 import '../../auth/screens/otp_verification_screen.dart';
 import '../../auth/screens/services/auth_service.dart';
 import '../../core/user_session.dart';
@@ -213,7 +214,31 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _passwordController,
                                   isPassword: true,
                                 ),
-                                const SizedBox(height: 30),
+                                const SizedBox(height: 8),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => ForgotPasswordScreen(
+                                            initialEmail:
+                                                _emailController.text.trim(),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Forgot password?',
+                                      style: GoogleFonts.poppins(
+                                        color: primaryBlue,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
 
                                 InkWell(
                                   onTap: _isLoading ? null : _handleLogin,

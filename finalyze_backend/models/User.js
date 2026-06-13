@@ -44,6 +44,11 @@ const userSchema = new mongoose.Schema({
     },
     otpExpiresAt: {
         type: Date
+    },
+    otpPurpose: {
+        type: String,
+        enum: ['verification', 'password_reset'],
+        default: 'verification'
     }
 }, { timestamps: true });
 

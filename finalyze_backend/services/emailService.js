@@ -112,7 +112,7 @@ async function verifyEmailConnection() {
     }
 }
 
-async function sendOtpEmail(to, otp, fullName) {
+async function sendOtpEmail(to, otp, fullName, purpose = 'verification') {
     if (!isEmailConfigured()) {
         throw new Error(
             'Email is not configured. Set SMTP_USER, SMTP_PASS, and SMTP_HOST in finalyze_backend/.env'
@@ -120,18 +120,31 @@ async function sendOtpEmail(to, otp, fullName) {
     }
 
     const from = process.env.EMAIL_FROM || `Finalyze <${getSmtpCredentials().user}>`;
-    const subject = 'Your Finalyze verification code';
-    const text = `Hi ${fullName},\n\nYour Finalyze verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you did not request this, please ignore this email.`;
+    const isPasswordReset = purpose === 'password_reset';
+    const subject = isPasswordReset
+        ? 'Your Finalyze password reset code'
+        : 'Your Finalyze verification code';
+    const intro = isPasswordReset
+        ? 'Use the code below to reset your password:'
+        : 'Use the code below to verify your email address:';
+    const title = isPasswordReset
+        ? 'Finalyze Password Reset'
+        : 'Finalyze Email Verification';
+    const footer = isPasswordReset
+        ? 'If you did not request a password reset, you can ignore this email.'
+        : 'If you did not create a Finalyze account, you can ignore this email.';
+
+    const text = `Hi ${fullName},\n\n${intro}\n\n${otp}\n\nThis code expires in 10 minutes.\n\n${footer}`;
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
-            <h2 style="color: #1A5694;">Finalyze Email Verification</h2>
+            <h2 style="color: #1A5694;">${title}</h2>
             <p>Hi ${fullName},</p>
-            <p>Use the code below to verify your email address:</p>
+            <p>${intro}</p>
             <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #1A5694; padding: 16px 0;">
                 ${otp}
             </div>
             <p style="color: #666;">This code expires in 10 minutes.</p>
-            <p style="color: #999; font-size: 12px;">If you did not create a Finalyze account, you can ignore this email.</p>
+            <p style="color: #999; font-size: 12px;">${footer}</p>
         </div>
     `;
 
