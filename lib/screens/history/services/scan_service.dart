@@ -4,13 +4,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:path/path.dart' as path;
 
 import '../../../core/api_config.dart';
 import '../../../core/user_session.dart';
 
 class ScanService {
-  static Future<http.StreamedResponse> saveScanResult({
+  static Future<http.Response> saveScanResult({
     required String userId,
     required File imageFile,
     required String fishName,
@@ -20,33 +19,23 @@ class ScanService {
     required String date,
     required String time,
   }) async {
-    try {
-      final url = Uri.parse(ApiConfig.saveScan);
-      final request = http.MultipartRequest('POST', url);
+    final imageBytes = await imageFile.readAsBytes();
+    final imageData = base64Encode(imageBytes);
 
-      request.fields['userId'] = userId;
-      request.fields['fishName'] = fishName;
-      request.fields['category'] = category;
-      request.fields['percentage'] = percentage.toString();
-      request.fields['area'] = area;
-      request.fields['scanDate'] = date;
-      request.fields['scanTime'] = time;
-
-      final stream = http.ByteStream(imageFile.openRead());
-      final length = await imageFile.length();
-
-      final multipartFile = http.MultipartFile(
-        'fishImage',
-        stream,
-        length,
-        filename: path.basename(imageFile.path),
-      );
-
-      request.files.add(multipartFile);
-      return await request.send();
-    } catch (e) {
-      rethrow;
-    }
+    return http.post(
+      Uri.parse(ApiConfig.saveScan),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': userId,
+        'fishName': fishName,
+        'category': category,
+        'percentage': percentage,
+        'area': area,
+        'scanDate': date,
+        'scanTime': time,
+        'imageData': imageData,
+      }),
+    );
   }
 
   static Future<bool> saveScanFromAnalysis({
@@ -89,9 +78,8 @@ class ScanService {
         time: formattedTime,
       );
 
-      final body = await response.stream.bytesToString();
       debugPrint(
-        '[ScanService] Save response ${response.statusCode}: $body',
+        '[ScanService] Save response ${response.statusCode}: ${response.body}',
       );
 
       return response.statusCode == 201;
@@ -106,14 +94,14 @@ class ScanService {
       final url = Uri.parse('${ApiConfig.baseUrl}/scan/history/$userId');
       final response = await http.get(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
         throw Exception(
-          "Failed loading history logs from server pipeline backend.",
+          'Failed loading history logs from server pipeline backend.',
         );
       }
     } catch (e) {

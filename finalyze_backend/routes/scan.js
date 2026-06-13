@@ -1,25 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
 const Scan = require('../models/Scan');
-
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}_${path.basename(file.originalname)}`);
-    }
-});
-
-const upload = multer({ storage: storage });
 
 router.get('/history/:userId', async (req, res) => {
     try {
@@ -30,27 +11,39 @@ router.get('/history/:userId', async (req, res) => {
     }
 });
 
-router.post('/save-scan', upload.single('fishImage'), async (req, res) => {
+router.post('/save-scan', async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: "Fish image file payload is required." });
-        }
+        const {
+            userId,
+            fishName,
+            category,
+            percentage,
+            area,
+            scanDate,
+            scanTime,
+            imageData,
+        } = req.body;
 
-        const { userId, fishName, category, percentage, area, scanDate, scanTime } = req.body;
+        if (!imageData) {
+            return res.status(400).json({ message: "Image data payload is required." });
+        }
 
         const newScan = new Scan({
             userId,
-            imagePath: `uploads/${req.file.filename}`,
+            imageData,
             fishName,
             category,
             percentage: parseFloat(percentage),
             area,
             scanDate,
-            scanTime
+            scanTime,
         });
 
         await newScan.save();
-        res.status(201).json({ message: "Scan metrics saved successfully to history profile!", scan: newScan });
+        res.status(201).json({
+            message: "Scan metrics saved successfully to history profile!",
+            scan: newScan,
+        });
     } catch (error) {
         console.error("Save Scan Backend Failure:", error);
         res.status(500).json({ error: error.message });

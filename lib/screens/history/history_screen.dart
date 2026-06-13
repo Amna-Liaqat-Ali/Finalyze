@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class ScanHistory {
       source: json['area'] ?? 'General Port',
       dateTime: parsedDate,
       status: parsedStatus,
-      image: json['imagePath'] ?? '',
+      image: json['imageData'] ?? json['imagePath'] ?? '',
       confidence: (json['percentage'] ?? 0.0).toDouble().round(),
     );
   }
@@ -140,6 +141,50 @@ class HistoryScreenState extends State<HistoryScreen> {
     final cleanPath = targetPath.replaceAll(r'\', '/');
     final String serverBase = ApiConfig.baseUrl.replaceAll('/api', '');
     return '$serverBase/$cleanPath';
+  }
+
+  bool _isNetworkImage(String image) {
+    return image.startsWith('http') || image.startsWith('uploads/');
+  }
+
+  Widget _buildHistoryImage(
+    String image, {
+    BoxFit fit = BoxFit.cover,
+    double? width,
+    double? height,
+  }) {
+    final placeholder = Container(
+      width: width,
+      height: height,
+      color: Colors.grey[200],
+      child: const Icon(Icons.broken_image, color: Colors.grey),
+    );
+
+    if (image.isEmpty) return placeholder;
+
+    if (_isNetworkImage(image)) {
+      return Image.network(
+        _getAbsoluteImageUrl(image),
+        fit: fit,
+        width: width,
+        height: height,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
+    }
+
+    try {
+      final base64Data = image.contains(',') ? image.split(',').last : image;
+      final bytes = base64Decode(base64Data);
+      return Image.memory(
+        bytes,
+        fit: fit,
+        width: width,
+        height: height,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
+    } catch (_) {
+      return placeholder;
+    }
   }
 
   @override
@@ -320,17 +365,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(15),
                       ),
-                      child: Image.network(
-                        _getAbsoluteImageUrl(item.image),
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, e, s) => Container(
-                          color: Colors.grey[200],
-                          child: const Icon(
-                            Icons.broken_image,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
+                      child: _buildHistoryImage(item.image, fit: BoxFit.cover),
                     ),
                   ),
                   Positioned(
@@ -399,17 +434,11 @@ class HistoryScreenState extends State<HistoryScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                _getAbsoluteImageUrl(item.image),
+              child: _buildHistoryImage(
+                item.image,
                 width: 60,
                 height: 60,
                 fit: BoxFit.cover,
-                errorBuilder: (c, e, s) => Container(
-                  width: 60,
-                  height: 60,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.broken_image, color: Colors.grey),
-                ),
               ),
             ),
             const SizedBox(width: 15),
@@ -476,20 +505,11 @@ class HistoryScreenState extends State<HistoryScreen> {
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(28),
                     ),
-                    child: Image.network(
-                      _getAbsoluteImageUrl(item.image),
+                    child: _buildHistoryImage(
+                      item.image,
                       fit: BoxFit.cover,
                       height: 190,
                       width: double.infinity,
-                      errorBuilder: (c, e, s) => Container(
-                        height: 190,
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.broken_image,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      ),
                     ),
                   ),
                   Padding(

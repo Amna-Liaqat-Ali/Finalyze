@@ -6,8 +6,8 @@ const scanSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    imagePath: {
-        type: String, 
+    imageData: {
+        type: String,
         required: true
     },
     fishName: {
@@ -15,7 +15,7 @@ const scanSchema = new mongoose.Schema({
         required: true
     },
     category: {
-        type: String, 
+        type: String,
         required: true
     },
     percentage: {
@@ -23,15 +23,15 @@ const scanSchema = new mongoose.Schema({
         required: true
     },
     area: {
-        type: String, 
+        type: String,
         required: true
     },
     scanDate: {
-        type: String, 
+        type: String,
         required: true
     },
     scanTime: {
-        type: String, 
+        type: String,
         required: true
     }
 }, { timestamps: true });
