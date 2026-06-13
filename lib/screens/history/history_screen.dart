@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import '../../../core/api_config.dart';
 import 'services/scan_service.dart';
 
-// Structured representation of categories matching your AI analysis metrics
 enum ScanStatus { fresh, fair, moderate, spoiled }
 
 class ScanHistory {
@@ -29,7 +28,6 @@ class ScanHistory {
     required this.confidence,
   });
 
-  // Maps backend JSON documents safely into local state objects
   factory ScanHistory.fromJson(Map<String, dynamic> json) {
     ScanStatus parsedStatus;
     switch (json['category'].toString().toLowerCase()) {
@@ -89,9 +87,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _refreshHistory() {
     setState(() {
-      _historyFuture = ScanService.getUserScanHistory(
-        widget.userId,
-      ).then((data) => data.map((json) => ScanHistory.fromJson(json)).toList());
+      _historyFuture = ScanService.getUserScanHistory(widget.userId)
+          .then((rawData) {
+            if (rawData == null || rawData is! List) {
+              return <ScanHistory>[];
+            }
+            return rawData
+                .map(
+                  (json) => ScanHistory.fromJson(json as Map<String, dynamic>),
+                )
+                .toList();
+          })
+          .catchError((error) {
+            print("Caught history loading exception thread: $error");
+            return <ScanHistory>[];
+          });
     });
   }
 
@@ -151,7 +161,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Text("Error fetching records: ${snapshot.error}"),
                 );
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                // Professional, Clean Empty State View UI Block
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -189,38 +198,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             fontSize: 13,
                             color: Colors.grey.shade500,
                             height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        SizedBox(
-                          width: 160,
-                          height: 46,
-                          child: OutlinedButton.icon(
-                            onPressed: _refreshHistory,
-                            icon: const Icon(
-                              Icons.refresh_rounded,
-                              size: 18,
-                              color: primaryBlue,
-                            ),
-                            label: Text(
-                              "Check Again",
-                              style: GoogleFonts.lexend(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: primaryBlue,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: primaryBlue.withOpacity(0.3),
-                                width: 1.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              backgroundColor: Colors.white,
-                              elevation: 0,
-                            ),
                           ),
                         ),
                       ],
