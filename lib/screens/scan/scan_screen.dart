@@ -4,6 +4,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../widgets/app_back_button.dart';
+import '../../widgets/app_inner_bar.dart';
 import '../home/widgets/settings_screen.dart';
 import '../Main/analyzing_screen.dart';
 
@@ -237,33 +239,16 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   }
 
   PreferredSizeWidget _buildDecentAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.settings_outlined),
-        color: primaryBlue,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsScreen()),
-          );
-        },
-      ),
-      title: Text(
-        "Finalyze",
-        style: GoogleFonts.poppins(
-          color: primaryBlue,
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        ),
-      ),
-      centerTitle: true,
+    return AppInnerBar(
+      title: "Scan",
+      showBack: false,
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_none_outlined),
-          color: primaryBlue,
-          onPressed: () {},
+          icon: const Icon(Icons.settings_outlined, color: primaryBlue, size: 22),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
+          ),
         ),
       ],
     );

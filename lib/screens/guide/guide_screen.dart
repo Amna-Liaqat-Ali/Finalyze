@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../widgets/app_inner_bar.dart';
+
 class GuideScreen extends StatelessWidget {
   const GuideScreen({super.key});
 
@@ -13,20 +15,7 @@ class GuideScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(
-          "Scan Guide",
-          style: GoogleFonts.poppins(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: const [],
-      ),
+      appBar: const AppInnerBar(title: "Scan Guide", showBack: false),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(

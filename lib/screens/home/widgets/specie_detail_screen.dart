@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../widgets/app_back_button.dart';
+import '../../../widgets/app_inner_bar.dart';
 import '../../species/models/fish_specie.dart';
 
 class SpeciesDetailScreen extends StatelessWidget {
@@ -15,14 +16,7 @@ class SpeciesDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Center(child: AppBackButton(onTap: () => Navigator.pop(context))),
-        ),
-      ),
+      appBar: AppInnerBar(title: fish.name, onBack: () => Navigator.pop(context)),
       body: Stack(
         children: [
           SingleChildScrollView(

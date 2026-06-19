@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/user_session.dart';
 import '../../widgets/app_back_button.dart';
+import '../../widgets/app_inner_bar.dart';
 import '../cook/recipe_screen.dart';
 import '../history/services/scan_service.dart';
 
@@ -301,16 +302,9 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context, Color primaryBlue) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 16),
-        child: Center(
-          child: AppBackButton(onTap: () => Navigator.pop(context)),
-        ),
-      ),
+    return AppInnerBar(
+      title: "Analysis Result",
+      onBack: () => Navigator.pop(context),
     );
   }
 

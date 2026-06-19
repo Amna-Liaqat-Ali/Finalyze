@@ -1,4 +1,6 @@
 import 'package:Finalyze/screens/home/widgets/specie_detail_screen.dart';
+import 'package:Finalyze/widgets/app_back_button.dart';
+import 'package:Finalyze/widgets/app_inner_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -60,6 +62,7 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppInnerBar(title: "Discover Species", onBack: () => Navigator.pop(context)),
       body: SafeArea(
         child: Column(
           children: [

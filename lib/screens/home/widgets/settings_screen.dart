@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../auth/screens/welcome_screen.dart';
 import '../../../core/user_session.dart';
 import '../../../widgets/app_back_button.dart';
+import '../../../widgets/app_inner_bar.dart';
 import '../../history/history_screen.dart';
 import 'account_screen.dart';
 
@@ -38,24 +39,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    AppBackButton(onTap: () => Navigator.pop(context)),
-                    const SizedBox(width: 40),
-                  ],
-                ),
-              ),
-
+      appBar: AppInnerBar(title: "Settings", onBack: () => Navigator.pop(context)),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
               const SizedBox(height: 20),
               _buildProfileHeader(),
               const SizedBox(height: 30),
@@ -132,7 +119,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 

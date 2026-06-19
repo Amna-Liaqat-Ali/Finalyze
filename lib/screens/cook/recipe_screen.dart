@@ -1,5 +1,6 @@
 import 'package:Finalyze/screens/cook/widgets/recipe_detail_screen.dart';
 import 'package:Finalyze/widgets/app_back_button.dart';
+import 'package:Finalyze/widgets/app_inner_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -49,45 +50,17 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        leading: Navigator.canPop(context)
-            ? Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Center(child: AppBackButton(onTap: () => Navigator.pop(context))),
-              )
-            : null,
+      appBar: AppInnerBar(
+        title: "Recipes",
+        showBack: Navigator.canPop(context),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search_rounded, color: primaryBlue),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: RecipeSearchDelegate(allRecipes: _allRecipes),
-              );
-            },
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list_rounded, color: accentTeal),
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+            icon: const Icon(Icons.search_rounded, color: primaryBlue, size: 22),
+            onPressed: () => showSearch(
+              context: context,
+              delegate: RecipeSearchDelegate(allRecipes: _allRecipes),
             ),
-            onSelected: _filterRecipes,
-            itemBuilder: (context) => _categories.map((String category) {
-              return PopupMenuItem<String>(
-                value: category,
-                child: Text(
-                  category,
-                  style: GoogleFonts.poppins(color: primaryBlue, fontSize: 14),
-                ),
-              );
-            }).toList(),
           ),
-          const SizedBox(width: 8),
         ],
       ),
       body: Column(

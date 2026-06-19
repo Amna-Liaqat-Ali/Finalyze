@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../widgets/app_back_button.dart';
+import '../../widgets/app_inner_bar.dart';
 import '../Main/analyzing_screen.dart';
 
 class ReviewScreen extends StatefulWidget {
@@ -26,28 +27,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: _isCropMode ? const Color(0xFF4EE3AA) : Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Center(
-            child: AppBackButton(
-              isGlass: _isCropMode,
-              onTap: () => Navigator.pop(context),
-            ),
-          ),
-        ),
-        title: Text(
-          _isCropMode ? "Crop Mode: Tap to Confirm" : "Review Photo",
-          style: GoogleFonts.poppins(
-            color: _isCropMode ? Colors.white : primaryBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+      appBar: AppInnerBar(
+        title: _isCropMode ? "Crop Mode" : "Review Photo",
+        onBack: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),

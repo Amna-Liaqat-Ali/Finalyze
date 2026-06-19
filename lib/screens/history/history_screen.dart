@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/api_config.dart';
 import '../../../widgets/app_back_button.dart';
+import '../../../widgets/app_inner_bar.dart';
 import '../../core/user_session.dart';
 import 'services/scan_service.dart';
 
@@ -192,30 +193,15 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        leading: Navigator.canPop(context)
-            ? Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Center(
-                  child: AppBackButton(onTap: () => Navigator.pop(context)),
-                ),
-              )
-            : null,
-        title: Text(
-          "Scan History",
-          style: GoogleFonts.poppins(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: AppInnerBar(
+        title: "Scan History",
+        showBack: Navigator.canPop(context),
+        onBack: () => Navigator.pop(context),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: primaryBlue),
+            icon: const Icon(Icons.refresh_rounded, color: primaryBlue, size: 22),
             onPressed: refreshHistory,
+            tooltip: 'Refresh',
           ),
         ],
       ),
