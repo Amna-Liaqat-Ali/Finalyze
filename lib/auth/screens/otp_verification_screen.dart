@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/user_session.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
 import '../../widgets/app_back_button.dart';
+import '../../widgets/app_toast.dart';
 import 'services/auth_service.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -98,16 +99,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         await UserSession.initialize(
           id: data['userId'].toString(),
           userToken: data['token'].toString(),
+          userName: data['fullName']?.toString() ?? data['name']?.toString(),
+          userEmail: widget.email,
         );
 
         if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email verified successfully!'),
-            backgroundColor: Color(0xFF2CB88E),
-          ),
-        );
+        AppToast.success(context, 'Email verified successfully!');
+
+        await Future.delayed(const Duration(milliseconds: 600));
+        if (!mounted) return;
 
         Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
@@ -119,11 +120,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           (_) => false,
         );
       } else {
-        _showError(data['message'] ?? 'Verification failed');
+        if (mounted) AppToast.error(context, data['message'] ?? 'Incorrect OTP. Please try again.');
         _clearOtp();
       }
     } catch (_) {
-      _showError('Could not connect to server. Check your backend/IP.');
+      if (mounted) AppToast.error(context, 'Could not connect to server. Check your network.');
       _clearOtp();
     } finally {
       if (mounted) setState(() => _isVerifying = false);
@@ -142,19 +143,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       if (response.statusCode == 200) {
         _startResendTimer();
         _clearOtp();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(data['message'] ?? 'OTP sent'),
-              backgroundColor: const Color(0xFF2CB88E),
-            ),
-          );
-        }
+        if (mounted) AppToast.success(context, data['message'] ?? 'New OTP sent to your email.');
       } else {
-        _showError(data['message'] ?? 'Could not resend OTP');
+        AppToast.error(context, data['message'] ?? 'Could not resend OTP.');
       }
     } catch (_) {
-      _showError('Could not connect to server.');
+      AppToast.error(context, 'Could not connect to server.');
     } finally {
       if (mounted) setState(() => _isResending = false);
     }
@@ -165,12 +159,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       controller.clear();
     }
     _focusNodes.first.requestFocus();
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
-    );
   }
 
   @override
@@ -272,10 +260,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                     decoration: InputDecoration(
                                       counterText: '',
                                       filled: true,
-                                      fillColor: Colors.white.withOpacity(0.6),
+                                      fillColor: Colors.white.withOpacity(0.65),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide.none,
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                            color: Color(0xFF1A5694), width: 2),
                                       ),
                                     ),
                                     onChanged: (value) =>

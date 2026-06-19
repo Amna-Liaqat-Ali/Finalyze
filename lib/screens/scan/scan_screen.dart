@@ -4,10 +4,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../widgets/app_back_button.dart';
 import '../../widgets/app_inner_bar.dart';
 import '../home/widgets/settings_screen.dart';
-import '../Main/analyzing_screen.dart';
+import '../result/photo_edit_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -93,7 +92,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => AnalyzingScreen(image: imageFile),
+            builder: (_) => PhotoEditScreen(image: imageFile),
           ),
         ).then((_) {
           if (widget.onScanCompleted != null) {

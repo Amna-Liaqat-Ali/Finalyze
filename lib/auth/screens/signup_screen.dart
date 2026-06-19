@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:Finalyze/auth/screens/otp_verification_screen.dart';
 import 'package:Finalyze/auth/screens/services/auth_service.dart';
 import 'package:Finalyze/widgets/app_back_button.dart';
+import 'package:Finalyze/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -46,14 +47,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final region = _regionController.text.trim();
 
     if (name.isEmpty || email.isEmpty || password.isEmpty || region.isEmpty) {
-      _showSnackBar("Please fill in all required fields", Colors.orangeAccent);
+      AppToast.warning(context, "Please fill in all required fields");
       return;
     }
     if (password.length < 6) {
-      _showSnackBar(
-        "Password must be at least 6 characters long",
-        Colors.orangeAccent,
-      );
+      AppToast.warning(context, "Password must be at least 6 characters long");
       return;
     }
 
@@ -77,10 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         if (!mounted) return;
 
-        _showSnackBar(
-          data['message'] ?? 'OTP sent to your email.',
-          const Color(0xFF2CB88E),
-        );
+        AppToast.success(context, data['message'] ?? 'OTP sent to your email.');
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -89,29 +84,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       } else {
         final data = jsonDecode(response.body);
-        _showSnackBar(
-          data['message'] ?? "Registration failed",
-          Colors.redAccent,
-        );
+        AppToast.error(context, data['message'] ?? "Registration failed");
       }
     } catch (e) {
-      _showSnackBar(
-        "Connection error. Is your server running?",
-        Colors.redAccent,
-      );
+      AppToast.error(context, "Connection error. Is your server running?");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   @override

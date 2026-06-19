@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:Finalyze/screens/Blogs/widgets/blog_slider.dart';
@@ -11,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../result/review_screen.dart';
+import '../../core/user_session.dart';
+import '../history/services/scan_service.dart';
+import '../result/photo_edit_screen.dart';
 import 'widgets/stat_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,6 +28,47 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _primaryBlue = Color(0xFF1A5694);
   static const _teal = Color(0xFF2CB88E);
 
+  int _totalScans = 0;
+  int _todayScans = 0;
+  String _accuracy = '—';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    try {
+      final userId = UserSession.userId ?? '';
+      if (userId.isEmpty) return;
+      final rawData = await ScanService.getUserScanHistory(userId);
+      if (!mounted) return;
+      final today = DateTime.now();
+      int todayCount = 0;
+      double totalConf = 0;
+      for (final item in rawData) {
+        final json = item as Map<String, dynamic>;
+        final dateStr = json['scanDate']?.toString() ?? '';
+        try {
+          final d = DateTime.parse(dateStr);
+          if (d.year == today.year && d.month == today.month && d.day == today.day) {
+            todayCount++;
+          }
+        } catch (_) {}
+        totalConf += ((json['percentage'] ?? 0.0) as num).toDouble();
+      }
+      if (!mounted) return;
+      setState(() {
+        _totalScans = rawData.length;
+        _todayScans = todayCount;
+        _accuracy = rawData.isEmpty
+            ? '—'
+            : '${(totalConf / rawData.length).round()}%';
+      });
+    } catch (_) {}
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -39,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ReviewScreen(image: File(image.path))),
+        MaterialPageRoute(builder: (context) => PhotoEditScreen(image: File(image.path))),
       );
     } catch (e) {
       debugPrint("Error picking image: $e");
@@ -60,12 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      StatCard(label: "Total Scans", value: "12"),
-                      StatCard(label: "Fresh Today", value: "7"),
-                      StatCard(label: "Accuracy", value: "98%"),
+                      StatCard(label: "Total Scans", value: "$_totalScans"),
+                      StatCard(label: "Today Scans", value: "$_todayScans"),
+                      StatCard(label: "Avg. Score", value: _accuracy),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -181,16 +223,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Good Morning',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white.withOpacity(0.78),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 0.4,
+                          'FINALYZE',
+                          style: GoogleFonts.lexend(
+                            color: Colors.white.withOpacity(0.55),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 5,
                           ),
                         ),
                         Text(
-                          'Finalyze',
+                          UserSession.name?.split(' ').first ?? 'Welcome',
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 34,
@@ -201,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'AI Fish Freshness Analysis',
+                          'Scan. Verify. Trust.',
                           style: GoogleFonts.poppins(
                             color: Colors.white.withOpacity(0.65),
                             fontSize: 12,

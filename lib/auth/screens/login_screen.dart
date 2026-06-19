@@ -10,6 +10,7 @@ import '../../auth/screens/services/auth_service.dart';
 import '../../core/user_session.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
 import '../../widgets/app_back_button.dart';
+import '../../widgets/app_toast.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onBack;
@@ -31,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _showSuccess = false;
 
   static const primaryBlue = Color(0xFF1A5694);
 
@@ -39,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showError("Please enter both email and password");
+      AppToast.warning(context, "Please enter both email and password");
       return;
     }
 
@@ -55,43 +57,18 @@ class _LoginScreenState extends State<LoginScreen> {
         await UserSession.initialize(
           id: data['userId'].toString(),
           userToken: data['token'].toString(),
+          userName: data['fullName']?.toString() ?? data['name']?.toString(),
+          userEmail: email,
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Login Successful!"),
-            backgroundColor: Color(0xFF2CB88E),
-            duration: Duration(milliseconds: 800),
-          ),
-        );
-
-        await Future.delayed(const Duration(milliseconds: 800));
 
         if (!mounted) return;
-
-        Navigator.of(context).pushAndRemoveUntil(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const OnboardingScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-            transitionDuration: const Duration(milliseconds: 500),
-          ),
-          (route) => false,
-        );
+        setState(() => _showSuccess = true);
       } else if (response.statusCode == 403 &&
           data['requiresVerification'] == true) {
         if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              data['message'] ?? 'Please verify your email with the OTP sent.',
-            ),
-            backgroundColor: Colors.orangeAccent,
-          ),
-        );
+        AppToast.warning(context,
+            data['message'] ?? 'Please verify your email with the OTP sent.');
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -101,26 +78,21 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-        _showError(data['message'] ?? "Invalid credentials");
+        if (mounted) AppToast.error(context, data['message'] ?? "Invalid credentials");
       }
     } catch (e) {
-      _showError("Could not connect to server. Check your backend/IP.");
+      if (mounted) AppToast.error(context, "Could not connect to server. Check your network.");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      body: Stack(children: [
+        SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stack(
@@ -319,6 +291,24 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+        if (_showSuccess)
+          Positioned.fill(
+            child: LoginSuccessOverlay(
+              onComplete: () {
+                if (!mounted) return;
+                Navigator.of(context).pushAndRemoveUntil(
+                  PageRouteBuilder(
+                    pageBuilder: (_, a, __) => const OnboardingScreen(),
+                    transitionsBuilder: (_, a, __, child) =>
+                        FadeTransition(opacity: a, child: child),
+                    transitionDuration: const Duration(milliseconds: 500),
+                  ),
+                  (_) => false,
+                );
+              },
+            ),
+          ),
+      ]),
     );
   }
 

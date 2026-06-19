@@ -134,6 +134,8 @@ router.post('/verify-otp', async (req, res) => {
             message: 'Email verified successfully.',
             token,
             userId: user._id,
+            fullName: user.fullName,
+            email: user.email,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -252,7 +254,17 @@ router.post('/signin', async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
-        res.status(200).json({ message: 'Login successful', token, userId: user._id });
+        res.status(200).json({ message: 'Login successful', token, userId: user._id, fullName: user.fullName, email: user.email });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/profile/:userId', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId).select('fullName email');
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+        res.status(200).json({ fullName: user.fullName, email: user.email });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

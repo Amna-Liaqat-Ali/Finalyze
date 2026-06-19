@@ -89,6 +89,20 @@ class ScanService {
     }
   }
 
+  static Future<bool> deleteScan(String scanId) async {
+    try {
+      final url = Uri.parse('${ApiConfig.baseUrl}/scan/$scanId');
+      final response = await http.delete(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      debugPrint('[ScanService] Delete failed: $e');
+      return false;
+    }
+  }
+
   static Future<List<dynamic>> getUserScanHistory(String userId) async {
     try {
       final url = Uri.parse('${ApiConfig.baseUrl}/scan/history/$userId');

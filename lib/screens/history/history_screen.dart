@@ -6,9 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/api_config.dart';
-import '../../../widgets/app_back_button.dart';
 import '../../../widgets/app_inner_bar.dart';
 import '../../core/user_session.dart';
+import 'history_detail_screen.dart';
 import 'services/scan_service.dart';
 
 enum ScanStatus { fresh, fair, moderate, spoiled }
@@ -76,18 +76,20 @@ class HistoryScreen extends StatefulWidget {
   State<HistoryScreen> createState() => HistoryScreenState();
 }
 
-// Named state made public so external parent tab containers can call refreshState() manually via Keys
 class HistoryScreenState extends State<HistoryScreen> {
   bool isGalleryView = true;
   ScanHistory? selectedItem;
   late Future<List<ScanHistory>> _historyFuture;
 
+  // Selection mode
+  bool _selectMode = false;
+  final Set<String> _selectedIds = {};
+  bool _isDeleting = false;
+
   static const primaryBlue = Color(0xFF1A5694);
 
-  // Read active target User Identity safely from whichever variable contains information
-  String get effectiveUserId => (widget.userId.isNotEmpty)
-      ? widget.userId
-      : (UserSession.userId ?? '');
+  String get effectiveUserId =>
+      widget.userId.isNotEmpty ? widget.userId : (UserSession.userId ?? '');
 
   @override
   void initState() {
@@ -98,32 +100,68 @@ class HistoryScreenState extends State<HistoryScreen> {
   @override
   void didUpdateWidget(covariant HistoryScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Auto query backend records if host configuration framework shifts parent trees
     refreshHistory();
   }
 
   void refreshHistory() {
     if (!mounted) return;
     setState(() {
-      debugPrint(
-        ">>>> [HISTORY VIEW]: Re-querying backend scan indices for: $effectiveUserId",
-      );
+      _selectMode = false;
+      _selectedIds.clear();
       _historyFuture = ScanService.getUserScanHistory(effectiveUserId)
           .then((rawData) {
-            if (rawData == null || rawData is! List) {
-              return <ScanHistory>[];
-            }
+            if (rawData is! List) return <ScanHistory>[];
             return rawData
-                .map(
-                  (json) => ScanHistory.fromJson(json as Map<String, dynamic>),
-                )
+                .map((json) => ScanHistory.fromJson(json as Map<String, dynamic>))
                 .toList();
           })
           .catchError((error) {
-            debugPrint("Caught history loading exception thread: $error");
+            debugPrint("History load error: $error");
             return <ScanHistory>[];
           });
     });
+  }
+
+  void _enterSelectMode(String id) {
+    setState(() {
+      _selectMode = true;
+      _selectedIds.add(id);
+    });
+  }
+
+  void _exitSelectMode() {
+    setState(() {
+      _selectMode = false;
+      _selectedIds.clear();
+    });
+  }
+
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+        if (_selectedIds.isEmpty) _selectMode = false;
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  Future<void> _deleteSelected() async {
+    setState(() => _isDeleting = true);
+    int failed = 0;
+    for (final id in _selectedIds.toList()) {
+      final ok = await ScanService.deleteScan(id);
+      if (!ok) failed++;
+    }
+    if (!mounted) return;
+    setState(() => _isDeleting = false);
+    if (failed > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$failed item(s) could not be deleted.")),
+      );
+    }
+    refreshHistory();
   }
 
   Color _getStatusColor(ScanStatus status) {
@@ -139,72 +177,132 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  String _getAbsoluteImageUrl(String targetPath) {
-    final cleanPath = targetPath.replaceAll(r'\', '/');
-    final String serverBase = ApiConfig.baseUrl.replaceAll('/api', '');
-    return '$serverBase/$cleanPath';
-  }
-
-  bool _isNetworkImage(String image) {
-    return image.startsWith('http') || image.startsWith('uploads/');
-  }
-
-  Widget _buildHistoryImage(
-    String image, {
-    BoxFit fit = BoxFit.cover,
-    double? width,
-    double? height,
-  }) {
+  Widget _buildHistoryImage(String image,
+      {BoxFit fit = BoxFit.cover, double? width, double? height}) {
     final placeholder = Container(
       width: width,
       height: height,
       color: Colors.grey[200],
       child: const Icon(Icons.broken_image, color: Colors.grey),
     );
-
     if (image.isEmpty) return placeholder;
 
-    if (_isNetworkImage(image)) {
-      return Image.network(
-        _getAbsoluteImageUrl(image),
-        fit: fit,
-        width: width,
-        height: height,
-        errorBuilder: (_, __, ___) => placeholder,
-      );
+    if (image.startsWith('http') || image.startsWith('uploads/')) {
+      final cleanPath = image.replaceAll(r'\', '/');
+      final serverBase = ApiConfig.baseUrl.replaceAll('/api', '');
+      final url = image.startsWith('http') ? image : '$serverBase/$cleanPath';
+      return Image.network(url,
+          fit: fit, width: width, height: height,
+          errorBuilder: (_, __, ___) => placeholder);
     }
 
     try {
       final base64Data = image.contains(',') ? image.split(',').last : image;
       final bytes = base64Decode(base64Data);
-      return Image.memory(
-        bytes,
-        fit: fit,
-        width: width,
-        height: height,
-        errorBuilder: (_, __, ___) => placeholder,
-      );
+      return Image.memory(bytes,
+          fit: fit, width: width, height: height,
+          errorBuilder: (_, __, ___) => placeholder);
     } catch (_) {
       return placeholder;
     }
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    if (_selectMode) {
+      return AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close_rounded, color: primaryBlue),
+          onPressed: _exitSelectMode,
+        ),
+        title: Text(
+          "${_selectedIds.length} selected",
+          style: GoogleFonts.poppins(
+            color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        actions: [
+          if (_isDeleting)
+            const Padding(
+              padding: EdgeInsets.all(14),
+              child: SizedBox(
+                width: 20, height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: primaryBlue),
+              ),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              tooltip: "Delete selected",
+              onPressed: _selectedIds.isEmpty ? null : _confirmDelete,
+            ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: Container(
+            height: 2,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return AppInnerBar(
+      title: "Scan History",
+      showBack: Navigator.canPop(context),
+      onBack: () => Navigator.pop(context),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh_rounded, color: primaryBlue, size: 22),
+          onPressed: refreshHistory,
+          tooltip: 'Refresh',
+        ),
+      ],
+    );
+  }
+
+  Future<void> _confirmDelete() async {
+    final count = _selectedIds.length;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text("Delete $count scan${count > 1 ? 's' : ''}?",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: primaryBlue)),
+        content: Text(
+          "This action cannot be undone.",
+          style: GoogleFonts.poppins(color: Colors.blueGrey, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text("Cancel",
+              style: GoogleFonts.poppins(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text("Delete",
+              style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) _deleteSelected();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppInnerBar(
-        title: "Scan History",
-        showBack: Navigator.canPop(context),
-        onBack: () => Navigator.pop(context),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: primaryBlue, size: 22),
-            onPressed: refreshHistory,
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: Stack(
         children: [
           FutureBuilder<List<ScanHistory>>(
@@ -215,64 +313,19 @@ class HistoryScreenState extends State<HistoryScreen> {
                   child: CircularProgressIndicator(color: primaryBlue),
                 );
               } else if (snapshot.hasError) {
-                return Center(
-                  child: Text("Error fetching records: ${snapshot.error}"),
-                );
+                return Center(child: Text("Error: ${snapshot.error}"));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(28),
-                          decoration: BoxDecoration(
-                            color: primaryBlue.withOpacity(0.05),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.analytics_outlined,
-                            size: 74,
-                            color: primaryBlue.withOpacity(0.4),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          "No Scan Records Found",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Your fresh catch evaluation updates will appear here once you perform a batch image classification scan from the dashboard framework terminal.",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            color: Colors.grey.shade500,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+                return _buildEmpty();
               }
 
-              final historyItems = snapshot.data!;
-
+              final items = snapshot.data!;
               return Column(
                 children: [
                   _buildToggle(),
                   Expanded(
                     child: isGalleryView
-                        ? _buildGalleryView(historyItems)
-                        : _buildListView(historyItems),
+                        ? _buildGalleryView(items)
+                        : _buildListView(items),
                   ),
                 ],
               );
@@ -284,9 +337,41 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  Widget _buildEmpty() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                color: primaryBlue.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.analytics_outlined,
+                  size: 74, color: primaryBlue.withOpacity(0.4)),
+            ),
+            const SizedBox(height: 24),
+            Text("No Scan Records Found",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 18, fontWeight: FontWeight.bold, color: primaryBlue)),
+            const SizedBox(height: 10),
+            Text("Scan a fish and the results will appear here.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 13, color: Colors.grey.shade500, height: 1.5)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildToggle() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -325,6 +410,8 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  // ─── Gallery view ────────────────────────────────────────────────────────────
+
   Widget _buildGalleryView(List<ScanHistory> items) {
     return GridView.builder(
       physics: const BouncingScrollPhysics(),
@@ -341,13 +428,28 @@ class HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildGridItem(ScanHistory item) {
+    final selected = _selectedIds.contains(item.id);
+
     return GestureDetector(
-      onTap: () => setState(() => selectedItem = item),
-      child: Container(
+      onTap: () {
+        if (_selectMode) {
+          _toggleSelection(item.id);
+        } else {
+          setState(() => selectedItem = item);
+        }
+      },
+      onLongPress: () {
+        if (!_selectMode) _enterSelectMode(item.id);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.shade100),
+          border: Border.all(
+            color: selected ? primaryBlue : Colors.grey.shade100,
+            width: selected ? 2 : 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,20 +459,35 @@ class HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   Positioned.fill(
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(15),
-                      ),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
                       child: _buildHistoryImage(item.image, fit: BoxFit.cover),
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: CircleAvatar(
-                      radius: 4,
-                      backgroundColor: _getStatusColor(item.status),
+                  // Status dot (non-select) or checkbox (select mode)
+                  if (_selectMode)
+                    Positioned(
+                      top: 6, right: 6,
+                      child: Container(
+                        width: 22, height: 22,
+                        decoration: BoxDecoration(
+                          color: selected ? primaryBlue : Colors.white.withOpacity(0.85),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: selected ? primaryBlue : Colors.grey.shade400),
+                        ),
+                        child: selected
+                            ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                            : null,
+                      ),
+                    )
+                  else
+                    Positioned(
+                      top: 8, right: 8,
+                      child: CircleAvatar(
+                        radius: 4,
+                        backgroundColor: _getStatusColor(item.status),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -379,17 +496,12 @@ class HistoryScreenState extends State<HistoryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    DateFormat('MMM d').format(item.dateTime),
-                    style: const TextStyle(fontSize: 8, color: Colors.grey),
-                  ),
+                  Text(DateFormat('MMM d').format(item.dateTime),
+                    style: const TextStyle(fontSize: 8, color: Colors.grey)),
                   Text(
                     item.fishName,
                     style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: primaryBlue,
-                    ),
+                      fontSize: 10, fontWeight: FontWeight.bold, color: primaryBlue),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -402,41 +514,66 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  // ─── List view ───────────────────────────────────────────────────────────────
+
   Widget _buildListView(List<ScanHistory> items) {
     return ListView.builder(
       itemCount: items.length,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       physics: const BouncingScrollPhysics(),
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return _buildListTile(item);
-      },
+      itemBuilder: (context, index) => _buildListTile(items[index]),
     );
   }
 
   Widget _buildListTile(ScanHistory item) {
+    final selected = _selectedIds.contains(item.id);
+
     return GestureDetector(
-      onTap: () => setState(() => selectedItem = item),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
+      onTap: () {
+        if (_selectMode) {
+          _toggleSelection(item.id);
+        } else {
+          setState(() => selectedItem = item);
+        }
+      },
+      onLongPress: () {
+        if (!_selectMode) _enterSelectMode(item.id);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.shade100),
+          border: Border.all(
+            color: selected ? primaryBlue : Colors.grey.shade100,
+            width: selected ? 2 : 1,
+          ),
         ),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: _buildHistoryImage(
-                item.image,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
+            // Checkbox or image
+            if (_selectMode)
+              Container(
+                width: 22, height: 22,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: selected ? primaryBlue : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected ? primaryBlue : Colors.grey.shade400),
+                ),
+                child: selected
+                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                    : null,
+              )
+            else
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: _buildHistoryImage(item.image, width: 60, height: 60),
               ),
-            ),
-            const SizedBox(width: 15),
+            if (!_selectMode) const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,10 +581,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                   Text(
                     item.fishName,
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      color: primaryBlue,
-                      fontSize: 15,
-                    ),
+                      fontWeight: FontWeight.bold, color: primaryBlue, fontSize: 15),
                   ),
                   Text(
                     DateFormat('MMM d, yyyy • hh:mm a').format(item.dateTime),
@@ -477,13 +611,15 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  // ─── Popup overlay ───────────────────────────────────────────────────────────
+
   Widget _buildPopupOverlay(ScanHistory item) {
     return GestureDetector(
       onTap: () => setState(() => selectedItem = null),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withOpacity(0.30),
           alignment: Alignment.center,
           child: GestureDetector(
             onTap: () {},
@@ -497,50 +633,71 @@ class HistoryScreenState extends State<HistoryScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(28),
-                    ),
-                    child: _buildHistoryImage(
-                      item.image,
-                      fit: BoxFit.cover,
-                      height: 190,
-                      width: double.infinity,
-                    ),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                    child: _buildHistoryImage(item.image,
+                        fit: BoxFit.cover, height: 190, width: double.infinity),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        Text(
-                          "Finalyze Result",
+                        Text("Finalyze Result",
                           style: GoogleFonts.poppins(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue,
-                          ),
-                        ),
+                            fontSize: 22, fontWeight: FontWeight.bold, color: primaryBlue)),
                         Text(
                           "${item.confidence}% ${item.status.name.toUpperCase()}",
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
-                            color: _getStatusColor(item.status),
-                          ),
+                            color: _getStatusColor(item.status)),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         _infoRow("Species", item.fishName),
                         _infoRow("Source", item.source),
-                        _infoRow(
-                          "Scanned",
-                          DateFormat('hh:mm a').format(item.dateTime),
+                        _infoRow("Scanned",
+                          DateFormat('MMM d • hh:mm a').format(item.dateTime)),
+                        const SizedBox(height: 20),
+                        // Full Report button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.description_rounded, size: 18),
+                            label: Text("Full Report",
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                            onPressed: () {
+                              setState(() => selectedItem = null);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => HistoryDetailScreen(item: item),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryBlue,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 25),
-                        _btn("Full Report", primaryBlue, Colors.white),
                         const SizedBox(height: 10),
-                        _btn(
-                          "Close",
-                          Colors.grey.shade100,
-                          Colors.grey.shade700,
-                          isDismiss: true,
+                        // Close button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton(
+                            onPressed: () => setState(() => selectedItem = null),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              side: BorderSide(color: Colors.grey.shade200),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text("Close",
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                          ),
                         ),
                       ],
                     ),
@@ -561,35 +718,9 @@ class HistoryScreenState extends State<HistoryScreen> {
         children: [
           Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
           const Spacer(),
-          Text(
-            val,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: primaryBlue,
-            ),
-          ),
+          Text(val,
+            style: const TextStyle(fontWeight: FontWeight.bold, color: primaryBlue)),
         ],
-      ),
-    );
-  }
-
-  Widget _btn(String txt, Color bg, Color textCol, {bool isDismiss = false}) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        onPressed: () => isDismiss ? setState(() => selectedItem = null) : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Text(
-          txt,
-          style: TextStyle(color: textCol, fontWeight: FontWeight.bold),
-        ),
       ),
     );
   }
