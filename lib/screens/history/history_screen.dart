@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/api_config.dart';
+import '../../../widgets/app_back_button.dart';
 import '../../core/user_session.dart';
 import 'services/scan_service.dart';
 
@@ -196,6 +197,14 @@ class HistoryScreenState extends State<HistoryScreen> {
         elevation: 0,
         automaticallyImplyLeading: false,
         centerTitle: true,
+        leading: Navigator.canPop(context)
+            ? Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Center(
+                  child: AppBackButton(onTap: () => Navigator.pop(context)),
+                ),
+              )
+            : null,
         title: Text(
           "Scan History",
           style: GoogleFonts.poppins(

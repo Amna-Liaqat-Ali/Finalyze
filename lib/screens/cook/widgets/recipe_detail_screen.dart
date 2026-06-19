@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../widgets/app_back_button.dart';
 import '../models/recipe.dart';
 
 class RecipeDetailScreen extends StatelessWidget {
@@ -29,15 +30,11 @@ class RecipeDetailScreen extends StatelessWidget {
             elevation: 0,
             stretch: true,
             backgroundColor: primaryBlue,
-            leading: IconButton(
-              icon: _buildBlurCircle(
-                const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 18,
-                ),
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Center(
+                child: AppBackButton(isGlass: true, onTap: () => Navigator.pop(context)),
               ),
-              onPressed: () => Navigator.pop(context),
             ),
             actions: [
               IconButton(

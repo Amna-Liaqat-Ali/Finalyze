@@ -9,6 +9,7 @@ import '../../auth/screens/otp_verification_screen.dart';
 import '../../auth/screens/services/auth_service.dart';
 import '../../core/user_session.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
+import '../../widgets/app_back_button.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onBack;
@@ -322,18 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildBackButton(VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.4),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
-        ),
-        child: const Icon(Icons.arrow_back, color: primaryBlue, size: 20),
-      ),
-    );
+    return AppBackButton(isGlass: true, onTap: onTap);
   }
 
   Widget _buildLightInput(

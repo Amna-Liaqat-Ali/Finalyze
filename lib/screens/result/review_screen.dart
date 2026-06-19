@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../widgets/app_back_button.dart';
 import '../Main/analyzing_screen.dart';
 
 class ReviewScreen extends StatefulWidget {
@@ -30,6 +31,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(
+            child: AppBackButton(
+              isGlass: _isCropMode,
+              onTap: () => Navigator.pop(context),
+            ),
+          ),
+        ),
         title: Text(
           _isCropMode ? "Crop Mode: Tap to Confirm" : "Review Photo",
           style: GoogleFonts.poppins(

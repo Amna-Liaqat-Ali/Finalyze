@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../auth/screens/welcome_screen.dart';
 import '../../../core/user_session.dart';
+import '../../../widgets/app_back_button.dart';
 import '../../history/history_screen.dart';
 import 'account_screen.dart';
 
@@ -49,14 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: primaryBlue,
-                        size: 20,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    AppBackButton(onTap: () => Navigator.pop(context)),
                     const SizedBox(width: 40),
                   ],
                 ),

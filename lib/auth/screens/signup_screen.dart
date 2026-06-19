@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:Finalyze/auth/screens/otp_verification_screen.dart';
 import 'package:Finalyze/auth/screens/services/auth_service.dart';
+import 'package:Finalyze/widgets/app_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -395,17 +396,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildBackButton(VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.4),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
-        ),
-        child: const Icon(Icons.arrow_back, color: primaryBlue, size: 20),
-      ),
-    );
+    return AppBackButton(isGlass: true, onTap: onTap);
   }
 }

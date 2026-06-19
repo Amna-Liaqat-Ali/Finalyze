@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../widgets/app_back_button.dart';
 import '../../species/models/fish_specie.dart';
 
 class SpeciesDetailScreen extends StatelessWidget {
@@ -17,9 +18,9 @@ class SpeciesDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryBlue),
-          onPressed: () => Navigator.pop(context),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(child: AppBackButton(onTap: () => Navigator.pop(context))),
         ),
       ),
       body: Stack(

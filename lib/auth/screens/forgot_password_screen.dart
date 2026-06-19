@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../widgets/app_back_button.dart';
 import 'services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -206,22 +207,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.4),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.3)),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: primaryBlue,
-                        size: 20,
-                      ),
-                    ),
-                  ),
+                  AppBackButton(isGlass: true, onTap: () => Navigator.pop(context)),
                   const SizedBox(height: 24),
                   Text(
                     'RESET PASSWORD',

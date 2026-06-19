@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/user_session.dart';
+import '../../widgets/app_back_button.dart';
 import '../cook/recipe_screen.dart';
 import '../history/services/scan_service.dart';
 
@@ -304,20 +305,12 @@ class _ResultScreenState extends State<ResultScreen> {
       backgroundColor: Colors.white,
       elevation: 0,
       automaticallyImplyLeading: false,
-      actions: [
-        TextButton.icon(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back, color: primaryBlue),
-          label: Text(
-            "Back",
-            style: GoogleFonts.poppins(
-              color: primaryBlue,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: Center(
+          child: AppBackButton(onTap: () => Navigator.pop(context)),
         ),
-        const Spacer(),
-      ],
+      ),
     );
   }
 

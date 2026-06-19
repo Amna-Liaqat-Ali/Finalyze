@@ -40,6 +40,12 @@ class MyApp extends StatelessWidget {
           surfaceTintColor: Colors.white,
           elevation: 0,
         ),
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
+        ),
       ),
       home: const SplashScreen(),
     );

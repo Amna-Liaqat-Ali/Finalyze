@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../widgets/app_back_button.dart';
+
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
@@ -65,23 +67,7 @@ class AboutScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Back Button
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: Colors.cyanAccent,
-              ),
-            ),
-          ),
+          AppBackButton(isGlass: true, onTap: () => Navigator.pop(context)),
           // Screen Title
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

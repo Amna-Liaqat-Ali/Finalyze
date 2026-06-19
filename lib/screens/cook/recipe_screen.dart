@@ -1,4 +1,5 @@
 import 'package:Finalyze/screens/cook/widgets/recipe_detail_screen.dart';
+import 'package:Finalyze/widgets/app_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -53,6 +54,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
+        leading: Navigator.canPop(context)
+            ? Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Center(child: AppBackButton(onTap: () => Navigator.pop(context))),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded, color: primaryBlue),
