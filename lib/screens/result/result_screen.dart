@@ -275,7 +275,7 @@ class _ResultScreenState extends State<ResultScreen> {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A5694),
                   shape: RoundedRectangleBorder(
@@ -314,7 +314,7 @@ class _ResultScreenState extends State<ResultScreen> {
       ),
       leading: IconButton(
         icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
         tooltip: 'Close',
       ),
     );
@@ -460,10 +460,14 @@ class _ResultScreenState extends State<ResultScreen> {
   Widget _buildDismissButton(BuildContext context) {
     return Center(
       child: TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text(
-          "DISMISS",
-          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+        onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
+        child: Text(
+          "Done",
+          style: GoogleFonts.poppins(
+            color: Colors.blueGrey,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
       ),
     );

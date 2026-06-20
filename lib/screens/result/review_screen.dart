@@ -125,7 +125,11 @@ class ReviewScreen extends StatelessWidget {
             Expanded(
               flex: 2,
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  // Pop ReviewScreen AND PhotoEditScreen → back to camera
+                  int count = 0;
+                  Navigator.of(context).popUntil((_) => count++ >= 2);
+                },
                 icon: const Icon(Icons.refresh_rounded, size: 17),
                 label: Text(
                   "Retake",

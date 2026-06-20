@@ -389,9 +389,16 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
   }
 
   Widget _buildBottomBar() {
+    return SafeArea(
+      top: false,
+      child: _buildBottomBarContent(),
+    );
+  }
+
+  Widget _buildBottomBarContent() {
     return Container(
       color: const Color(0xFF0E0E0E),
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Row(
         children: [
           // Reset
