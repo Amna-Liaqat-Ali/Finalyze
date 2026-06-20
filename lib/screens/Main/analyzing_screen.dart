@@ -22,7 +22,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
 
   int _stepIndex = 0;
   final List<String> _progressSteps = const [
-    "Warming up AI engine...",
+    "Warming up engine...",
     "Pre-processing fish image...",
     "Analyzing biological markers...",
     "Calculating freshness score...",
@@ -121,7 +121,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            "Our AI is inspecting details...",
+            "Inspecting freshness details...",
             style: GoogleFonts.poppins(
               fontSize: 14,
               color: Colors.blueGrey.shade300,

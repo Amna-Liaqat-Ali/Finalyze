@@ -201,7 +201,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(width: 20),
-              _statusChip("AI READY"),
+              _statusChip("READY"),
               const SizedBox(width: 20),
               _controlIcon(Icons.hd),
             ],

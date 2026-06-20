@@ -76,7 +76,6 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
-  bool isGalleryView = true;
   ScanHistory? selectedItem;
   late Future<List<ScanHistory>> _historyFuture;
 
@@ -369,16 +368,7 @@ class HistoryScreenState extends State<HistoryScreen> {
               }
 
               final items = snapshot.data!;
-              return Column(
-                children: [
-                  _buildToggle(),
-                  Expanded(
-                    child: isGalleryView
-                        ? _buildGalleryView(items)
-                        : _buildListView(items),
-                  ),
-                ],
-              );
+              return _buildGalleryView(items);
             },
           ),
           if (selectedItem != null) _buildPopupOverlay(selectedItem!),
@@ -427,47 +417,6 @@ class HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggle() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 10, 20, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryBlue.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          _toggleBtn("List View", !isGalleryView),
-          _toggleBtn("Visual Gallery", isGalleryView),
-        ],
-      ),
-    );
-  }
-
-  Widget _toggleBtn(String text, bool active) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => isGalleryView = (text == "Visual Gallery")),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: active ? primaryBlue : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: active ? Colors.white : primaryBlue.withOpacity(0.5),
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
-          ),
         ),
       ),
     );
@@ -588,112 +537,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ─── List view ───────────────────────────────────────────────────────────────
-
-  Widget _buildListView(List<ScanHistory> items) {
-    return ListView.builder(
-      itemCount: items.length,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      physics: const BouncingScrollPhysics(),
-      itemBuilder: (context, index) => _buildListTile(items[index]),
-    );
-  }
-
-  Widget _buildListTile(ScanHistory item) {
-    final selected = _selectedIds.contains(item.id);
-
-    return GestureDetector(
-      onTap: () {
-        if (_selectMode) {
-          _toggleSelection(item.id);
-        } else {
-          setState(() => selectedItem = item);
-        }
-      },
-      onLongPress: () {
-        if (!_selectMode) _enterSelectMode(item.id);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: selected ? primaryBlue : Colors.grey.shade100,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            // Checkbox or image
-            if (_selectMode)
-              Container(
-                width: 22,
-                height: 22,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  color: selected ? primaryBlue : Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected ? primaryBlue : Colors.grey.shade400,
-                  ),
-                ),
-                child: selected
-                    ? const Icon(
-                        Icons.check_rounded,
-                        color: Colors.white,
-                        size: 14,
-                      )
-                    : null,
-              )
-            else
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: _buildHistoryImage(item.image, width: 60, height: 60),
-              ),
-            if (!_selectMode) const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.fishName,
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      color: primaryBlue,
-                      fontSize: 15,
-                    ),
-                  ),
-                  Text(
-                    DateFormat('MMM d, yyyy • hh:mm a').format(item.dateTime),
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getStatusColor(item.status).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                item.status.name.toUpperCase(),
-                style: TextStyle(
-                  color: _getStatusColor(item.status),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
               ),
             ),
           ],

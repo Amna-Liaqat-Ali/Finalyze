@@ -125,7 +125,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Our AI identified this as $species. The biological markers in the ${widget.scanArea} indicate a $status state with ${(widget.confidence * 100).toStringAsFixed(1)}% confidence.",
+                    "Identified as $species. Biological markers in the ${widget.scanArea} indicate a $status state with ${(widget.confidence * 100).toStringAsFixed(1)}% confidence.",
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       color: Colors.blueGrey.shade600,

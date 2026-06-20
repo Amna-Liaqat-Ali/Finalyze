@@ -224,7 +224,7 @@ class HistoryDetailScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text("AI Confidence",
+            Text("Confidence Score",
               style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey)),
             const Spacer(),
             Text("${item.confidence}%",

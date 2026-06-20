@@ -62,7 +62,7 @@ class GradientScanCard extends StatelessWidget {
               ),
             ),
             const Text(
-              "AI Freshness Analysis",
+              "Freshness Analysis",
               style: TextStyle(color: Colors.white70),
             ),
           ],

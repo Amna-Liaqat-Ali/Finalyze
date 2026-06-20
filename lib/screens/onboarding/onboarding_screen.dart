@@ -23,13 +23,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "icon": Icons.camera_alt_rounded,
       "title": "Scan Fish Instantly",
       "desc":
-          "Capture or upload an image of fish to analyze its freshness in seconds using advanced AI technology.",
+          "Capture or upload an image of fish to analyze its freshness in seconds in seconds.",
     },
     {
       "icon": Icons.psychology_alt_rounded,
-      "title": "AI-Powered Analysis",
+      "title": "Smart Analysis",
       "desc":
-          "Our smart AI evaluates visual indicators like color, texture, and clarity for accurate freshness detection.",
+          "Evaluates visual indicators like color, texture, and clarity for accurate freshness detection.",
     },
     {
       "icon": Icons.analytics_rounded,
