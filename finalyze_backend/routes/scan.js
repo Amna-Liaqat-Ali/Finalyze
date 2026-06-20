@@ -50,4 +50,14 @@ router.post('/save-scan', async (req, res) => {
     }
 });
 
+router.delete('/:scanId', async (req, res) => {
+    try {
+        const scan = await Scan.findByIdAndDelete(req.params.scanId);
+        if (!scan) return res.status(404).json({ message: 'Scan not found.' });
+        res.status(200).json({ message: 'Scan deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

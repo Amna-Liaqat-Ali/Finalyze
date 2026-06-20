@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../widgets/app_inner_bar.dart';
 import '../../../widgets/app_toast.dart';
 
 class SecurityScreen extends StatefulWidget {
@@ -93,8 +92,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
-      appBar: AppInnerBar(
-          title: "Security", onBack: () => Navigator.pop(context)),
+      appBar: _gradientBar(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
@@ -332,6 +330,26 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   Widget _fieldDivider() =>
       Divider(height: 1, indent: 70, endIndent: 16, color: Colors.grey.shade100);
+
+  PreferredSizeWidget _gradientBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
 
   Widget _sectionLabel(String text) {
     return Padding(

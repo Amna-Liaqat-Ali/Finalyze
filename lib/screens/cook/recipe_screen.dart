@@ -1,6 +1,4 @@
 import 'package:Finalyze/screens/cook/widgets/recipe_detail_screen.dart';
-import 'package:Finalyze/widgets/app_back_button.dart';
-import 'package:Finalyze/widgets/app_inner_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -50,17 +48,35 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppInnerBar(
-        title: "Recipes",
-        showBack: Navigator.canPop(context),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        automaticallyImplyLeading: false,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white, size: 20),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search_rounded, color: primaryBlue, size: 22),
+            icon: const Icon(Icons.search_rounded, color: Colors.white, size: 22),
             onPressed: () => showSearch(
               context: context,
               delegate: RecipeSearchDelegate(allRecipes: _allRecipes),
             ),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: Column(

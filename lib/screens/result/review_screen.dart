@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../widgets/app_inner_bar.dart';
 import '../Main/analyzing_screen.dart';
 
 class ReviewScreen extends StatelessWidget {
@@ -14,9 +13,23 @@ class ReviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppInnerBar(
-        title: "Review Photo",
-        onBack: () => Navigator.pop(context),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+          onPressed: () => Navigator.pop(context),
+          tooltip: 'Cancel',
+        ),
       ),
       body: Column(
         children: [

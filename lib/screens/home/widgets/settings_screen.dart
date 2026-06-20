@@ -64,11 +64,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Premium banner (if not subscribed)
-                  if (!_isPremium) ...[
-                    _buildPremiumCard(),
-                    const SizedBox(height: 24),
-                  ],
+                  // Premium banner
+                  _buildPremiumCard(),
+                  const SizedBox(height: 24),
 
                   _sectionLabel("ACCOUNT"),
                   _buildCard([
@@ -296,12 +294,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Unlock Premium",
+                  Text(_isPremium ? "Premium Active" : "Unlock Premium",
                       style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 14)),
-                  Text("Unlimited scans + full AI power",
+                  Text(_isPremium ? "You have unlimited access" : "Unlimited scans + full AI power",
                       style: GoogleFonts.poppins(
                           color: Colors.white70, fontSize: 11)),
                 ],
@@ -314,7 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text("Upgrade",
+              child: Text(_isPremium ? "View" : "Upgrade",
                   style: GoogleFonts.poppins(
                       color: _blue,
                       fontWeight: FontWeight.bold,
@@ -496,6 +494,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
         if (confirmed == true) {
           await UserSession.clear();
+          // Reset premium state so it shows again on next login
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.remove('premium_seen');
+          await prefs.remove('is_premium');
           if (!mounted) return;
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const AuthWrapper()),

@@ -105,7 +105,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
     const accentTeal = Color(0xFF2CB88E);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFC),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

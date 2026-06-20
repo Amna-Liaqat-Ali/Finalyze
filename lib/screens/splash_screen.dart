@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:Finalyze/auth/screens/welcome_screen.dart';
 import 'package:Finalyze/core/user_session.dart'; // Imported to check session
 import 'package:Finalyze/screens/Main/MainScreen.dart';
-import 'package:Finalyze/screens/premium/premium_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -65,14 +64,10 @@ class _SplashScreenState extends State<SplashScreen> {
       final prefs = await SharedPreferences.getInstance();
       final premiumSeen = prefs.getBool('premium_seen') ?? false;
       if (!mounted) return;
-      if (premiumSeen) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
-      } else {
-        await PremiumScreen.showAsSheet(context);
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
     } else {
       Navigator.pushReplacement(
         context,

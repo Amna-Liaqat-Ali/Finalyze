@@ -4,7 +4,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../widgets/app_inner_bar.dart';
 import '../home/widgets/settings_screen.dart';
 import '../result/photo_edit_screen.dart';
 
@@ -238,17 +237,28 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   }
 
   PreferredSizeWidget _buildDecentAppBar() {
-    return AppInnerBar(
-      title: "Scan",
-      showBack: false,
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      automaticallyImplyLeading: false,
       actions: [
         IconButton(
-          icon: const Icon(Icons.settings_outlined, color: primaryBlue, size: 22),
+          icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 22),
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const SettingsScreen()),
           ),
         ),
+        const SizedBox(width: 4),
       ],
     );
   }

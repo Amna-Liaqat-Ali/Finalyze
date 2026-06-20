@@ -5,8 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/user_session.dart';
-import '../../widgets/app_back_button.dart';
-import '../../widgets/app_inner_bar.dart';
 import '../cook/recipe_screen.dart';
 import '../history/services/scan_service.dart';
 
@@ -302,9 +300,23 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context, Color primaryBlue) {
-    return AppInnerBar(
-      title: "Analysis Result",
-      onBack: () => Navigator.pop(context),
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      leading: IconButton(
+        icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+        onPressed: () => Navigator.pop(context),
+        tooltip: 'Close',
+      ),
     );
   }
 
@@ -405,30 +417,43 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget _buildActionRow(BuildContext context, Color primaryBlue) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const RecipeScreen()),
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const RecipeScreen()),
+      ),
+      child: Container(
+        width: double.infinity,
+        height: 52,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0891B2).withOpacity(0.30),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2CB88E),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              "VIEW RECIPES",
-              style: TextStyle(
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.restaurant_menu_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 10),
+            Text(
+              "View Recipes",
+              style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 15,
               ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

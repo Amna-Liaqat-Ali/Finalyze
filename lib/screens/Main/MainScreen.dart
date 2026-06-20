@@ -1,11 +1,13 @@
 import 'package:Finalyze/screens/Main/bottom_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../main.dart';
 import '../cook/recipe_screen.dart';
 import '../guide/guide_screen.dart';
 import '../history/history_screen.dart';
 import '../home/home_screen.dart';
+import '../premium/premium_screen.dart';
 import '../scan/scan_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -35,6 +37,25 @@ class _MainScreenState extends State<MainScreen> {
       const GuideScreen(),
       const RecipeScreen(),
     ];
+
+    // Show premium sheet once per install after the first frame renders
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowPremium());
+  }
+
+  Future<void> _maybeShowPremium() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('premium_seen') ?? false;
+    if (seen) return;
+    if (!mounted) return;
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      enableDrag: true,
+      builder: (_) => const PremiumSheet(),
+    );
+    await prefs.setBool('premium_seen', true);
   }
 
   void _onItemTapped(int index) {

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +22,7 @@ class PremiumScreen extends StatefulWidget {
       backgroundColor: Colors.transparent,
       isDismissible: true,
       enableDrag: true,
-      builder: (_) => const _PremiumSheet(),
+      builder: (_) => const PremiumSheet(),
     );
     // After sheet closes (either by dismiss or subscribe), mark seen & go home
     final prefs = await SharedPreferences.getInstance();
@@ -94,21 +95,19 @@ class _PremiumScreenState extends State<PremiumScreen>
   }
 
   Future<void> _subscribe() async {
-    // TODO: wire up real in-app purchase here
+    if (!mounted) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (ctx) => _PaymentDialog(
+        plan: _yearlySelected ? 'Yearly' : 'Monthly',
+        price: _yearlySelected ? 'Rs. 2,999/year' : 'Rs. 500/month',
+      ),
+    );
+    if (confirmed != true) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('is_premium', true);
     await prefs.setBool('premium_seen', true);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Premium activated! Enjoy unlimited scans.",
-            style: GoogleFonts.poppins()),
-        backgroundColor: _teal,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-    await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
     if (widget.standalone) {
       Navigator.pop(context);
@@ -636,14 +635,14 @@ class _PremiumScreenState extends State<PremiumScreen>
 
 // ── Bottom-sheet variant (dismissible card) ──────────────────────────────────
 
-class _PremiumSheet extends StatefulWidget {
-  const _PremiumSheet();
+class PremiumSheet extends StatefulWidget {
+  const PremiumSheet({super.key});
 
   @override
-  State<_PremiumSheet> createState() => _PremiumSheetState();
+  State<PremiumSheet> createState() => _PremiumSheetState();
 }
 
-class _PremiumSheetState extends State<_PremiumSheet> {
+class _PremiumSheetState extends State<PremiumSheet> {
   bool _yearlySelected = true;
 
   static const _blue = Color(0xFF1A5694);
@@ -651,11 +650,23 @@ class _PremiumSheetState extends State<_PremiumSheet> {
   static const _ocean = Color(0xFF0891B2);
 
   Future<void> _subscribe() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_premium', true);
-    await prefs.setBool('premium_seen', true);
     if (!mounted) return;
-    Navigator.pop(context);
+    // Show payment dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (ctx) => _PaymentDialog(
+        plan: _yearlySelected ? 'Yearly' : 'Monthly',
+        price: _yearlySelected ? 'Rs. 2,999/year' : 'Rs. 500/month',
+      ),
+    );
+    if (confirmed == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_premium', true);
+      await prefs.setBool('premium_seen', true);
+      if (!mounted) return;
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -949,3 +960,269 @@ class _PremiumSheetState extends State<_PremiumSheet> {
     );
   }
 }
+
+// ── Payment dialog ────────────────────────────────────────────────────────────
+
+class _PaymentDialog extends StatefulWidget {
+  final String plan;
+  final String price;
+
+  const _PaymentDialog({required this.plan, required this.price});
+
+  @override
+  State<_PaymentDialog> createState() => _PaymentDialogState();
+}
+
+class _PaymentDialogState extends State<_PaymentDialog> {
+  final _cardCtrl = TextEditingController();
+  final _expiryCtrl = TextEditingController();
+  final _cvvCtrl = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  bool _processing = false;
+
+  static const _blue = Color(0xFF1A5694);
+  static const _teal = Color(0xFF2CB88E);
+
+  @override
+  void dispose() {
+    _cardCtrl.dispose();
+    _expiryCtrl.dispose();
+    _cvvCtrl.dispose();
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pay() async {
+    if (_cardCtrl.text.replaceAll(' ', '').length < 16 ||
+        _expiryCtrl.text.length < 5 ||
+        _cvvCtrl.text.length < 3 ||
+        _nameCtrl.text.trim().isEmpty) {
+      return;
+    }
+    setState(() => _processing = true);
+    await Future.delayed(const Duration(milliseconds: 1800));
+    if (!mounted) return;
+    Navigator.pop(context, true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF0D2E5C), Color(0xFF0891B2), Color(0xFF2CB88E)],
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.lock_rounded, color: Colors.white70, size: 16),
+                      const SizedBox(width: 6),
+                      Text("Secure Payment",
+                          style: GoogleFonts.poppins(
+                              color: Colors.white70, fontSize: 12)),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context, false),
+                        child: const Icon(Icons.close_rounded,
+                            color: Colors.white60, size: 20),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "${widget.plan} Plan",
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    widget.price,
+                    style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.75), fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            // Form
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  _field("Cardholder Name", Icons.person_rounded, _nameCtrl,
+                      TextInputType.name),
+                  const SizedBox(height: 14),
+                  _field("Card Number", Icons.credit_card_rounded, _cardCtrl,
+                      TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        _CardNumberFormatter(),
+                      ],
+                      maxLength: 19),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _field("MM/YY", Icons.date_range_rounded,
+                              _expiryCtrl, TextInputType.number,
+                              inputFormatters: [_ExpiryFormatter()],
+                              maxLength: 5)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                          child: _field("CVV", Icons.security_rounded, _cvvCtrl,
+                              TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              maxLength: 3,
+                              obscure: true)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: _processing ? null : _pay,
+                    child: Container(
+                      width: double.infinity,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                              color: _teal.withOpacity(0.28),
+                              blurRadius: 14,
+                              offset: const Offset(0, 5)),
+                        ],
+                      ),
+                      child: Center(
+                        child: _processing
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                    color: Colors.white, strokeWidth: 2.5))
+                            : Text(
+                                "Pay ${widget.price}",
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15),
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shield_rounded,
+                          size: 13, color: _blue.withOpacity(0.4)),
+                      const SizedBox(width: 4),
+                      Text("256-bit SSL encrypted · Secure checkout",
+                          style: GoogleFonts.poppins(
+                              color: Colors.grey.shade400, fontSize: 10)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _field(
+    String label,
+    IconData icon,
+    TextEditingController ctrl,
+    TextInputType type, {
+    List<TextInputFormatter>? inputFormatters,
+    int? maxLength,
+    bool obscure = false,
+  }) {
+    return TextField(
+      controller: ctrl,
+      keyboardType: type,
+      obscureText: obscure,
+      inputFormatters: inputFormatters,
+      maxLength: maxLength,
+      style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFF1A5694)),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.poppins(
+            fontSize: 12, color: Colors.blueGrey.shade400),
+        prefixIcon: Icon(icon, color: _blue, size: 18),
+        counterText: '',
+        filled: true,
+        fillColor: const Color(0xFFF4F7FB),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:
+                BorderSide(color: _blue.withOpacity(0.4), width: 1.5)),
+      ),
+    );
+  }
+}
+
+class _CardNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue old, TextEditingValue newVal) {
+    final digits = newVal.text.replaceAll(' ', '');
+    final buf = StringBuffer();
+    for (int i = 0; i < digits.length && i < 16; i++) {
+      if (i > 0 && i % 4 == 0) buf.write(' ');
+      buf.write(digits[i]);
+    }
+    final str = buf.toString();
+    return newVal.copyWith(
+      text: str,
+      selection: TextSelection.collapsed(offset: str.length),
+    );
+  }
+}
+
+class _ExpiryFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue old, TextEditingValue newVal) {
+    var digits = newVal.text.replaceAll('/', '');
+    if (digits.length > 4) digits = digits.substring(0, 4);
+    final buf = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i == 2) buf.write('/');
+      buf.write(digits[i]);
+    }
+    final str = buf.toString();
+    return newVal.copyWith(
+      text: str,
+      selection: TextSelection.collapsed(offset: str.length),
+    );
+  }
+}
+

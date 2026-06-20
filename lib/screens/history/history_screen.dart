@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/api_config.dart';
-import '../../../widgets/app_inner_bar.dart';
 import '../../core/user_session.dart';
 import 'history_detail_screen.dart';
 import 'services/scan_service.dart';
@@ -112,7 +111,9 @@ class HistoryScreenState extends State<HistoryScreen> {
           .then((rawData) {
             if (rawData is! List) return <ScanHistory>[];
             return rawData
-                .map((json) => ScanHistory.fromJson(json as Map<String, dynamic>))
+                .map(
+                  (json) => ScanHistory.fromJson(json as Map<String, dynamic>),
+                )
                 .toList();
           })
           .catchError((error) {
@@ -177,8 +178,12 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Widget _buildHistoryImage(String image,
-      {BoxFit fit = BoxFit.cover, double? width, double? height}) {
+  Widget _buildHistoryImage(
+    String image, {
+    BoxFit fit = BoxFit.cover,
+    double? width,
+    double? height,
+  }) {
     final placeholder = Container(
       width: width,
       height: height,
@@ -191,17 +196,25 @@ class HistoryScreenState extends State<HistoryScreen> {
       final cleanPath = image.replaceAll(r'\', '/');
       final serverBase = ApiConfig.baseUrl.replaceAll('/api', '');
       final url = image.startsWith('http') ? image : '$serverBase/$cleanPath';
-      return Image.network(url,
-          fit: fit, width: width, height: height,
-          errorBuilder: (_, __, ___) => placeholder);
+      return Image.network(
+        url,
+        fit: fit,
+        width: width,
+        height: height,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
     }
 
     try {
       final base64Data = image.contains(',') ? image.split(',').last : image;
       final bytes = base64Decode(base64Data);
-      return Image.memory(bytes,
-          fit: fit, width: width, height: height,
-          errorBuilder: (_, __, ___) => placeholder);
+      return Image.memory(
+        bytes,
+        fit: fit,
+        width: width,
+        height: height,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
     } catch (_) {
       return placeholder;
     }
@@ -210,57 +223,80 @@ class HistoryScreenState extends State<HistoryScreen> {
   PreferredSizeWidget _buildAppBar() {
     if (_selectMode) {
       return AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF1A5694),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: primaryBlue),
+          icon: const Icon(Icons.close_rounded, color: Colors.white),
           onPressed: _exitSelectMode,
         ),
         title: Text(
           "${_selectedIds.length} selected",
           style: GoogleFonts.poppins(
-            color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 16),
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         actions: [
           if (_isDeleting)
             const Padding(
               padding: EdgeInsets.all(14),
               child: SizedBox(
-                width: 20, height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: primaryBlue),
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
             )
           else
             IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              icon: Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.redAccent.shade100,
+              ),
               tooltip: "Delete selected",
               onPressed: _selectedIds.isEmpty ? null : _confirmDelete,
             ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(2),
-          child: Container(
-            height: 2,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
-              ),
-            ),
-          ),
-        ),
       );
     }
 
-    return AppInnerBar(
-      title: "Scan History",
-      showBack: Navigator.canPop(context),
-      onBack: () => Navigator.pop(context),
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      automaticallyImplyLeading: false,
+      leading: Navigator.canPop(context)
+          ? IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: () => Navigator.pop(context),
+            )
+          : null,
       actions: [
         IconButton(
-          icon: const Icon(Icons.refresh_rounded, color: primaryBlue, size: 22),
+          icon: const Icon(
+            Icons.refresh_rounded,
+            color: Colors.white70,
+            size: 22,
+          ),
           onPressed: refreshHistory,
           tooltip: 'Refresh',
         ),
+        const SizedBox(width: 4),
       ],
     );
   }
@@ -271,8 +307,13 @@ class HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Text("Delete $count scan${count > 1 ? 's' : ''}?",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: primaryBlue)),
+        title: Text(
+          "Delete $count scan${count > 1 ? 's' : ''}?",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: primaryBlue,
+          ),
+        ),
         content: Text(
           "This action cannot be undone.",
           style: GoogleFonts.poppins(color: Colors.blueGrey, fontSize: 13),
@@ -280,17 +321,26 @@ class HistoryScreenState extends State<HistoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text("Cancel",
-              style: GoogleFonts.poppins(color: Colors.grey)),
+            child: Text(
+              "Cancel",
+              style: GoogleFonts.poppins(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text("Delete",
-              style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(
+              "Delete",
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -350,19 +400,32 @@ class HistoryScreenState extends State<HistoryScreen> {
                 color: primaryBlue.withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.analytics_outlined,
-                  size: 74, color: primaryBlue.withOpacity(0.4)),
+              child: Icon(
+                Icons.analytics_outlined,
+                size: 74,
+                color: primaryBlue.withOpacity(0.4),
+              ),
             ),
             const SizedBox(height: 24),
-            Text("No Scan Records Found",
+            Text(
+              "No Scan Records Found",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 18, fontWeight: FontWeight.bold, color: primaryBlue)),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
+            ),
             const SizedBox(height: 10),
-            Text("Scan a fish and the results will appear here.",
+            Text(
+              "Scan a fish and the results will appear here.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 13, color: Colors.grey.shade500, height: 1.5)),
+                fontSize: 13,
+                color: Colors.grey.shade500,
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),
@@ -459,30 +522,44 @@ class HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   Positioned.fill(
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(14),
+                      ),
                       child: _buildHistoryImage(item.image, fit: BoxFit.cover),
                     ),
                   ),
                   // Status dot (non-select) or checkbox (select mode)
                   if (_selectMode)
                     Positioned(
-                      top: 6, right: 6,
+                      top: 6,
+                      right: 6,
                       child: Container(
-                        width: 22, height: 22,
+                        width: 22,
+                        height: 22,
                         decoration: BoxDecoration(
-                          color: selected ? primaryBlue : Colors.white.withOpacity(0.85),
+                          color: selected
+                              ? primaryBlue
+                              : Colors.white.withOpacity(0.85),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: selected ? primaryBlue : Colors.grey.shade400),
+                            color: selected
+                                ? primaryBlue
+                                : Colors.grey.shade400,
+                          ),
                         ),
                         child: selected
-                            ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              )
                             : null,
                       ),
                     )
                   else
                     Positioned(
-                      top: 8, right: 8,
+                      top: 8,
+                      right: 8,
                       child: CircleAvatar(
                         radius: 4,
                         backgroundColor: _getStatusColor(item.status),
@@ -496,12 +573,17 @@ class HistoryScreenState extends State<HistoryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(DateFormat('MMM d').format(item.dateTime),
-                    style: const TextStyle(fontSize: 8, color: Colors.grey)),
+                  Text(
+                    DateFormat('MMM d').format(item.dateTime),
+                    style: const TextStyle(fontSize: 8, color: Colors.grey),
+                  ),
                   Text(
                     item.fishName,
                     style: const TextStyle(
-                      fontSize: 10, fontWeight: FontWeight.bold, color: primaryBlue),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: primaryBlue,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -556,16 +638,22 @@ class HistoryScreenState extends State<HistoryScreen> {
             // Checkbox or image
             if (_selectMode)
               Container(
-                width: 22, height: 22,
+                width: 22,
+                height: 22,
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
                   color: selected ? primaryBlue : Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: selected ? primaryBlue : Colors.grey.shade400),
+                    color: selected ? primaryBlue : Colors.grey.shade400,
+                  ),
                 ),
                 child: selected
-                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                    ? const Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      )
                     : null,
               )
             else
@@ -581,7 +669,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                   Text(
                     item.fishName,
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold, color: primaryBlue, fontSize: 15),
+                      fontWeight: FontWeight.bold,
+                      color: primaryBlue,
+                      fontSize: 15,
+                    ),
                   ),
                   Text(
                     DateFormat('MMM d, yyyy • hh:mm a').format(item.dateTime),
@@ -633,43 +724,65 @@ class HistoryScreenState extends State<HistoryScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-                    child: _buildHistoryImage(item.image,
-                        fit: BoxFit.cover, height: 190, width: double.infinity),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(28),
+                    ),
+                    child: _buildHistoryImage(
+                      item.image,
+                      fit: BoxFit.cover,
+                      height: 190,
+                      width: double.infinity,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        Text("Finalyze Result",
+                        Text(
+                          "Finalyze Result",
                           style: GoogleFonts.poppins(
-                            fontSize: 22, fontWeight: FontWeight.bold, color: primaryBlue)),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: primaryBlue,
+                          ),
+                        ),
                         Text(
                           "${item.confidence}% ${item.status.name.toUpperCase()}",
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
-                            color: _getStatusColor(item.status)),
+                            color: _getStatusColor(item.status),
+                          ),
                         ),
                         const SizedBox(height: 16),
                         _infoRow("Species", item.fishName),
                         _infoRow("Source", item.source),
-                        _infoRow("Scanned",
-                          DateFormat('MMM d • hh:mm a').format(item.dateTime)),
+                        _infoRow(
+                          "Scanned",
+                          DateFormat('MMM d • hh:mm a').format(item.dateTime),
+                        ),
                         const SizedBox(height: 20),
                         // Full Report button
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton.icon(
-                            icon: const Icon(Icons.description_rounded, size: 18),
-                            label: Text("Full Report",
-                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                            icon: const Icon(
+                              Icons.description_rounded,
+                              size: 18,
+                            ),
+                            label: Text(
+                              "Full Report",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             onPressed: () {
                               setState(() => selectedItem = null);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => HistoryDetailScreen(item: item),
+                                  builder: (_) =>
+                                      HistoryDetailScreen(item: item),
                                 ),
                               );
                             },
@@ -678,7 +791,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
@@ -688,15 +802,21 @@ class HistoryScreenState extends State<HistoryScreen> {
                           width: double.infinity,
                           height: 50,
                           child: OutlinedButton(
-                            onPressed: () => setState(() => selectedItem = null),
+                            onPressed: () =>
+                                setState(() => selectedItem = null),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.grey.shade600,
                               side: BorderSide(color: Colors.grey.shade200),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                            child: Text("Close",
-                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                            child: Text(
+                              "Close",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -718,8 +838,13 @@ class HistoryScreenState extends State<HistoryScreen> {
         children: [
           Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
           const Spacer(),
-          Text(val,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: primaryBlue)),
+          Text(
+            val,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: primaryBlue,
+            ),
+          ),
         ],
       ),
     );
