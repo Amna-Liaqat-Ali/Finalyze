@@ -417,10 +417,15 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget _buildActionRow(BuildContext context, Color primaryBlue) {
+    final statusKey = widget.detectedLabel.split('_').length > 1
+        ? widget.detectedLabel.split('_')[1].toLowerCase()
+        : 'fresh';
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const RecipeScreen()),
+        MaterialPageRoute(
+            builder: (_) => RecipeScreen(freshnessStatus: statusKey)),
       ),
       child: Container(
         width: double.infinity,
