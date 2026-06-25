@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:Finalyze/auth/screens/login_screen.dart';
 import 'package:Finalyze/auth/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +8,37 @@ import '../../screens/onboarding/onboarding_screen.dart';
 class WelcomeScreen extends StatelessWidget {
   final VoidCallback onSignIn;
   final VoidCallback onSignUp;
-  final VoidCallback onGuest;
 
   const WelcomeScreen({
     super.key,
     required this.onSignIn,
     required this.onSignUp,
-    required this.onGuest,
   });
+
+  Widget _authButton(String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 55,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.18),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white.withOpacity(0.35), width: 1),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,63 +92,9 @@ class WelcomeScreen extends StatelessWidget {
                   ),
 
                   const Spacer(),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        width: double.infinity,
-                        height: 55,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        child: InkWell(
-                          onTap: onSignIn,
-                          child: Center(
-                            child: Text(
-                              "Sign in",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: GestureDetector(
-                      onTap: onSignUp,
-                      child: Text(
-                        "Create an account",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Center(
-                    child: GestureDetector(
-                      onTap: onGuest,
-                      child: Text(
-                        "Continue without an account",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _authButton("Sign In", onSignIn),
+                  const SizedBox(height: 12),
+                  _authButton("Create Account", onSignUp),
                 ],
               ),
             ),
@@ -194,7 +161,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
           WelcomeScreen(
             onSignIn: _goToLogin,
             onSignUp: _goToRegister,
-            onGuest: _goToGuest,
           ),
 
           LoginScreen(onBack: _goToWelcome, onRegisterTap: _goToRegister),

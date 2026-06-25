@@ -23,22 +23,18 @@ enum _DragHandle { tl, tr, bl, br, rect }
 class _PhotoEditScreenState extends State<PhotoEditScreen> {
   _Tool _activeTool = _Tool.none;
 
-  // Actual image dimensions (loaded async for precise crop mapping)
   int _imgW = 1, _imgH = 1;
   bool _dimensionsLoaded = false;
 
-  // Crop rect in normalized image coords (0..1)
   double _cropL = 0.08, _cropT = 0.08, _cropR = 0.92, _cropB = 0.92;
 
-  // Drag state
   _DragHandle? _dragging;
   double _dragStartL = 0, _dragStartT = 0, _dragStartR = 0, _dragStartB = 0;
   Offset _dragStartPos = Offset.zero;
 
-  // Enhance values
-  double _brightness = 0.0;   // -0.4 to 0.4 (0 = no change)
-  double _contrast = 1.0;     // 0.7 to 1.5 (1.0 = no change)
-  double _saturation = 1.0;   // 0.5 to 1.8 (1.0 = no change)
+  double _brightness = 0.0;   
+  double _contrast = 1.0;     
+  double _saturation = 1.0;  
 
   bool _isProcessing = false;
 
@@ -62,7 +58,6 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
     codec.dispose();
   }
 
-  /// Compute the display rect of the image inside the container (BoxFit.contain).
   Rect _imageDisplayRect(Size container) {
     if (_imgW == 0 || _imgH == 0) return Rect.fromLTWH(0, 0, container.width, container.height);
     final imgAspect = _imgW / _imgH;
@@ -91,7 +86,6 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
     );
   }
 
-  /// 5x4 color matrix for real-time ColorFiltered preview.
   List<double> _buildMatrix() {
     final b = _brightness;
     final c = _contrast;
@@ -203,7 +197,7 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
       await tmpFile.writeAsBytes(img.encodeJpg(decoded, quality: 92));
 
       if (!mounted) return;
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => ReviewScreen(image: tmpFile)),
       );
@@ -235,17 +229,9 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
           tooltip: 'Cancel',
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.restart_alt_rounded, color: Colors.white70, size: 22),
-            tooltip: 'Reset',
-            onPressed: _resetEdits,
-          ),
-          const SizedBox(width: 4),
-        ],
       ),
       body: Column(
         children: [
@@ -253,9 +239,7 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
           Expanded(child: _buildImageArea()),
           // Tool tabs
           _buildToolTabs(),
-          // Sliders (only in enhance mode)
           if (_activeTool == _Tool.enhance) _buildEnhanceSliders(),
-          // Bottom action bar
           _buildBottomBar(),
         ],
       ),
@@ -272,14 +256,11 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Slight dark background for letterboxed areas
             Container(color: const Color(0xFF0E0E0E)),
-            // Image with color filter for live enhance preview
             ColorFiltered(
               colorFilter: ColorFilter.matrix(_buildMatrix()),
               child: Image.file(widget.image, fit: BoxFit.contain),
             ),
-            // Crop overlay
             if (_activeTool == _Tool.crop && _dimensionsLoaded)
               CustomPaint(
                 painter: _CropPainter(
@@ -401,21 +382,6 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Row(
         children: [
-          // Reset
-          GestureDetector(
-            onTap: _resetEdits,
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white12),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(Icons.restart_alt_rounded, color: Colors.white38, size: 22),
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Continue
           Expanded(
             child: GestureDetector(
               onTap: _isProcessing ? null : _onContinue,
@@ -471,14 +437,12 @@ class _CropPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Dark mask outside crop
     final mask = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
       ..addRect(cropRect)
       ..fillType = PathFillType.evenOdd;
     canvas.drawPath(mask, Paint()..color = Colors.black.withOpacity(0.58));
 
-    // Crop border
     canvas.drawRect(
       cropRect,
       Paint()
@@ -487,7 +451,6 @@ class _CropPainter extends CustomPainter {
         ..strokeWidth = 1.2,
     );
 
-    // Rule-of-thirds grid
     final grid = Paint()
       ..color = Colors.white.withOpacity(0.22)
       ..strokeWidth = 0.8;
@@ -506,7 +469,6 @@ class _CropPainter extends CustomPainter {
       );
     }
 
-    // Teal corner handles
     final handle = Paint()
       ..color = const Color(0xFF2CB88E)
       ..strokeWidth = 3.0
@@ -519,7 +481,6 @@ class _CropPainter extends CustomPainter {
     _corner(canvas, handle, cropRect.bottomLeft, arm, 1, -1);
     _corner(canvas, handle, cropRect.bottomRight, arm, -1, -1);
 
-    // Corner dots
     final dot = Paint()..color = const Color(0xFF2CB88E);
     for (final c in [cropRect.topLeft, cropRect.topRight, cropRect.bottomLeft, cropRect.bottomRight]) {
       canvas.drawCircle(c, 5, dot);

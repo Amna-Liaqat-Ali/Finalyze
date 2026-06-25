@@ -10,7 +10,7 @@ import '../result/photo_edit_screen.dart';
 class ScanScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   final VoidCallback?
-  onScanCompleted; // Callback to notify history screen container wrapper to refresh tabs
+  onScanCompleted; // Callback to notify history screen to refresh tabs
 
   const ScanScreen({super.key, required this.cameras, this.onScanCompleted});
 
@@ -97,10 +97,14 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
           if (widget.onScanCompleted != null) {
             widget.onScanCompleted!();
           }
+          // Reinitialize camera when returning 
+          if (mounted && widget.cameras.isNotEmpty) {
+            _initCamera(widget.cameras.first);
+          }
         });
       }
     } catch (cameraHardwareException) {
-      debugPrint(">>>> ❌ [HARDWARE CAPTURE ERROR]: $cameraHardwareException");
+      debugPrint(">>>> [HARDWARE CAPTURE ERROR]: $cameraHardwareException");
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }

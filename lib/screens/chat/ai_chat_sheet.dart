@@ -137,20 +137,26 @@ class _AiChatSheetState extends State<AiChatSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.82,
-      decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
-        children: [
-          _buildHandle(),
-          _buildHeader(),
-          Expanded(child: _buildMessages()),
-          if (_loading) _buildTypingIndicator(),
-          _buildInputBar(),
-        ],
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: keyboardHeight),
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.82,
+        decoration: const BoxDecoration(
+          color: Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          children: [
+            _buildHandle(),
+            _buildHeader(),
+            Expanded(child: _buildMessages()),
+            if (_loading) _buildTypingIndicator(),
+            _buildInputBar(),
+          ],
+        ),
       ),
     );
   }
@@ -349,7 +355,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
   Widget _buildInputBar() {
     return Container(
       padding: EdgeInsets.fromLTRB(
-          16, 10, 16, MediaQuery.of(context).padding.bottom + 10),
+          16, 10, 16, 10),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [

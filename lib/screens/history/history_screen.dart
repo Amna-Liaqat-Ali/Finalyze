@@ -422,7 +422,6 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // ─── Gallery view ────────────────────────────────────────────────────────────
 
   Widget _buildGalleryView(List<ScanHistory> items) {
     return GridView.builder(
@@ -477,7 +476,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                       child: _buildHistoryImage(item.image, fit: BoxFit.cover),
                     ),
                   ),
-                  // Status dot (non-select) or checkbox (select mode)
                   if (_selectMode)
                     Positioned(
                       top: 6,
@@ -545,7 +543,6 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // ─── Popup overlay ───────────────────────────────────────────────────────────
 
   Widget _buildPopupOverlay(ScanHistory item) {
     return GestureDetector(
@@ -608,12 +605,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: 50,
-                          child: ElevatedButton.icon(
-                            icon: const Icon(
-                              Icons.description_rounded,
-                              size: 18,
-                            ),
-                            label: Text(
+                          child: ElevatedButton(
+                            child: Text(
                               "Full Report",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,

@@ -27,7 +27,7 @@ class ReviewScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
           tooltip: 'Cancel',
         ),
       ),
@@ -38,7 +38,7 @@ class ReviewScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Column(
                 children: [
-                  // Image preview — takes most of the vertical space
+                  // Image preview 
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(22),
@@ -70,7 +70,6 @@ class ReviewScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Sticky bottom action bar
           _buildActionBar(context),
         ],
       ),
@@ -126,9 +125,9 @@ class ReviewScreen extends StatelessWidget {
               flex: 2,
               child: OutlinedButton.icon(
                 onPressed: () {
-                  // Pop ReviewScreen AND PhotoEditScreen → back to camera
-                  int count = 0;
-                  Navigator.of(context).popUntil((_) => count++ >= 2);
+                  final nav = Navigator.of(context);
+                  nav.pop(); // pop ReviewScreen
+                  nav.pop(); // pop back to ScanScreen
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 17),
                 label: Text(
@@ -146,7 +145,6 @@ class ReviewScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-            // Analyze
             Expanded(
               flex: 3,
               child: GestureDetector(

@@ -74,6 +74,7 @@ class _MainScreenState extends State<MainScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       enableDrag: true,
+      useSafeArea: true,
       builder: (_) => const AiChatSheet(),
     );
   }
