@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -241,6 +242,147 @@ class ReviewScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ScanLimitSheet extends StatefulWidget {
+  final DateTime resetAt;
+  const _ScanLimitSheet({required this.resetAt});
+
+  @override
+  State<_ScanLimitSheet> createState() => _ScanLimitSheetState();
+}
+
+class _ScanLimitSheetState extends State<_ScanLimitSheet> {
+  late Timer _timer;
+  Duration _remaining = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+  }
+
+  void _tick() {
+    final diff = widget.resetAt.difference(DateTime.now());
+    if (mounted) setState(() => _remaining = diff.isNegative ? Duration.zero : diff);
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String _pad(int n) => n.toString().padLeft(2, '0');
+
+  @override
+  Widget build(BuildContext context) {
+    final h = _pad(_remaining.inHours);
+    final m = _pad(_remaining.inMinutes.remainder(60));
+    final s = _pad(_remaining.inSeconds.remainder(60));
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40, height: 4,
+            decoration: BoxDecoration(
+              color: Colors.blueGrey.shade200,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 28),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.lock_clock_rounded,
+                color: Colors.orange, size: 48),
+          ),
+          const SizedBox(height: 20),
+          Text("Daily Limit Reached",
+              style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF0D2E5C))),
+          const SizedBox(height: 8),
+          Text(
+            "You've used all 15 free scans for today.\nScanner resets in:",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+                fontSize: 13, color: Colors.blueGrey, height: 1.6),
+          ),
+          const SizedBox(height: 24),
+          // Countdown timer
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              "$h : $m : $s",
+              style: GoogleFonts.poppins(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 4),
+            ),
+          ),
+          const SizedBox(height: 28),
+          // Upgrade button
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              PremiumScreen.showAsSheet(context);
+            },
+            child: Container(
+              width: double.infinity,
+              height: 54,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0891B2).withOpacity(0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text("Upgrade to Premium",
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Wait for Reset",
+                style: GoogleFonts.poppins(
+                    color: Colors.blueGrey, fontWeight: FontWeight.w500)),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:Finalyze/screens/Main/bottom_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../main.dart';
@@ -81,13 +83,47 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      floatingActionButton: _buildChatFab(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: BottomNav(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        if (_selectedIndex != 0) {
+          setState(() => _selectedIndex = 0);
+        } else {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              title: Text("Exit App",
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)),
+              content: Text("Are you sure you want to close Finalyze?",
+                  style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text("No", style: GoogleFonts.poppins(color: Colors.blueGrey)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text("Yes", style: GoogleFonts.poppins(
+                      color: const Color(0xFF0D2E5C), fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+          if (shouldExit == true) {
+            SystemNavigator.pop();
+          }
+        }
+      },
+      child: Scaffold(
+        body: _screens[_selectedIndex],
+        floatingActionButton: _buildChatFab(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        bottomNavigationBar: BottomNav(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
