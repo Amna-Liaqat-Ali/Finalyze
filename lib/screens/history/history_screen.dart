@@ -49,9 +49,22 @@ class ScanHistory {
 
     DateTime parsedDate;
     try {
-      parsedDate = DateTime.parse("${json['scanDate']} ${json['scanTime']}");
+      final dateStr = json['scanDate'] ?? '';
+      final timeStr = json['scanTime'] ?? '';
+      if (dateStr.isNotEmpty && timeStr.isNotEmpty) {
+        // Try ISO parse first (yyyy-MM-dd HH:mm:ss)
+        parsedDate = DateTime.tryParse('$dateStr $timeStr') ??
+            // Fall back for 12-hour format (yyyy-MM-dd hh:mm:ss a)
+            DateFormat('yyyy-MM-dd hh:mm:ss a').parse('$dateStr $timeStr');
+      } else {
+        parsedDate = DateTime.now();
+      }
     } catch (_) {
-      parsedDate = DateTime.now();
+      try {
+        parsedDate = DateFormat('yyyy-MM-dd').parse(json['scanDate'] ?? '');
+      } catch (_) {
+        parsedDate = DateTime.now();
+      }
     }
 
     return ScanHistory(
