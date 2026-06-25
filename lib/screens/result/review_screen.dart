@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Main/analyzing_screen.dart';
+import '../premium/premium_screen.dart';
 
 class ReviewScreen extends StatelessWidget {
   final File? image;
@@ -150,12 +152,50 @@ class ReviewScreen extends StatelessWidget {
               child: GestureDetector(
                 onTap: image == null
                     ? null
-                    : () => Navigator.push(
+                    : () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final now = DateTime.now();
+
+                        // Get stored window start time
+                        final windowStart = prefs.getString('scan_window_start');
+                        DateTime? windowTime = windowStart != null
+                            ? DateTime.tryParse(windowStart)
+                            : null;
+
+                        // Reset if 24h have passed
+                        if (windowTime == null ||
+                            now.difference(windowTime).inHours >= 24) {
+                          windowTime = now;
+                          await prefs.setString(
+                              'scan_window_start', now.toIso8601String());
+                          await prefs.setInt('scan_count', 0);
+                        }
+
+                        final count = prefs.getInt('scan_count') ?? 0;
+
+                        if (count >= 15) {
+                          final resetAt =
+                              windowTime!.add(const Duration(hours: 24));
+                          if (!context.mounted) return;
+                          await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) =>
+                                _ScanLimitSheet(resetAt: resetAt),
+                          );
+                          return;
+                        }
+
+                        await prefs.setInt('scan_count', count + 1);
+                        if (!context.mounted) return;
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => AnalyzingScreen(image: image!),
                           ),
-                        ),
+                        );
+                      },
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(

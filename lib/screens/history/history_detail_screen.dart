@@ -260,8 +260,6 @@ class HistoryDetailScreen extends StatelessWidget {
         children: [
           _infoRow(Icons.set_meal_rounded, "Species", item.fishName, primaryBlue),
           _divider(),
-          _infoRow(Icons.location_on_rounded, "Source / Area", item.source, primaryBlue),
-          _divider(),
           _infoRow(Icons.calendar_today_rounded, "Date",
               DateFormat('MMMM d, yyyy').format(item.dateTime), primaryBlue),
           _divider(),

@@ -341,7 +341,6 @@ class _ResultScreenState extends State<ResultScreen> {
       children: [
         _infoColumn("DATE", date, color),
         _infoColumn("TIME", time, color),
-        _infoColumn("TARGET", area, color),
       ],
     );
   }

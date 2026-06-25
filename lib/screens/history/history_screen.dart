@@ -595,7 +595,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                         ),
                         const SizedBox(height: 16),
                         _infoRow("Species", item.fishName),
-                        _infoRow("Source", item.source),
                         _infoRow(
                           "Scanned",
                           DateFormat('MMM d • hh:mm a').format(item.dateTime),
