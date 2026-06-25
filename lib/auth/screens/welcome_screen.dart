@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:Finalyze/auth/screens/login_screen.dart';
 import 'package:Finalyze/auth/screens/signup_screen.dart';
 import 'package:Finalyze/core/app_sizes.dart';
@@ -77,6 +79,30 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ClipOval(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: Container(
+                        width: rs(context, 72),
+                        height: rs(context, 72),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.12),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/icon/app_icon.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: rsh(context, 16)),
                   Text(
                     "The best\napp for\nyour fish",
                     style: GoogleFonts.poppins(

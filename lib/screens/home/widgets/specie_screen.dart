@@ -14,9 +14,17 @@ class DiscoverSpeciesScreen extends StatefulWidget {
 
 class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
   String selectedCategory = "All";
+  String _searchQuery = "";
   final List<String> categories = ["All", "Marine", "Freshwater"];
+  final TextEditingController _searchController = TextEditingController();
 
   final List<FishSpecies> speciesList = SpeciesSlider.speciesList;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +66,18 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
                   final fish = speciesList[index];
-                  // Category filtering logic
                   final isFreshwater = fish.category.toLowerCase().contains('freshwater') ||
                       fish.category.toLowerCase().contains('carp') ||
                       fish.category.toLowerCase().contains('shad');
                   if (selectedCategory == "Freshwater" && !isFreshwater) return const SizedBox.shrink();
                   if (selectedCategory == "Marine" && isFreshwater) return const SizedBox.shrink();
+                  if (_searchQuery.isNotEmpty) {
+                    final match = fish.name.toLowerCase().contains(_searchQuery) ||
+                        fish.urduName.contains(_searchQuery) ||
+                        fish.category.toLowerCase().contains(_searchQuery) ||
+                        fish.region.toLowerCase().contains(_searchQuery);
+                    if (!match) return const SizedBox.shrink();
+                  }
                   return _buildSpeciesCard(context, fish);
                 },
               ),
@@ -88,10 +102,21 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
           ],
         ),
         child: TextField(
+          controller: _searchController,
+          onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
           decoration: InputDecoration(
             hintText: "Search species or region...",
             hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
             prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 22),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close_rounded, color: Colors.grey, size: 20),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchQuery = "");
+                    },
+                  )
+                : null,
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(vertical: 15),

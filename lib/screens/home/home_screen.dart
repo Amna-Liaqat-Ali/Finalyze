@@ -223,14 +223,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'FINALYZE',
-                          style: GoogleFonts.lexend(
-                            color: Colors.white.withOpacity(0.55),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 5,
-                          ),
+                        Row(
+                          children: [
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/icon/app_icon.png',
+                                width: 22,
+                                height: 22,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'FINALYZE',
+                              style: GoogleFonts.lexend(
+                                color: Colors.white.withOpacity(0.55),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 5,
+                              ),
+                            ),
+                          ],
                         ),
                         Text(
                           UserSession.name?.split(' ').first ?? 'Welcome',

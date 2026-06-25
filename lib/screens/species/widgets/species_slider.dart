@@ -198,24 +198,6 @@ class SpeciesSlider extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2CB88E).withOpacity(0.22),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF2CB88E).withOpacity(0.5)),
-                      ),
-                      child: const Text(
-                        "TAP TO EXPLORE",
-                        style: TextStyle(
-                          color: Color(0xFF4EE3AA),
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Text(
                       fish.name,
                       style: const TextStyle(
