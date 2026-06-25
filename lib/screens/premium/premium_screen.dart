@@ -100,8 +100,8 @@ class _PremiumScreenState extends State<PremiumScreen>
       context: context,
       barrierColor: Colors.black87,
       builder: (ctx) => _PaymentDialog(
-        plan: _yearlySelected ? 'Yearly' : 'Monthly',
-        price: _yearlySelected ? 'Rs. 2,999/year' : 'Rs. 500/month',
+        plan: _selectedPlan == 'business' ? 'Business' : _yearlySelected ? 'Yearly' : 'Monthly',
+        price: _selectedPlan == 'business' ? 'Rs. 5,000/month' : _yearlySelected ? 'Rs. 2,999/year' : 'Rs. 500/month',
       ),
     );
     if (confirmed != true) return;
@@ -168,9 +168,11 @@ class _PremiumScreenState extends State<PremiumScreen>
                           children: [
                             const SizedBox(height: 10),
                             _buildHeroSection(size),
-                            const SizedBox(height: 28),
-                            _buildFeatureList(),
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 20),
+                            _buildSocialProof(),
+                            const SizedBox(height: 24),
+                            _buildComparisonTable(),
+                            const SizedBox(height: 24),
                             _buildPlanToggle(),
                             const SizedBox(height: 28),
                             _buildCTA(),
@@ -316,15 +318,56 @@ class _PremiumScreenState extends State<PremiumScreen>
     );
   }
 
-  // ── Feature list ─────────────────────────────────────────────────────────
+  // ── Social proof ─────────────────────────────────────────────────────────
 
-  Widget _buildFeatureList() {
-    final features = [
-      (Icons.all_inclusive_rounded, "Unlimited fish scans", "Scan as many as you need, anytime"),
-      (Icons.bolt_rounded, "Priority AI analysis", "Faster processing & higher accuracy"),
-      (Icons.history_rounded, "Full scan history", "Unlimited history with export support"),
-      (Icons.analytics_rounded, "Detailed freshness reports", "In-depth breakdown with recommendations"),
-      (Icons.no_accounts_rounded, "No ads, ever", "Clean experience, completely ad-free"),
+  Widget _buildSocialProof() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Avatar stack
+        SizedBox(
+          width: 64,
+          height: 26,
+          child: Stack(
+            children: List.generate(3, (i) => Positioned(
+              left: i * 18.0,
+              child: Container(
+                width: 26, height: 26,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: [_blue, _ocean, _teal][i],
+                  border: Border.all(color: const Color(0xFF061A30), width: 2),
+                ),
+                child: Icon(Icons.person_rounded, color: Colors.white.withOpacity(0.8), size: 14),
+              ),
+            )),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          "Trusted by 500+ fish vendors across Pakistan",
+          style: GoogleFonts.poppins(
+            color: Colors.white.withOpacity(0.45),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Comparison table ─────────────────────────────────────────────────────
+
+  Widget _buildComparisonTable() {
+    final rows = [
+      ("Daily Scans",        "15 scans",     "Unlimited",   "Unlimited"),
+      ("AI Freshness Check", "✓",            "✓",           "✓"),
+      ("Scan History",       "Last 10 only", "Full history", "Full history"),
+      ("Export Reports",     "✗",            "PDF export",   "PDF + Excel"),
+      ("Priority Analysis",  "✗",            "✓",           "✓"),
+      ("Ads",                "Shown",        "Ad-free",      "Ad-free"),
+      ("Vendor Badge",       "✗",            "✗",           "✓ Certified"),
+      ("API Access",         "✗",            "✗",           "✓ Included"),
+      ("Support",            "Community",    "Email",        "Dedicated"),
     ];
 
     return ClipRRect(
@@ -333,68 +376,67 @@ class _PremiumScreenState extends State<PremiumScreen>
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.07),
+            color: Colors.white.withOpacity(0.06),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withOpacity(0.10)),
           ),
           child: Column(
-            children: features.asMap().entries.map((entry) {
-              final i = entry.key;
-              final f = entry.value;
-              return Column(
-                children: [
-                  _featureRow(f.$1, f.$2, f.$3),
-                  if (i < features.length - 1)
-                    Divider(
-                      color: Colors.white.withOpacity(0.06),
-                      height: 1,
-                      indent: 20,
-                      endIndent: 20,
+            children: [
+              // Header row
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                child: Row(
+                  children: [
+                    const Expanded(flex: 3, child: SizedBox()),
+                    Expanded(flex: 2, child: Text("Free",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(color: Colors.white38, fontSize: 11, fontWeight: FontWeight.w600))),
+                    Expanded(flex: 2, child: Text("Premium",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(color: _teal, fontSize: 11, fontWeight: FontWeight.w700))),
+                    Expanded(flex: 2, child: Text("Business",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(color: const Color(0xFFFFB74D), fontSize: 11, fontWeight: FontWeight.w700))),
+                  ],
+                ),
+              ),
+              Divider(color: Colors.white.withOpacity(0.07), height: 1),
+              ...rows.asMap().entries.map((e) {
+                final i = e.key;
+                final r = e.value;
+                return Column(children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      children: [
+                        Expanded(flex: 3, child: Text(r.$1,
+                          style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11))),
+                        Expanded(flex: 2, child: Text(r.$2,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: r.$2 == "✗" ? Colors.white24 : Colors.white38,
+                            fontSize: 10))),
+                        Expanded(flex: 2, child: Text(r.$3,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: r.$3 == "✗" ? Colors.white24 : _teal,
+                            fontSize: 10, fontWeight: FontWeight.w600))),
+                        Expanded(flex: 2, child: Text(r.$4,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: r.$4 == "✗" ? Colors.white24 : const Color(0xFFFFB74D),
+                            fontSize: 10, fontWeight: FontWeight.w600))),
+                      ],
                     ),
-                ],
-              );
-            }).toList(),
+                  ),
+                  if (i < rows.length - 1)
+                    Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 16, endIndent: 16),
+                ]);
+              }),
+              const SizedBox(height: 4),
+            ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _featureRow(IconData icon, String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: _teal.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: _teal, size: 18),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  )),
-                Text(subtitle,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withOpacity(0.45),
-                    fontSize: 11,
-                  )),
-              ],
-            ),
-          ),
-          const Icon(Icons.check_circle_rounded, color: _teal, size: 18),
-        ],
       ),
     );
   }
@@ -403,12 +445,19 @@ class _PremiumScreenState extends State<PremiumScreen>
 
   Widget _buildPlanToggle() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text("Choose a plan",
+          style: GoogleFonts.poppins(
+            color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(child: _planCard(yearly: false)),
-            const SizedBox(width: 12),
-            Expanded(child: _planCard(yearly: true)),
+            Expanded(child: _planCard(type: "monthly")),
+            const SizedBox(width: 10),
+            Expanded(child: _planCard(type: "yearly")),
+            const SizedBox(width: 10),
+            Expanded(child: _planCard(type: "business")),
           ],
         ),
         if (_yearlySelected) ...[
@@ -419,7 +468,7 @@ class _PremiumScreenState extends State<PremiumScreen>
               const Icon(Icons.savings_rounded, color: Color(0xFF4EE3AA), size: 14),
               const SizedBox(width: 5),
               Text(
-                "You save 50% with the yearly plan",
+                "Save 50% vs monthly with yearly",
                 style: GoogleFonts.poppins(
                   color: const Color(0xFF4EE3AA),
                   fontSize: 11,
@@ -433,23 +482,38 @@ class _PremiumScreenState extends State<PremiumScreen>
     );
   }
 
-  Widget _planCard({required bool yearly}) {
-    final selected = _yearlySelected == yearly;
+  // "type" is "monthly" | "yearly" | "business"
+  String _selectedPlan = "yearly";
+
+  Widget _planCard({required String type}) {
+    final selected = _selectedPlan == type;
+    final isYearly = type == "yearly";
+    final isBusiness = type == "business";
+
+    final label = isBusiness ? "Business" : isYearly ? "Yearly" : "Monthly";
+    final price = isBusiness ? "Rs. 417" : isYearly ? "Rs. 250" : "Rs. 500";
+    final sub   = isBusiness ? "Rs. 5,000/mo" : isYearly ? "Rs. 2,999/yr" : "/month";
+    final badge = isBusiness ? "B2B" : isYearly ? "BEST VALUE" : null;
+    final badgeColor = isBusiness ? const Color(0xFFFFB74D) : _teal;
+    final accentColor = isBusiness ? const Color(0xFFFFB74D) : _teal;
 
     return GestureDetector(
-      onTap: () => setState(() => _yearlySelected = yearly),
+      onTap: () => setState(() {
+        _selectedPlan = type;
+        _yearlySelected = isYearly;
+      }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
           color: selected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? _teal : Colors.white.withOpacity(0.12),
+            color: selected ? accentColor : Colors.white.withOpacity(0.12),
             width: selected ? 1.8 : 1,
           ),
           boxShadow: selected
-              ? [BoxShadow(color: _teal.withOpacity(0.18), blurRadius: 16, spreadRadius: 0)]
+              ? [BoxShadow(color: accentColor.withOpacity(0.18), blurRadius: 16)]
               : [],
         ),
         child: Stack(
@@ -457,85 +521,41 @@ class _PremiumScreenState extends State<PremiumScreen>
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (yearly)
+                if (badge != null)
                   Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1A5694), Color(0xFF2CB88E)],
-                      ),
-                      borderRadius: BorderRadius.circular(6),
+                      color: badgeColor.withOpacity(0.20),
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: badgeColor.withOpacity(0.5)),
                     ),
-                    child: Text(
-                      "BEST VALUE",
+                    child: Text(badge,
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
+                        color: badgeColor, fontSize: 7,
+                        fontWeight: FontWeight.bold, letterSpacing: 0.4)),
                   )
                 else
-                  const SizedBox(height: 26),
-                Text(
-                  yearly ? "Yearly" : "Monthly",
+                  const SizedBox(height: 20),
+                Text(label,
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: yearly ? "Rs. 250" : "Rs. 500",
-                        style: GoogleFonts.poppins(
-                          color: selected ? _teal : Colors.white70,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: yearly ? "\n/month" : "\n/month",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white38,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (yearly)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      "Billed Rs. 2,999/yr",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white30,
-                        fontSize: 9,
-                      ),
-                    ),
-                  ),
+                    color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 3),
+                Text(price,
+                  style: GoogleFonts.poppins(
+                    color: selected ? accentColor : Colors.white60,
+                    fontSize: 15, fontWeight: FontWeight.bold)),
+                Text(sub,
+                  style: GoogleFonts.poppins(color: Colors.white30, fontSize: 8)),
               ],
             ),
-            // Selection indicator
             if (selected)
               Positioned(
-                top: 0,
-                right: 0,
+                top: 0, right: 0,
                 child: Container(
-                  width: 18,
-                  height: 18,
-                  decoration: const BoxDecoration(
-                    color: _teal,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check_rounded,
-                      color: Colors.white, size: 11),
+                  width: 16, height: 16,
+                  decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                  child: const Icon(Icons.check_rounded, color: Colors.white, size: 10),
                 ),
               ),
           ],
@@ -572,9 +592,11 @@ class _PremiumScreenState extends State<PremiumScreen>
                 color: Colors.white, size: 20),
             const SizedBox(width: 10),
             Text(
-              _yearlySelected
-                  ? "Start Yearly Plan — Rs. 2,999"
-                  : "Start Monthly Plan — Rs. 500",
+              _selectedPlan == "business"
+                  ? "Start Business Plan — Rs. 5,000/mo"
+                  : _selectedPlan == "yearly"
+                      ? "Start Yearly Plan — Rs. 2,999"
+                      : "Start Monthly Plan — Rs. 500",
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
