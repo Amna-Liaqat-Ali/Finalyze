@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import '../../services/tflite_service.dart';
 import '../result/result_screen.dart';
 
@@ -109,36 +110,41 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildAnimatedLoader(_controller, progressValue, accentTeal),
-          const SizedBox(height: 50),
+          _buildAnimatedLoader(context, _controller, progressValue, accentTeal),
+          SizedBox(height: rsh(context, 40)),
           Text(
             "Analyzing Freshness",
             style: GoogleFonts.poppins(
-              fontSize: 22,
+              fontSize: rs(context, 20),
               fontWeight: FontWeight.bold,
               color: primaryBlue,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: rsh(context, 6)),
           Text(
             "Inspecting freshness details...",
             style: GoogleFonts.poppins(
-              fontSize: 14,
+              fontSize: rs(context, 13),
               color: Colors.blueGrey.shade300,
             ),
           ),
-          const SizedBox(height: 40),
-          _buildProgressTile(primaryBlue, accentTeal, progressValue),
+          SizedBox(height: rsh(context, 32)),
+          _buildProgressTile(context, primaryBlue, accentTeal, progressValue),
         ],
       ),
     );
   }
 
   Widget _buildAnimatedLoader(
+    BuildContext context,
     AnimationController controller,
     double progress,
     Color accent,
   ) {
+    final outerSize = rs(context, 170);
+    final ringSize = rs(context, 150);
+    final innerSize = rs(context, 105);
+    final emojiSize = rs(context, 46);
     return Center(
       child: AnimatedBuilder(
         animation: controller,
@@ -147,16 +153,16 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
             alignment: Alignment.center,
             children: [
               Container(
-                height: 180,
-                width: 180,
+                height: outerSize,
+                width: outerSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: accent.withOpacity(0.05 + (controller.value * 0.05)),
                 ),
               ),
               SizedBox(
-                height: 160,
-                width: 160,
+                height: ringSize,
+                width: ringSize,
                 child: CircularProgressIndicator(
                   value: progress,
                   strokeWidth: 8,
@@ -166,8 +172,8 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                 ),
               ),
               Container(
-                height: 110,
-                width: 110,
+                height: innerSize,
+                width: innerSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
@@ -182,7 +188,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                 child: Center(
                   child: Transform.scale(
                     scale: 1.0 + (controller.value * 0.1),
-                    child: const Text("🐟", style: TextStyle(fontSize: 50)),
+                    child: Text("🐟", style: TextStyle(fontSize: emojiSize)),
                   ),
                 ),
               ),
@@ -193,10 +199,10 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
     );
   }
 
-  Widget _buildProgressTile(Color primary, Color accent, double progress) {
+  Widget _buildProgressTile(BuildContext context, Color primary, Color accent, double progress) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40),
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      margin: EdgeInsets.symmetric(horizontal: rs(context, 36)),
+      padding: EdgeInsets.symmetric(vertical: rsh(context, 14), horizontal: rs(context, 18)),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(15),

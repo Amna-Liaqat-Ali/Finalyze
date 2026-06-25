@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/app_sizes.dart';
 import '../../core/user_session.dart';
 import '../cook/recipe_screen.dart';
 import '../history/services/scan_service.dart';
@@ -89,9 +90,9 @@ class _ResultScreenState extends State<ResultScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            _buildImageHeader(),
+            _buildImageHeader(context),
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(rs(context, 20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -118,16 +119,16 @@ class _ResultScreenState extends State<ResultScreen> {
                   Text(
                     "$species: $status",
                     style: GoogleFonts.poppins(
-                      fontSize: 28,
+                      fontSize: rs(context, 24),
                       fontWeight: FontWeight.bold,
                       color: primaryBlue,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: rsh(context, 10)),
                   Text(
                     "Identified as $species. Biological markers in the ${widget.scanArea} indicate a $status state with ${(widget.confidence * 100).toStringAsFixed(1)}% confidence.",
                     style: GoogleFonts.poppins(
-                      fontSize: 15,
+                      fontSize: rs(context, 13),
                       color: Colors.blueGrey.shade600,
                       height: 1.6,
                     ),
@@ -320,10 +321,10 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget _buildImageHeader() {
+  Widget _buildImageHeader(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      height: 220,
+      margin: EdgeInsets.symmetric(horizontal: rs(context, 16)),
+      height: rsh(context, 200),
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
@@ -389,8 +390,8 @@ class _ResultScreenState extends State<ResultScreen> {
 
   Widget _buildMetricCard(String title, String value, Color color) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(20),
+      child: Builder(builder: (context) => Container(
+        padding: EdgeInsets.all(rs(context, 16)),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color.withOpacity(0.2)),
@@ -400,18 +401,18 @@ class _ResultScreenState extends State<ResultScreen> {
             Text(
               value,
               style: GoogleFonts.poppins(
-                fontSize: 28,
+                fontSize: rs(context, 24),
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
             ),
             Text(
               title,
-              style: GoogleFonts.poppins(fontSize: 12, color: Colors.blueGrey),
+              style: GoogleFonts.poppins(fontSize: rs(context, 11), color: Colors.blueGrey),
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 

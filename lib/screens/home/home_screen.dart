@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/app_sizes.dart';
 import '../../core/user_session.dart';
 import '../history/services/scan_service.dart';
 import '../result/photo_edit_screen.dart';
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+              padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 18), rs(context, 20), 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -185,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ClipPath(
       clipper: _WaveClipper(),
       child: Container(
-        height: 210 + MediaQuery.of(context).padding.top,
+        height: rsh(context, 200) + MediaQuery.of(context).padding.top,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -235,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           UserSession.name?.split(' ').first ?? 'Welcome',
                           style: GoogleFonts.poppins(
                             color: Colors.white,
-                            fontSize: 34,
+                            fontSize: rs(context, 30),
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,
                             height: 1.15,
@@ -311,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () => _pickImage(ImageSource.camera),
       child: Container(
         width: double.infinity,
-        height: 115,
+        height: rsh(context, 110),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
@@ -397,7 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Scan Fish Now',
                             style: GoogleFonts.poppins(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: rs(context, 18),
                               fontWeight: FontWeight.bold,
                               height: 1.2,
                             ),
@@ -407,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'AI-powered freshness analysis',
                             style: GoogleFonts.poppins(
                               color: Colors.white.withOpacity(0.75),
-                              fontSize: 12,
+                              fontSize: rs(context, 11),
                               fontWeight: FontWeight.w400,
                             ),
                           ),

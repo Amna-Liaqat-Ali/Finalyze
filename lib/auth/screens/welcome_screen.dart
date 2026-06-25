@@ -1,5 +1,6 @@
 import 'package:Finalyze/auth/screens/login_screen.dart';
 import 'package:Finalyze/auth/screens/signup_screen.dart';
+import 'package:Finalyze/core/app_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,12 +16,12 @@ class WelcomeScreen extends StatelessWidget {
     required this.onSignUp,
   });
 
-  Widget _authButton(String label, VoidCallback onTap) {
+  Widget _authButton(BuildContext context, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 55,
+        height: rsh(context, 52),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.18),
           borderRadius: BorderRadius.circular(10),
@@ -31,7 +32,7 @@ class WelcomeScreen extends StatelessWidget {
             label,
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: rs(context, 15),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -69,32 +70,35 @@ class WelcomeScreen extends StatelessWidget {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+              padding: EdgeInsets.symmetric(
+                horizontal: rs(context, 30),
+                vertical: rsh(context, 36),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "The best\napp for\nyour fish",
                     style: GoogleFonts.poppins(
-                      fontSize: 42,
+                      fontSize: rs(context, 40),
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       height: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: rsh(context, 10)),
                   Text(
                     "Analyze freshness instantly with AI",
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
-                      fontSize: 16,
+                      fontSize: rs(context, 15),
                     ),
                   ),
 
                   const Spacer(),
-                  _authButton("Sign In", onSignIn),
-                  const SizedBox(height: 12),
-                  _authButton("Create Account", onSignUp),
+                  _authButton(context, "Sign In", onSignIn),
+                  SizedBox(height: rsh(context, 12)),
+                  _authButton(context, "Create Account", onSignUp),
                 ],
               ),
             ),

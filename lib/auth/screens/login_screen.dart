@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import '../../auth/screens/forgot_password_screen.dart';
 import '../../auth/screens/otp_verification_screen.dart';
 import '../../auth/screens/services/auth_service.dart';
@@ -125,11 +126,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: rs(context, 24)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 20),
+                      SizedBox(height: rsh(context, 20)),
                       _buildBackButton(widget.onBack),
 
                       const Spacer(flex: 1),
@@ -137,31 +138,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         "FINALYZE",
                         style: GoogleFonts.lexend(
-                          fontSize: 14,
+                          fontSize: rs(context, 13),
                           color: primaryBlue,
                           letterSpacing: 8,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: rsh(context, 8)),
                       Text(
                         "Verify\nFreshness",
                         style: GoogleFonts.poppins(
-                          fontSize: 42,
+                          fontSize: rs(context, 38),
                           color: primaryBlue,
                           fontWeight: FontWeight.bold,
                           height: 1.1,
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      SizedBox(height: rsh(context, 32)),
 
                       ClipRRect(
                         borderRadius: BorderRadius.circular(24),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                           child: Container(
-                            padding: const EdgeInsets.all(28),
+                            padding: EdgeInsets.all(rs(context, 24)),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(
                                 0.3,
@@ -179,14 +180,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Icons.alternate_email_rounded,
                                   _emailController,
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: rsh(context, 16)),
                                 _buildLightInput(
                                   "Password",
                                   Icons.fingerprint_rounded,
                                   _passwordController,
                                   isPassword: true,
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: rsh(context, 6)),
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
@@ -210,14 +211,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: rsh(context, 14)),
 
                                 InkWell(
                                   onTap: _isLoading ? null : _handleLogin,
                                   borderRadius: BorderRadius.circular(16),
                                   child: Container(
                                     width: double.infinity,
-                                    height: 55,
+                                    height: rsh(context, 52),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(16),
                                       color: primaryBlue,
@@ -267,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               text: "Don't have an account? ",
                               style: TextStyle(
                                 color: Colors.black.withOpacity(0.7),
-                                fontSize: 13,
+                                fontSize: rs(context, 13),
                               ),
                               children: const [
                                 TextSpan(

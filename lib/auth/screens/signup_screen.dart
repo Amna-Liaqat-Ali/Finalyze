@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:Finalyze/core/app_sizes.dart';
 import 'package:Finalyze/auth/screens/otp_verification_screen.dart';
 import 'package:Finalyze/auth/screens/services/auth_service.dart';
 import 'package:Finalyze/widgets/app_back_button.dart';
@@ -136,41 +137,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SafeArea(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: rs(context, 24)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    SizedBox(height: rsh(context, 20)),
                     _buildBackButton(widget.onBack),
-                    const SizedBox(height: 15),
+                    SizedBox(height: rsh(context, 12)),
 
                     Text(
                       "NEW MEMBER",
                       style: GoogleFonts.lexend(
-                        fontSize: 14,
+                        fontSize: rs(context, 13),
                         color: primaryBlue,
                         letterSpacing: 8,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: rsh(context, 4)),
                     Text(
                       "Create\nAccount",
                       style: GoogleFonts.poppins(
-                        fontSize: 38,
+                        fontSize: rs(context, 36),
                         color: primaryBlue,
                         fontWeight: FontWeight.bold,
                         height: 1.1,
                       ),
                     ),
-                    const SizedBox(height: 25),
+                    SizedBox(height: rsh(context, 20)),
 
                     ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                         child: Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: EdgeInsets.all(rs(context, 20)),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(24),
@@ -186,20 +187,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 Icons.person_outline_rounded,
                                 _nameController,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: rsh(context, 14)),
                               _buildLightInput(
                                 "Email Address",
                                 Icons.alternate_email_rounded,
                                 _emailController,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: rsh(context, 14)),
                               _buildLightInput(
                                 "Password",
                                 Icons.fingerprint_rounded,
                                 _passwordController,
                                 isPassword: true,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: rsh(context, 14)),
 
                               // User Role Dropdown
                               Container(
@@ -246,7 +247,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: rsh(context, 14)),
 
                               _buildLightInput(
                                 "Operational Region / Port",
@@ -255,21 +256,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
 
                               if (_selectedRole != 'End Consumer') ...[
-                                const SizedBox(height: 16),
+                                SizedBox(height: rsh(context, 14)),
                                 _buildLightInput(
                                   "Company / Organization Name",
                                   Icons.business_center_outlined,
                                   _orgController,
                                 ),
                               ],
-                              const SizedBox(height: 24),
+                              SizedBox(height: rsh(context, 20)),
 
                               InkWell(
                                 onTap: _isLoading ? null : _handleRegister,
                                 borderRadius: BorderRadius.circular(16),
                                 child: Container(
                                   width: double.infinity,
-                                  height: 55,
+                                  height: rsh(context, 52),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
                                     color: primaryBlue,
@@ -309,7 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 30),
+                    SizedBox(height: rsh(context, 24)),
                     Center(
                       child: TextButton(
                         onPressed: widget.onLoginTap,
@@ -318,7 +319,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             text: "Already have an account? ",
                             style: TextStyle(
                               color: Colors.black.withOpacity(0.7),
-                              fontSize: 13,
+                              fontSize: rs(context, 13),
                             ),
                             children: const [
                               TextSpan(
