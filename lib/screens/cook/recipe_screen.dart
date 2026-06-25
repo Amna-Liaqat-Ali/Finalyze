@@ -6,8 +6,6 @@ import 'data/recipe_data.dart';
 import 'models/recipe.dart';
 
 class RecipeScreen extends StatefulWidget {
-  /// Pass 'fresh', 'moderate', or 'spoiled' when coming from ResultScreen.
-  /// Null means browse all (tab navigation).
   final String? freshnessStatus;
 
   const RecipeScreen({super.key, this.freshnessStatus});
@@ -290,15 +288,23 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   children: [
                     AspectRatio(
                       aspectRatio: 16 / 9,
-                      child: Image.asset(
-                        recipe.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, e, s) => Container(
-                          color: softBg,
-                          child: const Icon(Icons.broken_image,
-                              color: Colors.blueGrey),
-                        ),
-                      ),
+                      child: recipe.imageUrl.startsWith('assets/')
+                          ? Image.asset(
+                              recipe.imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: softBg,
+                                child: const Icon(Icons.broken_image, color: Colors.blueGrey),
+                              ),
+                            )
+                          : Image.network(
+                              recipe.imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: softBg,
+                                child: const Icon(Icons.broken_image, color: Colors.blueGrey),
+                              ),
+                            ),
                     ),
                     if (highlight)
                       Positioned(

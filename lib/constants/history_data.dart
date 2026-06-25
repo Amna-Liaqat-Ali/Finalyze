@@ -2,6 +2,7 @@ import '../models/scan_history_model.dart';
 
 final historyData = [
   ScanHistory(
+    id: "",
     fishName: "Rohu",
     source: "Market A",
     dateTime: DateTime.now(),
@@ -10,6 +11,7 @@ final historyData = [
     confidence: 98,
   ),
   ScanHistory(
+    id: "",
     fishName: "Paplet",
     source: "Market B",
     dateTime: DateTime.now(),
@@ -18,6 +20,7 @@ final historyData = [
     confidence: 98,
   ),
   ScanHistory(
+    id: "",
     fishName: "Mushka",
     source: "Market B",
     dateTime: DateTime.now(),
@@ -26,6 +29,7 @@ final historyData = [
     confidence: 98,
   ),
   ScanHistory(
+    id: "",
     fishName: "Palla",
     source: "Market A",
     dateTime: DateTime.now(),
@@ -34,6 +38,7 @@ final historyData = [
     confidence: 98,
   ),
   ScanHistory(
+    id: "",
     fishName: "Surmai",
     source: "Market A",
     dateTime: DateTime.now(),
@@ -42,6 +47,7 @@ final historyData = [
     confidence: 98,
   ),
   ScanHistory(
+    id: "",
     fishName: "Heera",
     source: "Market A",
     dateTime: DateTime.now(),

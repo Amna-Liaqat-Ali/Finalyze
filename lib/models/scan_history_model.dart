@@ -1,6 +1,7 @@
 enum ScanStatus { fresh, spoiled, moderate, fair }
 
 class ScanHistory {
+  final String id;
   final String fishName;
   final String source;
   final DateTime dateTime;
@@ -9,6 +10,7 @@ class ScanHistory {
   final int confidence;
 
   ScanHistory({
+    required this.id,
     required this.fishName,
     required this.source,
     required this.dateTime,

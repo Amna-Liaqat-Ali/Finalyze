@@ -1,16 +1,41 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/api_config.dart';
 import 'history_screen.dart';
+import 'services/scan_service.dart';
 
-class HistoryDetailScreen extends StatelessWidget {
+class HistoryDetailScreen extends StatefulWidget {
   final ScanHistory item;
 
   const HistoryDetailScreen({super.key, required this.item});
+
+  @override
+  State<HistoryDetailScreen> createState() => _HistoryDetailScreenState();
+}
+
+class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
+  late Future<Uint8List?> _imageFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _imageFuture = _loadImage();
+  }
+
+  Future<Uint8List?> _loadImage() async {
+    if (widget.item.id.isEmpty) return null;
+    final base64Data = await ScanService.getScanImage(widget.item.id);
+    if (base64Data == null || base64Data.isEmpty) return null;
+    final clean = base64Data.contains(',') ? base64Data.split(',').last : base64Data;
+    return compute(base64Decode, clean);
+  }
+
+  ScanHistory get item => widget.item;
 
   Color get _statusColor {
     switch (item.status) {
@@ -25,7 +50,8 @@ class HistoryDetailScreen extends StatelessWidget {
     }
   }
 
-  String get _statusLabel => item.status.name[0].toUpperCase() + item.status.name.substring(1);
+  String get _statusLabel =>
+      item.status.name[0].toUpperCase() + item.status.name.substring(1);
 
   String get _recommendation {
     switch (item.status) {
@@ -53,30 +79,57 @@ class HistoryDetailScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildImage() {
+  Widget _buildImageArea() {
     final placeholder = Container(
       color: Colors.grey[200],
-      child: const Center(child: Icon(Icons.broken_image, color: Colors.grey, size: 40)),
+      child: const Center(
+        child: Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: 48),
+      ),
     );
-    if (item.image.isEmpty) return placeholder;
 
-    if (item.image.startsWith('http') || item.image.startsWith('uploads/')) {
-      final serverBase = ApiConfig.baseUrl.replaceAll('/api', '');
-      final url = item.image.startsWith('http')
-          ? item.image
-          : '$serverBase/${item.image.replaceAll(r'\', '/')}';
-      return Image.network(url, fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => placeholder);
-    }
-
-    try {
-      final data = item.image.contains(',') ? item.image.split(',').last : item.image;
-      final bytes = base64Decode(data);
-      return Image.memory(bytes, fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => placeholder);
-    } catch (_) {
-      return placeholder;
-    }
+    return SizedBox(
+      height: 260,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          FutureBuilder<Uint8List?>(
+            future: _imageFuture,
+            builder: (_, snap) {
+              if (snap.connectionState == ConnectionState.waiting) {
+                return Container(
+                  color: Colors.grey[100],
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFF0891B2),
+                    ),
+                  ),
+                );
+              }
+              if (snap.hasData && snap.data != null) {
+                return Image.memory(snap.data!, fit: BoxFit.cover, gaplessPlayback: true);
+              }
+              return placeholder;
+            },
+          ),
+          // Bottom fade
+          Positioned(
+            bottom: 0, left: 0, right: 0,
+            child: Container(
+              height: 100,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [Color(0xFFF8FAFC), Colors.transparent],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -107,46 +160,22 @@ class HistoryDetailScreen extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Hero image
-            SizedBox(
-              height: 260,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  _buildImage(),
-                  // Bottom gradient
-                  Positioned(
-                    bottom: 0, left: 0, right: 0,
-                    child: Container(
-                      height: 100,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [Color(0xFFF8FAFC), Colors.transparent],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
+            _buildImageArea(),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Status badge + confidence
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: _statusColor.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: _statusColor.withOpacity(0.3)),
+                          border: Border.all(
+                              color: _statusColor.withOpacity(0.3)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -176,38 +205,32 @@ class HistoryDetailScreen extends StatelessWidget {
                       const SizedBox(width: 4),
                       Padding(
                         padding: const EdgeInsets.only(top: 6),
-                        child: Text("confidence",
+                        child: Text(
+                          "confidence",
                           style: GoogleFonts.poppins(
-                            fontSize: 11, color: Colors.grey,
-                          ),
+                              fontSize: 11, color: Colors.grey),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
 
-                  // Species title
                   Text(
                     item.fishName,
                     style: GoogleFonts.poppins(
-                      fontSize: 24, fontWeight: FontWeight.bold, color: primaryBlue,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: primaryBlue,
                     ),
-                  ),
-                  Text(
-                    item.source,
-                    style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey),
                   ),
                   const SizedBox(height: 20),
 
-                  // Confidence progress bar
                   _buildConfidenceBar(),
                   const SizedBox(height: 20),
 
-                  // Info card
                   _buildInfoCard(primaryBlue),
                   const SizedBox(height: 16),
 
-                  // Recommendation card
                   _buildRecommendation(),
                 ],
               ),
@@ -225,11 +248,14 @@ class HistoryDetailScreen extends StatelessWidget {
         Row(
           children: [
             Text("Confidence Score",
-              style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey)),
+                style: GoogleFonts.poppins(
+                    fontSize: 13, color: Colors.blueGrey)),
             const Spacer(),
             Text("${item.confidence}%",
-              style: GoogleFonts.poppins(
-                fontSize: 13, fontWeight: FontWeight.bold, color: _statusColor)),
+                style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: _statusColor)),
           ],
         ),
         const SizedBox(height: 8),
@@ -253,35 +279,52 @@ class HistoryDetailScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         children: [
-          _infoRow(Icons.set_meal_rounded, "Species", item.fishName, primaryBlue),
+          _infoRow(Icons.set_meal_rounded, "Species", item.fishName,
+              primaryBlue),
           _divider(),
-          _infoRow(Icons.calendar_today_rounded, "Date",
-              DateFormat('MMMM d, yyyy').format(item.dateTime), primaryBlue),
+          _infoRow(
+            Icons.calendar_today_rounded,
+            "Date",
+            DateFormat('MMMM d, yyyy').format(item.dateTime),
+            primaryBlue,
+          ),
           _divider(),
-          _infoRow(Icons.access_time_rounded, "Time",
-              DateFormat('hh:mm a').format(item.dateTime), primaryBlue),
+          _infoRow(
+            Icons.access_time_rounded,
+            "Time",
+            DateFormat('hh:mm a').format(item.dateTime),
+            primaryBlue,
+          ),
         ],
       ),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value, Color primary) {
+  Widget _infoRow(
+      IconData icon, String label, String value, Color primary) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
           Icon(icon, color: primary.withOpacity(0.5), size: 18),
           const SizedBox(width: 12),
-          Text(label, style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey)),
+          Text(label,
+              style: GoogleFonts.poppins(
+                  fontSize: 13, color: Colors.grey)),
           const Spacer(),
           Text(value,
-            style: GoogleFonts.poppins(
-              fontSize: 13, fontWeight: FontWeight.w600, color: primary)),
+              style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: primary)),
         ],
       ),
     );
@@ -307,11 +350,16 @@ class HistoryDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Recommendation",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold, color: _statusColor, fontSize: 14)),
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: _statusColor,
+                        fontSize: 14)),
                 const SizedBox(height: 4),
                 Text(_recommendation,
-                  style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey, height: 1.5)),
+                    style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: Colors.blueGrey,
+                        height: 1.5)),
               ],
             ),
           ),

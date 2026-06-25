@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class GuideScreen extends StatelessWidget {
   const GuideScreen({super.key});
 
-  // --- Theme Constants ---
   static const primaryBlue = Color(0xFF1A5694);
   static const lightBlueBg = Color(0xFFE8F1FF);
   static const accentTeal = Color(0xFF2CB88E);
@@ -42,42 +40,73 @@ class GuideScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 32),
 
-                  _buildSectionHeader("Scanning Best Practices", "Pro Guide"),
+                  _buildSectionHeader("How to Scan", "Step-by-Step"),
                   const SizedBox(height: 20),
 
                   _buildStepCard(
                     number: "1",
-                    icon: Icons.wb_sunny_outlined,
-                    title: "Lighting",
-                    desc:
-                        "Use natural, diffused light. Avoid direct harsh sunlight or heavy shadows on the specimen.",
+                    icon: Icons.camera_alt_outlined,
+                    title: "Open the Scanner",
+                    desc: "Tap 'Scan Fish Now' on the home screen or use the camera button. You can also upload an image from your gallery using 'Upload Image'.",
                   ),
                   _buildStepCard(
                     number: "2",
-                    icon: Icons.center_focus_strong_outlined,
-                    title: "Focus",
-                    desc:
-                        "Ensure the lens is clean and the subject is in sharp focus. Tap the screen to lock focus on the center.",
+                    icon: Icons.wb_sunny_outlined,
+                    title: "Set Up Good Lighting",
+                    desc: "Place the fish under natural or bright indoor light. Avoid harsh shadows and direct flash, which can distort the gill and eye colour the AI reads.",
                   ),
                   _buildStepCard(
                     number: "3",
+                    icon: Icons.center_focus_strong_outlined,
+                    title: "Focus on Eyes and Gills",
+                    desc: "Position the camera so the fish's eye and gill area fill most of the frame. These are the primary biological markers Finalyze analyses.",
+                  ),
+                  _buildStepCard(
+                    number: "4",
                     icon: Icons.crop_free_outlined,
-                    title: "Framing",
-                    desc:
-                        "Keep the entire specimen within the guide lines. Maintain a distance of roughly 15-20cm.",
+                    title: "Hold Steady and Capture",
+                    desc: "Keep the camera still and at roughly 15–20 cm from the fish. Tap the shutter, then review the image in the editor before submitting for analysis.",
+                  ),
+                  _buildStepCard(
+                    number: "5",
+                    icon: Icons.analytics_outlined,
+                    title: "Read Your Result",
+                    desc: "Finalyze returns a freshness status (Fresh, Moderate, or Spoiled) with a confidence percentage. Check the full report in History for date, time, and species details.",
                   ),
 
                   const SizedBox(height: 40),
 
+                  _buildSectionHeader("Daily Scan Limit", "Free Plan"),
+                  const SizedBox(height: 16),
+
+                  _buildInfoCard(
+                    icon: Icons.timer_outlined,
+                    title: "15 Scans Per Day",
+                    body: "Free accounts can perform up to 15 AI scans within any 24-hour window. Once the limit is reached, a countdown shows when your quota resets. Upgrade to Premium for unlimited scans.",
+                    color: const Color(0xFFE8F1FF),
+                    iconColor: primaryBlue,
+                  ),
+                  const SizedBox(height: 16),
+
+                  _buildInfoCard(
+                    icon: Icons.history_rounded,
+                    title: "Scan History",
+                    body: "Every successful scan is saved to your History tab. Tap any entry to open the Full Report, which shows the scanned image, species, confidence score, and the date and time of analysis.",
+                    color: const Color(0xFFE8FFF5),
+                    iconColor: accentTeal,
+                  ),
+                  const SizedBox(height: 40),
+
+                  _buildSectionHeader("Manual Verification", "Double-Check"),
+                  const SizedBox(height: 16),
+
                   Text(
-                    "Manual Verification",
+                    "Use these physical checks alongside the AI result for maximum confidence.",
                     style: GoogleFonts.poppins(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      fontSize: 13, color: Colors.blueGrey, height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   GridView.count(
                     shrinkWrap: true,
@@ -88,31 +117,50 @@ class GuideScreen extends StatelessWidget {
                     childAspectRatio: 0.85,
                     children: [
                       _buildManualCard(
-                        icon: Icons.air,
+                        icon: Icons.air_outlined,
                         title: "Smell Test",
-                        desc:
-                            "Should have a clean, oceanic scent; never ammonia-like.",
+                        desc: "Should have a clean, oceanic scent. An ammonia or sour odour means spoilage.",
                       ),
                       _buildManualCard(
                         icon: Icons.visibility_outlined,
                         title: "Clear Eyes",
-                        desc:
-                            "Look for bright, bulging eyes. Cloudiness indicates age.",
+                        desc: "Look for bright, bulging eyes. Cloudiness or sunken eyes indicate age.",
                       ),
                       _buildManualCard(
                         icon: Icons.water_drop_outlined,
                         title: "Red Gills",
-                        desc:
-                            "Fresh specimens display vivid red or deep pink gills.",
+                        desc: "Gills should be vivid red or pink. Grey or brown colouring signals deterioration.",
                       ),
                       _buildManualCard(
                         icon: Icons.back_hand_outlined,
                         title: "Firm Flesh",
-                        desc:
-                            "Meat should spring back instantly when pressed gently.",
+                        desc: "Press the flesh — it should spring back instantly. Soft or mushy flesh is a spoilage sign.",
                       ),
                     ],
                   ),
+
+                  const SizedBox(height: 40),
+                  _buildSectionHeader("Understanding Results", "AI Output"),
+                  const SizedBox(height: 16),
+
+                  _buildResultRow(
+                    color: accentTeal,
+                    label: "Fresh",
+                    desc: "Safe for immediate consumption, grilling, or storing up to 2 days. High confidence AI detection.",
+                  ),
+                  const SizedBox(height: 10),
+                  _buildResultRow(
+                    color: Colors.orange,
+                    label: "Moderate",
+                    desc: "Cook thoroughly at high heat. Not suitable for raw consumption. Use the same day.",
+                  ),
+                  const SizedBox(height: 10),
+                  _buildResultRow(
+                    color: Colors.redAccent,
+                    label: "Spoiled",
+                    desc: "Not safe for consumption. Discard immediately. No recipe recommendations are shown.",
+                  ),
+
                   const SizedBox(height: 100),
                 ],
               ),
@@ -140,11 +188,7 @@ class GuideScreen extends StatelessWidget {
               color: primaryBlue,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.verified_user_outlined,
-              color: Colors.white,
-              size: 28,
-            ),
+            child: const Icon(Icons.biotech_outlined, color: Colors.white, size: 28),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -152,20 +196,16 @@ class GuideScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Get 100% Accuracy",
+                  "How to Use Finalyze",
                   style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: primaryBlue,
+                    fontSize: 20, fontWeight: FontWeight.bold, color: primaryBlue,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Follow these scientific protocols to ensure the highest fidelity in AI fresh-ness analysis.",
+                  "Finalyze uses a TFLite AI model trained on fish eye and gill images to instantly assess freshness. Follow this guide to get the most accurate results.",
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: primaryBlue.withOpacity(0.8),
-                    height: 1.5,
+                    fontSize: 13, color: primaryBlue.withOpacity(0.8), height: 1.5,
                   ),
                 ),
               ],
@@ -183,9 +223,7 @@ class GuideScreen extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black,
           ),
         ),
         Container(
@@ -197,9 +235,7 @@ class GuideScreen extends StatelessWidget {
           child: Text(
             badge,
             style: GoogleFonts.poppins(
-              color: primaryBlue,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+              color: primaryBlue, fontSize: 12, fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -236,10 +272,7 @@ class GuideScreen extends StatelessWidget {
             backgroundColor: lightBlueBg,
             child: Text(
               number,
-              style: GoogleFonts.poppins(
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-              ),
+              style: GoogleFonts.poppins(color: primaryBlue, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 20),
@@ -253,10 +286,7 @@ class GuideScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       title,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                   ],
                 ),
@@ -264,9 +294,7 @@ class GuideScreen extends StatelessWidget {
                 Text(
                   desc,
                   style: GoogleFonts.poppins(
-                    color: Colors.grey.shade600,
-                    fontSize: 14,
-                    height: 1.5,
+                    color: Colors.grey.shade600, fontSize: 13, height: 1.5,
                   ),
                 ),
               ],
@@ -277,11 +305,50 @@ class GuideScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildManualCard({
+  Widget _buildInfoCard({
     required IconData icon,
     required String title,
-    required String desc,
+    required String body,
+    required Color color,
+    required Color iconColor,
   }) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, fontSize: 14, color: iconColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  body,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12, color: Colors.blueGrey, height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildManualCard({required IconData icon, required String title, required String desc}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -294,28 +361,60 @@ class GuideScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
             child: Icon(icon, color: accentTeal, size: 24),
           ),
           const SizedBox(height: 12),
           Text(
             title,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Text(
             desc,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: Colors.grey.shade600,
-              fontSize: 12,
-              height: 1.4,
+            style: GoogleFonts.poppins(color: Colors.grey.shade600, fontSize: 11, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultRow({required Color color, required String label, required String desc}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 12, height: 12,
+            margin: const EdgeInsets.only(top: 3),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, fontSize: 14, color: color,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  desc,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12, color: Colors.blueGrey, height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

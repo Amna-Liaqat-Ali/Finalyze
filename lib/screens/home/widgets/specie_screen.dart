@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../species/models/fish_specie.dart';
+import '../../species/widgets/species_slider.dart';
 
 class DiscoverSpeciesScreen extends StatefulWidget {
   const DiscoverSpeciesScreen({super.key});
@@ -13,46 +14,9 @@ class DiscoverSpeciesScreen extends StatefulWidget {
 
 class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
   String selectedCategory = "All";
-  final List<String> categories = ["All", "Saltwater", "Freshwater"];
+  final List<String> categories = ["All", "Marine", "Freshwater"];
 
-  final List<FishSpecies> speciesList = [
-    FishSpecies(
-      name: "Heera (ہیرا)",
-      category: "Saltwater",
-      imagePath: "assets/images/heera.jpeg",
-      tip: "Eyes should be clear and bulging, not sunken or cloudy.",
-    ),
-    FishSpecies(
-      name: "Paplet (پاپلیٹ)",
-      category: "Saltwater",
-      imagePath: "assets/images/paplet.jpeg",
-      tip: "Check for a stiff body and moist, white skin.",
-    ),
-    FishSpecies(
-      name: "Rohu (رہو)",
-      category: "Freshwater",
-      imagePath: "assets/images/rohu.jpeg",
-      tip: "Gills should be bright red; scales must be tight and shiny.",
-    ),
-    FishSpecies(
-      name: "Surmai (سرمئی)",
-      category: "Saltwater",
-      imagePath: "assets/images/surmai.jpeg",
-      tip: "Flesh should be firm and spring back when pressed.",
-    ),
-    FishSpecies(
-      name: "Palla (پلاّ)",
-      category: "Freshwater",
-      imagePath: "assets/images/palla.jpeg",
-      tip: "Look for a distinct silvery sheen and oily texture.",
-    ),
-    FishSpecies(
-      name: "Mushka (مشکا)",
-      category: "Saltwater",
-      imagePath: "assets/images/mushka.jpeg",
-      tip: "Avoid if the skin feels slimy or has a strong 'fishy' odor.",
-    ),
-  ];
+  final List<FishSpecies> speciesList = SpeciesSlider.speciesList;
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +59,11 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                 itemBuilder: (context, index) {
                   final fish = speciesList[index];
                   // Category filtering logic
-                  if (selectedCategory != "All" &&
-                      fish.category != selectedCategory) {
-                    return const SizedBox.shrink();
-                  }
+                  final isFreshwater = fish.category.toLowerCase().contains('freshwater') ||
+                      fish.category.toLowerCase().contains('carp') ||
+                      fish.category.toLowerCase().contains('shad');
+                  if (selectedCategory == "Freshwater" && !isFreshwater) return const SizedBox.shrink();
+                  if (selectedCategory == "Marine" && isFreshwater) return const SizedBox.shrink();
                   return _buildSpeciesCard(context, fish);
                 },
               ),
@@ -212,25 +177,19 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
-                  child: Image.asset(
-                    fish.imagePath,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  top: 15,
-                  right: 15,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white.withOpacity(0.9),
-                    radius: 18,
-                    child: const Icon(
-                      Icons.favorite_border,
-                      color: Color(0xFF1A5694),
-                      size: 20,
-                    ),
-                  ),
+                  child: fish.imagePath.startsWith('assets/')
+                      ? Image.asset(fish.imagePath, height: 200, width: double.infinity, fit: BoxFit.cover)
+                      : Image.network(
+                          fish.imagePath,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            height: 200,
+                            color: const Color(0xFF0D2E5C),
+                            child: const Icon(Icons.set_meal_rounded, color: Colors.white38, size: 60),
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -249,13 +208,28 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    fish.name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A5694),
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        fish.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A5694),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        fish.urduName,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF1A5694).withOpacity(0.55),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
