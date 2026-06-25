@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:ui';
+
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -86,6 +89,19 @@ class HistoryScreen extends StatefulWidget {
 
   @override
   State<HistoryScreen> createState() => HistoryScreenState();
+}
+
+// Cache decoded image bytes keyed by scan ID
+final Map<String, Uint8List> _imageCache = {};
+
+Future<Uint8List?> _fetchAndCacheImage(String scanId) async {
+  if (_imageCache.containsKey(scanId)) return _imageCache[scanId]!;
+  final base64Data = await ScanService.getScanImage(scanId);
+  if (base64Data == null || base64Data.isEmpty) return null;
+  final clean = base64Data.contains(',') ? base64Data.split(',').last : base64Data;
+  final bytes = await compute(base64Decode, clean);
+  _imageCache[scanId] = bytes;
+  return bytes;
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
@@ -190,47 +206,31 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Widget _buildHistoryImage(
-    String image, {
-    BoxFit fit = BoxFit.cover,
-    double? width,
-    double? height,
-  }) {
+  Widget _buildLazyImage(String scanId, {BoxFit fit = BoxFit.cover, double? width, double? height}) {
     final placeholder = Container(
-      width: width,
-      height: height,
-      color: Colors.grey[200],
-      child: const Icon(Icons.broken_image, color: Colors.grey),
+      width: width, height: height,
+      color: Colors.grey[100],
+      child: const Center(child: SizedBox(width: 18, height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0891B2)))),
     );
-    if (image.isEmpty) return placeholder;
-
-    if (image.startsWith('http') || image.startsWith('uploads/')) {
-      final cleanPath = image.replaceAll(r'\', '/');
-      final serverBase = ApiConfig.baseUrl.replaceAll('/api', '');
-      final url = image.startsWith('http') ? image : '$serverBase/$cleanPath';
-      return Image.network(
-        url,
-        fit: fit,
-        width: width,
-        height: height,
-        errorBuilder: (_, __, ___) => placeholder,
-      );
+    if (_imageCache.containsKey(scanId)) {
+      return Image.memory(_imageCache[scanId]!, fit: fit, width: width, height: height, gaplessPlayback: true);
     }
-
-    try {
-      final base64Data = image.contains(',') ? image.split(',').last : image;
-      final bytes = base64Decode(base64Data);
-      return Image.memory(
-        bytes,
-        fit: fit,
-        width: width,
-        height: height,
-        errorBuilder: (_, __, ___) => placeholder,
-      );
-    } catch (_) {
-      return placeholder;
-    }
+    return FutureBuilder<Uint8List?>(
+      future: _fetchAndCacheImage(scanId),
+      builder: (_, snap) {
+        if (snap.hasData && snap.data != null) {
+          return Image.memory(snap.data!, fit: fit, width: width, height: height, gaplessPlayback: true);
+        }
+        if (snap.connectionState == ConnectionState.done) {
+          return Container(width: width, height: height, color: Colors.grey[200],
+            child: const Icon(Icons.broken_image, color: Colors.grey));
+        }
+        return placeholder;
+      },
+    );
   }
+
 
   PreferredSizeWidget _buildAppBar() {
     if (_selectMode) {
@@ -486,7 +486,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(14),
                       ),
-                      child: _buildHistoryImage(item.image, fit: BoxFit.cover),
+                      child: _buildLazyImage(item.id, fit: BoxFit.cover),
                     ),
                   ),
                   if (_selectMode)
@@ -580,8 +580,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(28),
                     ),
-                    child: _buildHistoryImage(
-                      item.image,
+                    child: _buildLazyImage(
+                      item.id,
                       fit: BoxFit.cover,
                       height: 190,
                       width: double.infinity,

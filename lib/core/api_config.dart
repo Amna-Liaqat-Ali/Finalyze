@@ -8,5 +8,6 @@ class ApiConfig {
   static String get forgotPassword => '$baseUrl/auth/forgot-password';
   static String get resetPassword => '$baseUrl/auth/reset-password';
   static String get saveScan => '$baseUrl/scan/save-scan';
+  static String scanDetail(String scanId) => '$baseUrl/scan/detail/$scanId';
   static String userProfile(String userId) => '$baseUrl/auth/profile/$userId';
 }

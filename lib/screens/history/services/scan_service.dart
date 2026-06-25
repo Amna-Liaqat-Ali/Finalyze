@@ -20,7 +20,7 @@ class ScanService {
     required String time,
   }) async {
     final imageBytes = await imageFile.readAsBytes();
-    final imageData = base64Encode(imageBytes);
+    final imageData = await compute(base64Encode, imageBytes);
 
     return http.post(
       Uri.parse(ApiConfig.saveScan),
@@ -120,6 +120,22 @@ class ScanService {
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  static Future<String?> getScanImage(String scanId) async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConfig.scanDetail(scanId)),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['imageData'] as String?;
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 }

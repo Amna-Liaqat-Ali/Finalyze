@@ -15,9 +15,9 @@ class TFLiteService {
       String? res = await Tflite.loadModel(
         model: modelPath,
         labels: labelPath,
-        numThreads: 1,
+        numThreads: 4,
         isAsset: true,
-        useGpuDelegate: false,
+        useGpuDelegate: true,
       );
       _isModelLoaded = res != null;
       debugPrint("Model loaded successfully");
