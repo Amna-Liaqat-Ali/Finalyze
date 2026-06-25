@@ -1,8 +1,8 @@
-import 'package:Finalyze/screens/home/widgets/specie_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../species/models/fish_specie.dart';
+import '../models/fish_specie.dart';
+import '../screens/specie_detail_screen.dart';
 import '../../species/widgets/species_slider.dart';
 
 class DiscoverSpeciesScreen extends StatefulWidget {

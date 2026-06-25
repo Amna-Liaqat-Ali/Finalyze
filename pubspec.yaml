@@ -45,7 +45,6 @@ flutter:
 
   assets:
     - .env
-    - assets/images/recipes/
     - assets/images/
     - assets/sounds/
     - assets/videos/splash_video.mp4

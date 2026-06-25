@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../home/widgets/specie_detail_screen.dart';
+import '../screens/specie_detail_screen.dart';
 import '../models/fish_specie.dart';
 
 class SpeciesSlider extends StatelessWidget {

@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:Finalyze/screens/Blogs/widgets/blog_slider.dart';
 import 'package:Finalyze/screens/history/history_screen.dart';
 import 'package:Finalyze/screens/home/widgets/settings_screen.dart';
-import 'package:Finalyze/screens/home/widgets/specie_screen.dart';
+import 'package:Finalyze/screens/species/screens/specie_screen.dart';
 import 'package:Finalyze/screens/species/widgets/species_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
