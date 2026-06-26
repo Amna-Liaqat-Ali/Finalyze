@@ -53,6 +53,34 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
   String get _statusLabel =>
       item.status.name[0].toUpperCase() + item.status.name.substring(1);
 
+  String get _speciesOrigin {
+    final key = item.fishName.toLowerCase();
+    if (key.contains('pomfret') || key.contains('paplet')) return 'Arabian Sea, Karachi';
+    if (key.contains('surmai') || key.contains('kingfish')) return 'Arabian Sea, Offshore';
+    return 'Pakistani Waters';
+  }
+
+  String get _speciesDescription {
+    final key = item.fishName.toLowerCase();
+    if (key.contains('pomfret') || key.contains('paplet')) {
+      return 'Pomfret (Paplet) is a silver-bodied coastal fish widely found in the Arabian Sea. It is highly prized in Pakistani markets for its delicate white flesh and mild flavour, making it ideal for frying, grilling, and curries.';
+    }
+    if (key.contains('surmai') || key.contains('kingfish')) {
+      return 'Kingfish (Surmai) is a premium deep-sea migratory fish found along Pakistan\'s coastline. Known for its dense, flavourful flesh and high omega-3 content, it is one of the most commercially valuable fish in Karachi markets.';
+    }
+    return 'A fish species detected by the Finalyze AI model from a scan of its biological markers.';
+  }
+
+  int get _freshnessPercent {
+    final conf = item.confidence / 100;
+    switch (item.status) {
+      case ScanStatus.fresh: return (85 + conf * 15).toInt().clamp(0, 100);
+      case ScanStatus.fair: return (55 + conf * 20).toInt().clamp(0, 100);
+      case ScanStatus.moderate: return (40 + conf * 30).toInt().clamp(0, 100);
+      case ScanStatus.spoiled: return (conf * 35).toInt().clamp(0, 100);
+    }
+  }
+
   String get _recommendation {
     switch (item.status) {
       case ScanStatus.fresh:
@@ -223,8 +251,19 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                       color: primaryBlue,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _speciesDescription,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.blueGrey.shade500,
+                      height: 1.6,
+                    ),
+                  ),
                   const SizedBox(height: 20),
 
+                  _buildFreshnessBar(),
+                  const SizedBox(height: 12),
                   _buildConfidenceBar(),
                   const SizedBox(height: 20),
 
@@ -238,6 +277,44 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFreshnessBar() {
+    final percent = _freshnessPercent;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Freshness Level",
+                style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey)),
+            Text("$percent%",
+                style: GoogleFonts.poppins(
+                    fontSize: 13, fontWeight: FontWeight.bold, color: _statusColor)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: percent / 100,
+            minHeight: 10,
+            backgroundColor: Colors.grey.shade200,
+            valueColor: AlwaysStoppedAnimation<Color>(_statusColor),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Spoiled", style: GoogleFonts.poppins(fontSize: 10, color: Colors.red.shade300)),
+            Text("Moderate", style: GoogleFonts.poppins(fontSize: 10, color: Colors.orange.shade300)),
+            Text("Fresh", style: GoogleFonts.poppins(fontSize: 10, color: Colors.green.shade400)),
+          ],
+        ),
+      ],
     );
   }
 
@@ -294,6 +371,13 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
             Icons.calendar_today_rounded,
             "Date",
             DateFormat('MMMM d, yyyy').format(item.dateTime),
+            primaryBlue,
+          ),
+          _divider(),
+          _infoRow(
+            Icons.location_on_rounded,
+            "Origin",
+            _speciesOrigin,
             primaryBlue,
           ),
           _divider(),

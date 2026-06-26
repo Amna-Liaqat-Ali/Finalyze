@@ -47,9 +47,7 @@ class ScanService {
     if (!UserSession.isLoggedIn) return false;
 
     final normalizedLabel = detectedLabel.toLowerCase();
-    if (normalizedLabel == 'data_invalid' ||
-        normalizedLabel == 'invalid_data' ||
-        confidence < 0.4) {
+    if (normalizedLabel == 'data_invalid' || normalizedLabel == 'invalid_data') {
       return false;
     }
 

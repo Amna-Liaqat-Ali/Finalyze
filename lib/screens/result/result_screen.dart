@@ -64,7 +64,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.detectedLabel == "data_invalid" || widget.confidence < 0.4) {
+    if (widget.detectedLabel == "data_invalid") {
       return _buildInvalidScanUI(context);
     }
 
@@ -76,13 +76,17 @@ class _ResultScreenState extends State<ResultScreen> {
       'pomfret': 'Pomfret (Paplet)',
       'surmai': 'Kingfish (Surmai)',
     };
-    const speciesDescriptions = {
-      'pomfret': 'Pomfret (Paplet) is a silver-bodied marine fish widely consumed across Pakistan. It is highly valued for its delicate, white flesh.',
-      'surmai': 'Kingfish (Surmai) is a premium deep-sea fish prized in Karachi markets for its dense, flavourful flesh and high omega-3 content.',
+    const speciesOrigins = {
+      'pomfret': 'Arabian Sea, Karachi',
+      'surmai': 'Arabian Sea, Offshore',
     };
-
+    const speciesDescriptions = {
+      'pomfret': 'Pomfret (Paplet) is a silver-bodied coastal fish widely found in the Arabian Sea. It is highly prized in Pakistani markets for its delicate white flesh and mild flavour, making it ideal for frying, grilling, and curries.',
+      'surmai': 'Kingfish (Surmai) is a premium deep-sea migratory fish found along Pakistan\'s coastline. Known for its dense, flavourful flesh and high omega-3 content, it is one of the most commercially valuable fish in Karachi markets.',
+    };
     final String species = speciesNames[speciesKey] ?? speciesKey.toUpperCase();
-    final String speciesDesc = speciesDescriptions[speciesKey] ?? 'Fish species detected by AI model.';
+    final String speciesOrigin = speciesOrigins[speciesKey] ?? 'Pakistani Waters';
+    final String speciesDesc = speciesDescriptions[speciesKey] ?? 'Fish species detected by the AI model.';
 
     final bool isFresh = status.toLowerCase() == 'fresh';
     final bool isModerate = status.toLowerCase() == 'moderate';
@@ -92,16 +96,9 @@ class _ResultScreenState extends State<ResultScreen> {
         ? const Color(0xFF2CB88E)
         : (isModerate ? Colors.orange : Colors.redAccent);
 
+    final int freshnessPercent = isFresh ? 85 + (widget.confidence * 15).toInt() : isModerate ? 40 + (widget.confidence * 30).toInt() : (widget.confidence * 35).toInt();
     final String scanDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
     final String scanTime = DateFormat('hh:mm a').format(DateTime.now());
-
-    // Freshness % based on status range + confidence
-    final double freshnessScore = isFresh
-        ? (0.75 + widget.confidence * 0.25) * 100
-        : isModerate
-            ? (0.35 + widget.confidence * 0.25) * 100
-            : (widget.confidence * 0.20) * 100;
-    final int freshnessPercent = freshnessScore.clamp(0, 100).toInt();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -116,7 +113,7 @@ class _ResultScreenState extends State<ResultScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildScanDetails(scanDate, scanTime, widget.scanArea, primaryBlue),
+                  _buildScanDetails(scanDate, speciesOrigin, scanTime, widget.scanArea, primaryBlue),
                   const SizedBox(height: 20),
                   _buildSaveStatusBanner(primaryBlue),
                   const SizedBox(height: 24),
@@ -162,24 +159,18 @@ class _ResultScreenState extends State<ResultScreen> {
                       height: 1.6,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
+                  _buildFreshnessBar(context, freshnessPercent.clamp(0, 100), statusColor),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       _buildMetricCard(
-                        "Freshness",
-                        "$freshnessPercent%",
-                        statusColor,
-                      ),
-                      const SizedBox(width: 16),
-                      _buildMetricCard(
-                        "AI Confidence",
+                        "Confidence",
                         "${(widget.confidence * 100).toInt()}%",
                         primaryBlue,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  _buildFreshnessBar(context, freshnessPercent, statusColor),
                   const SizedBox(height: 40),
                   _buildActionRow(context, primaryBlue),
                   _buildDismissButton(context),
@@ -367,11 +358,12 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget _buildScanDetails(String date, String time, String area, Color color) {
+  Widget _buildScanDetails(String date, String origin, String time, String area, Color color) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _infoColumn("DATE", date, color),
+        _infoColumn("ORIGIN", origin, color),
         _infoColumn("TIME", time, color),
       ],
     );

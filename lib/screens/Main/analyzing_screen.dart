@@ -84,17 +84,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
     } catch (e) {
       debugPrint("Analysis Error: $e");
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResultScreen(
-            image: widget.image,
-            detectedLabel: "data_invalid",
-            confidence: 0.0,
-            scanArea: "Eye & Gills",
-          ),
-        ),
-      );
+      Navigator.pop(context);
     }
   }
 

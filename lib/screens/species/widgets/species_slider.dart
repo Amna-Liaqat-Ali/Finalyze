@@ -50,7 +50,7 @@ class SpeciesSlider extends StatelessWidget {
       nutrition: const NutritionInfo(protein: "16g", omega3: "0.2g", calories: "97 kcal", fat: "2.0g"),
     ),
     FishSpecies(
-      name: "Surmai",
+      name: "Kingfish (Surmai)",
       urduName: "سرمئی",
       category: "Kingfish",
       imagePath: "assets/images/surmai.jpg",
@@ -90,7 +90,7 @@ class SpeciesSlider extends StatelessWidget {
       nutrition: const NutritionInfo(protein: "21g", omega3: "1.7g", calories: "189 kcal", fat: "11g"),
     ),
     FishSpecies(
-      name: "Paplet",
+      name: "Pomfret (Paplet)",
       urduName: "پاپلیٹ",
       category: "Silver Pomfret",
       imagePath: "assets/images/paplet.webp",

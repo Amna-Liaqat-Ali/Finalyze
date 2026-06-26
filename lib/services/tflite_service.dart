@@ -6,7 +6,7 @@ import 'package:tflite_v2/tflite_v2.dart';
 class TFLiteService {
   bool _isModelLoaded = false;
 
-  static const String modelPath = 'assets/model/fishe_freshness_model1.tflite';
+  static const String modelPath = 'assets/model/fish_file_11.tflite';
   static const String labelPath = 'assets/model/labels.txt';
 
   Future<void> loadModel() async {
