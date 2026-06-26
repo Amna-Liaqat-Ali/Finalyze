@@ -9,7 +9,7 @@ import '../../auth/screens/forgot_password_screen.dart';
 import '../../auth/screens/otp_verification_screen.dart';
 import '../../auth/screens/services/auth_service.dart';
 import '../../core/user_session.dart';
-import '../../screens/onboarding/onboarding_screen.dart';
+import '../../screens/Main/MainScreen.dart';
 import '../../widgets/app_back_button.dart';
 import '../../widgets/app_toast.dart';
 
@@ -299,10 +299,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (!mounted) return;
                 Navigator.of(context).pushAndRemoveUntil(
                   PageRouteBuilder(
-                    pageBuilder: (_, a, __) => const OnboardingScreen(),
-                    transitionsBuilder: (_, a, __, child) =>
-                        FadeTransition(opacity: a, child: child),
-                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (_, a, __) => const MainScreen(),
+                    transitionsBuilder: (_, a, __, child) {
+                      final slide = Tween<Offset>(
+                        begin: const Offset(0, 0.06),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic));
+                      return FadeTransition(
+                        opacity: a,
+                        child: SlideTransition(position: slide, child: child),
+                      );
+                    },
+                    transitionDuration: const Duration(milliseconds: 550),
                   ),
                   (_) => false,
                 );
