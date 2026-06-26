@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadStats();
     _loadScanLimit();
     // Refresh scan limit every 30s so banner stays current
-    _limitTimer = Timer.periodic(const Duration(seconds: 30), (_) => _loadScanLimit());
+    _limitTimer = Timer.periodic(const Duration(seconds: 10), (_) => _loadScanLimit());
   }
 
   @override
@@ -96,6 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(builder: (context) => PhotoEditScreen(image: File(image.path))),
       );
+      // Small delay to ensure backend has finished processing the scan increment
+      await Future.delayed(const Duration(milliseconds: 600));
       _loadStats();
       _loadScanLimit();
     } catch (e) {

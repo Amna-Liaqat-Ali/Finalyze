@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -19,8 +21,17 @@ class ScanService {
     required String date,
     required String time,
   }) async {
-    final imageBytes = await imageFile.readAsBytes();
-    final imageData = await compute(base64Encode, imageBytes);
+    // Compress to max 400px wide, quality 60 before encoding
+    final Uint8List? compressed = await FlutterImageCompress.compressWithFile(
+      imageFile.absolute.path,
+      minWidth: 400,
+      minHeight: 400,
+      quality: 60,
+    );
+    final imageData = await compute(
+      base64Encode,
+      compressed ?? await imageFile.readAsBytes(),
+    );
 
     return http.post(
       Uri.parse(ApiConfig.saveScan),
@@ -35,7 +46,7 @@ class ScanService {
         'scanTime': time,
         'imageData': imageData,
       }),
-    );
+    ).timeout(const Duration(seconds: 30));
   }
 
   static Future<bool> saveScanFromAnalysis({

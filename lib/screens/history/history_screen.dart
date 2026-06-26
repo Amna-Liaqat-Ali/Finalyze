@@ -486,7 +486,14 @@ class HistoryScreenState extends State<HistoryScreen> {
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(14),
                       ),
-                      child: _buildLazyImage(item.id, fit: BoxFit.cover),
+                      child: Container(
+                        color: const Color(0xFFEEF4FF),
+                        child: Icon(
+                          Icons.set_meal_rounded,
+                          color: const Color(0xFF1A5694).withOpacity(0.18),
+                          size: 40,
+                        ),
+                      ),
                     ),
                   ),
                   if (_selectMode)

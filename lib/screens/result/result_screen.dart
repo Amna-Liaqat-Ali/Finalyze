@@ -39,34 +39,37 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     _saveToHistory();
-    _countValidScan();
-  }
-
-  Future<void> _countValidScan() async {
-    if (widget.detectedLabel == 'data_invalid') return;
-    await ScanLimitService.checkAndIncrement();
   }
 
   Future<void> _saveToHistory() async {
-    if (!UserSession.isLoggedIn) {
+    final isValid = widget.detectedLabel != 'data_invalid';
+    final isLoggedIn = UserSession.isLoggedIn;
+
+    if (!isLoggedIn) {
+      // Still count the scan limit even for guests, but no history save
+      if (isValid) ScanLimitService.checkAndIncrement();
       if (mounted) setState(() => _saveStatus = _SaveStatus.skipped);
       return;
     }
 
-    final saved = await ScanService.saveScanFromAnalysis(
-      imageFile: widget.image,
-      detectedLabel: widget.detectedLabel,
-      confidence: widget.confidence,
-      scanArea: widget.scanArea,
-    );
+    // Run scan limit increment and history save in parallel
+    final results = await Future.wait([
+      isValid
+          ? ScanLimitService.checkAndIncrement()
+          : Future.value(null),
+      ScanService.saveScanFromAnalysis(
+        imageFile: widget.image,
+        detectedLabel: widget.detectedLabel,
+        confidence: widget.confidence,
+        scanArea: widget.scanArea,
+      ),
+    ]);
 
     if (!mounted) return;
 
+    final saved = results[1] as bool;
     setState(() => _saveStatus = saved ? _SaveStatus.saved : _SaveStatus.failed);
-
-    if (saved) {
-      widget.onSaved?.call();
-    }
+    if (saved) widget.onSaved?.call();
   }
 
   @override
