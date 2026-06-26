@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/app_sizes.dart';
+import '../../core/scan_limit_service.dart';
 import '../../core/user_session.dart';
 import '../cook/recipe_screen.dart';
 import '../history/services/scan_service.dart';
@@ -38,6 +39,12 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     _saveToHistory();
+    _countValidScan();
+  }
+
+  Future<void> _countValidScan() async {
+    if (widget.detectedLabel == 'data_invalid') return;
+    await ScanLimitService.checkAndIncrement();
   }
 
   Future<void> _saveToHistory() async {

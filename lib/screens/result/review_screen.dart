@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/scan_limit_service.dart';
 import '../Main/analyzing_screen.dart';
 import '../premium/premium_screen.dart';
 
@@ -154,42 +154,16 @@ class ReviewScreen extends StatelessWidget {
                 onTap: image == null
                     ? null
                     : () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        final now = DateTime.now();
-
-                        // Only enforce limit for logged-in users
-                        final isPremium = prefs.getBool('is_premium') ?? false;
-                        if (!isPremium) {
-                          const countKey = 'scan_count';
-                          const windowKey = 'scan_window_start';
-
-                          final windowStart = prefs.getString(windowKey);
-                          DateTime? windowTime = windowStart != null
-                              ? DateTime.tryParse(windowStart)
-                              : null;
-
-                          if (windowTime == null ||
-                              now.difference(windowTime).inHours >= 24) {
-                            windowTime = now;
-                            await prefs.setString(windowKey, now.toIso8601String());
-                            await prefs.setInt(countKey, 0);
-                          }
-
-                          final count = prefs.getInt(countKey) ?? 0;
-
-                          if (count >= 15) {
-                            final resetAt = windowTime!.add(const Duration(hours: 24));
-                            if (!context.mounted) return;
-                            await showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (_) => _ScanLimitSheet(resetAt: resetAt),
-                            );
-                            return;
-                          }
-
-                          await prefs.setInt(countKey, count + 1);
+                        final status = await ScanLimitService.getStatus();
+                        if (status.isLimited) {
+                          if (!context.mounted) return;
+                          await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => _ScanLimitSheet(resetAt: status.resetAt!),
+                          );
+                          return;
                         }
                         if (!context.mounted) return;
                         Navigator.push(

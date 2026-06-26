@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
@@ -11,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/app_sizes.dart';
+import '../../core/scan_limit_service.dart';
 import '../../core/user_session.dart';
 import '../history/services/scan_service.dart';
 import '../result/photo_edit_screen.dart';
@@ -32,11 +34,31 @@ class _HomeScreenState extends State<HomeScreen> {
   int _totalScans = 0;
   int _todayScans = 0;
   String _accuracy = '—';
+  ScanLimitStatus? _scanLimit;
+  Timer? _limitTimer;
 
   @override
   void initState() {
     super.initState();
     _loadStats();
+    _loadScanLimit();
+    // Refresh scan limit every 30s so banner stays current
+    _limitTimer = Timer.periodic(const Duration(seconds: 30), (_) => _loadScanLimit());
+  }
+
+  @override
+  void dispose() {
+    _limitTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadScanLimit() async {
+    final status = await ScanLimitService.getStatus();
+    if (!mounted) return;
+    setState(() {
+      _scanLimit = status;
+      _todayScans = status.used;
+    });
   }
 
   Future<void> _loadStats() async {
@@ -45,24 +67,14 @@ class _HomeScreenState extends State<HomeScreen> {
       if (userId.isEmpty) return;
       final rawData = await ScanService.getUserScanHistory(userId);
       if (!mounted) return;
-      final today = DateTime.now();
-      int todayCount = 0;
       double totalConf = 0;
       for (final item in rawData) {
         final json = item as Map<String, dynamic>;
-        final dateStr = json['scanDate']?.toString() ?? '';
-        try {
-          final d = DateTime.parse(dateStr);
-          if (d.year == today.year && d.month == today.month && d.day == today.day) {
-            todayCount++;
-          }
-        } catch (_) {}
         totalConf += ((json['percentage'] ?? 0.0) as num).toDouble();
       }
       if (!mounted) return;
       setState(() {
         _totalScans = rawData.length;
-        _todayScans = todayCount;
         _accuracy = rawData.isEmpty
             ? '—'
             : '${(totalConf / rawData.length).round()}%';
@@ -80,10 +92,12 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       if (image == null) return;
       if (!mounted) return;
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => PhotoEditScreen(image: File(image.path))),
       );
+      _loadStats();
+      _loadScanLimit();
     } catch (e) {
       debugPrint("Error picking image: $e");
     }
@@ -111,7 +125,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       StatCard(label: "Avg. Score", value: _accuracy),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  if (_scanLimit != null && !_scanLimit!.isPremium)
+                    _buildScanLimitBanner(),
+                  const SizedBox(height: 16),
 
                   _buildScanButton(),
                   const SizedBox(height: 20),
@@ -127,13 +144,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 15),
                       Expanded(
-                        child: _actionButton(Icons.history_rounded, "View History", () {
-                          Navigator.push(
+                        child: _actionButton(Icons.history_rounded, "View History", () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => HistoryScreen(userId: ''),
                             ),
                           );
+                          _loadStats();
+                          _loadScanLimit();
                         }),
                       ),
                     ],
@@ -320,6 +339,60 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildScanLimitBanner() {
+    final limit = _scanLimit!;
+    final remaining = limit.remaining;
+    final isFull = limit.isLimited;
+    final color = isFull ? Colors.redAccent : (remaining <= 5 ? Colors.orange : _teal);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isFull ? Icons.lock_clock_rounded : Icons.query_stats_rounded,
+            color: color,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: isFull && limit.resetAt != null
+                ? _ScanResetCountdown(resetAt: limit.resetAt!, color: color, onExpired: _loadScanLimit)
+                : Text(
+                    "$remaining / ${limit.max} scans remaining today",
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+                  ),
+          ),
+          if (!isFull)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "${(remaining / limit.max * 100).toInt()}%",
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildScanButton() {
     return GestureDetector(
       onTap: () => _pickImage(ImageSource.camera),
@@ -489,6 +562,61 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ScanResetCountdown extends StatefulWidget {
+  final DateTime resetAt;
+  final Color color;
+  final VoidCallback onExpired;
+  const _ScanResetCountdown({required this.resetAt, required this.color, required this.onExpired});
+
+  @override
+  State<_ScanResetCountdown> createState() => _ScanResetCountdownState();
+}
+
+class _ScanResetCountdownState extends State<_ScanResetCountdown> {
+  late Timer _timer;
+  Duration _remaining = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+  }
+
+  void _tick() {
+    final diff = widget.resetAt.difference(DateTime.now());
+    if (diff.isNegative || diff == Duration.zero) {
+      _timer.cancel();
+      widget.onExpired();
+      return;
+    }
+    if (mounted) setState(() => _remaining = diff);
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String _pad(int n) => n.toString().padLeft(2, '0');
+
+  @override
+  Widget build(BuildContext context) {
+    final h = _pad(_remaining.inHours);
+    final m = _pad(_remaining.inMinutes.remainder(60));
+    final s = _pad(_remaining.inSeconds.remainder(60));
+    return Text(
+      "Limit reached · resets in $h:$m:$s",
+      style: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: widget.color,
       ),
     );
   }
