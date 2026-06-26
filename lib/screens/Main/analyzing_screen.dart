@@ -83,13 +83,18 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
       );
     } catch (e) {
       debugPrint("Analysis Error: $e");
-      // If error occurs, go back with a snackbar message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Analysis failed. Please try again.")),
-        );
-        Navigator.pop(context);
-      }
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(
+            image: widget.image,
+            detectedLabel: "data_invalid",
+            confidence: 0.0,
+            scanArea: "Eye & Gills",
+          ),
+        ),
+      );
     }
   }
 

@@ -66,12 +66,22 @@ class UserSession {
   }
 
   static Future<void> clear() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Clear per-user scan limit keys before wiping userId
+    if (userId != null && userId!.isNotEmpty) {
+      await prefs.remove('scan_count_$userId');
+      await prefs.remove('scan_window_start_$userId');
+    }
+    // Clear legacy global keys if present
+    await prefs.remove('scan_count');
+    await prefs.remove('scan_window_start');
+
     userId = null;
     token = null;
     name = null;
     email = null;
 
-    final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyToken);
     await prefs.remove(_keyName);

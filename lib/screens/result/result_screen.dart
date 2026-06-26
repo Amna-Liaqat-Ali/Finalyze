@@ -69,8 +69,20 @@ class _ResultScreenState extends State<ResultScreen> {
     }
 
     List<String> parts = widget.detectedLabel.split('_');
-    String species = parts.isNotEmpty ? parts[0].toUpperCase() : "UNKNOWN";
+    final speciesKey = parts.isNotEmpty ? parts[0].toLowerCase() : 'unknown';
     String status = parts.length > 1 ? parts[1].toUpperCase() : "UNKNOWN";
+
+    const speciesNames = {
+      'pomfret': 'Pomfret (Paplet)',
+      'surmai': 'Kingfish (Surmai)',
+    };
+    const speciesDescriptions = {
+      'pomfret': 'Pomfret (Paplet) is a silver-bodied marine fish widely consumed across Pakistan. It is highly valued for its delicate, white flesh.',
+      'surmai': 'Kingfish (Surmai) is a premium deep-sea fish prized in Karachi markets for its dense, flavourful flesh and high omega-3 content.',
+    };
+
+    final String species = speciesNames[speciesKey] ?? speciesKey.toUpperCase();
+    final String speciesDesc = speciesDescriptions[speciesKey] ?? 'Fish species detected by AI model.';
 
     final bool isFresh = status.toLowerCase() == 'fresh';
     final bool isModerate = status.toLowerCase() == 'moderate';
@@ -82,6 +94,14 @@ class _ResultScreenState extends State<ResultScreen> {
 
     final String scanDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
     final String scanTime = DateFormat('hh:mm a').format(DateTime.now());
+
+    // Freshness % based on status range + confidence
+    final double freshnessScore = isFresh
+        ? (0.75 + widget.confidence * 0.25) * 100
+        : isModerate
+            ? (0.35 + widget.confidence * 0.25) * 100
+            : (widget.confidence * 0.20) * 100;
+    final int freshnessPercent = freshnessScore.clamp(0, 100).toInt();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -117,16 +137,25 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    "$species: $status",
+                    species,
                     style: GoogleFonts.poppins(
                       fontSize: rs(context, 24),
                       fontWeight: FontWeight.bold,
                       color: primaryBlue,
                     ),
                   ),
-                  SizedBox(height: rsh(context, 10)),
+                  SizedBox(height: rsh(context, 6)),
                   Text(
-                    "Identified as $species. Biological markers in the ${widget.scanArea} indicate a $status state with ${(widget.confidence * 100).toStringAsFixed(1)}% confidence.",
+                    speciesDesc,
+                    style: GoogleFonts.poppins(
+                      fontSize: rs(context, 12),
+                      color: Colors.blueGrey.shade500,
+                      height: 1.6,
+                    ),
+                  ),
+                  SizedBox(height: rsh(context, 8)),
+                  Text(
+                    "Biological markers in the ${widget.scanArea} indicate a ${status.toLowerCase()} freshness state with ${(widget.confidence * 100).toStringAsFixed(1)}% AI confidence.",
                     style: GoogleFonts.poppins(
                       fontSize: rs(context, 13),
                       color: Colors.blueGrey.shade600,
@@ -138,17 +167,19 @@ class _ResultScreenState extends State<ResultScreen> {
                     children: [
                       _buildMetricCard(
                         "Freshness",
-                        status == "FRESH" ? "90%+" : "Low",
+                        "$freshnessPercent%",
                         statusColor,
                       ),
                       const SizedBox(width: 16),
                       _buildMetricCard(
-                        "Confidence",
+                        "AI Confidence",
                         "${(widget.confidence * 100).toInt()}%",
                         primaryBlue,
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  _buildFreshnessBar(context, freshnessPercent, statusColor),
                   const SizedBox(height: 40),
                   _buildActionRow(context, primaryBlue),
                   _buildDismissButton(context),
@@ -413,6 +444,54 @@ class _ResultScreenState extends State<ResultScreen> {
           ],
         ),
       )),
+    );
+  }
+
+  Widget _buildFreshnessBar(BuildContext context, int percent, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Freshness Level",
+              style: GoogleFonts.poppins(
+                fontSize: rs(context, 13),
+                color: Colors.blueGrey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              "$percent%",
+              style: GoogleFonts.poppins(
+                fontSize: rs(context, 13),
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: LinearProgressIndicator(
+            value: percent / 100,
+            minHeight: 10,
+            backgroundColor: Colors.grey.shade100,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Spoiled", style: GoogleFonts.poppins(fontSize: 10, color: Colors.red.shade300)),
+            Text("Moderate", style: GoogleFonts.poppins(fontSize: 10, color: Colors.orange.shade300)),
+            Text("Fresh", style: GoogleFonts.poppins(fontSize: 10, color: Colors.green.shade400)),
+          ],
+        ),
+      ],
     );
   }
 

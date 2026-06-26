@@ -52,7 +52,7 @@ class SpeciesSlider extends StatelessWidget {
     FishSpecies(
       name: "Surmai",
       urduName: "سرمئی",
-      category: "King Mackerel",
+      category: "Kingfish",
       imagePath: "assets/images/surmai.jpg",
       tip: "Flesh should be firm and spring back when pressed.",
       scientificName: "Scomberomorus commerson",

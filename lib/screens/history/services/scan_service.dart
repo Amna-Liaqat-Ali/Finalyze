@@ -54,8 +54,14 @@ class ScanService {
     }
 
     final parts = detectedLabel.split('_');
-    final species = parts.isNotEmpty ? parts[0].toUpperCase() : 'UNKNOWN';
+    final speciesKey = parts.isNotEmpty ? parts[0].toLowerCase() : 'unknown';
     final status = parts.length > 1 ? parts[1].toUpperCase() : 'UNKNOWN';
+
+    const speciesNames = {
+      'pomfret': 'Pomfret (Paplet)',
+      'surmai': 'Kingfish (Surmai)',
+    };
+    final species = speciesNames[speciesKey] ?? speciesKey.toUpperCase();
 
     final now = DateTime.now();
     final formattedDate = DateFormat('yyyy-MM-dd').format(now);
