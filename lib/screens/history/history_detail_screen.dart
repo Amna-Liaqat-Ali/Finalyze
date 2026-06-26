@@ -1,7 +1,5 @@
-import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -19,20 +17,14 @@ class HistoryDetailScreen extends StatefulWidget {
 }
 
 class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
-  late Future<Uint8List?> _imageFuture;
+  late Future<File?> _imageFuture;
 
   @override
   void initState() {
     super.initState();
-    _imageFuture = _loadImage();
-  }
-
-  Future<Uint8List?> _loadImage() async {
-    if (widget.item.id.isEmpty) return null;
-    final base64Data = await ScanService.getScanImage(widget.item.id);
-    if (base64Data == null || base64Data.isEmpty) return null;
-    final clean = base64Data.contains(',') ? base64Data.split(',').last : base64Data;
-    return compute(base64Decode, clean);
+    _imageFuture = item.id.isEmpty
+        ? Future.value(null)
+        : ScanService.getScanImageFile(item.id);
   }
 
   ScanHistory get item => widget.item;
@@ -121,12 +113,12 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          FutureBuilder<Uint8List?>(
+          FutureBuilder<File?>(
             future: _imageFuture,
             builder: (_, snap) {
               if (snap.connectionState == ConnectionState.waiting) {
                 return Container(
-                  color: Colors.grey[100],
+                  color: const Color(0xFFEEF4FF),
                   child: const Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
@@ -136,7 +128,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                 );
               }
               if (snap.hasData && snap.data != null) {
-                return Image.memory(snap.data!, fit: BoxFit.cover, gaplessPlayback: true);
+                return Image.file(snap.data!, fit: BoxFit.cover, gaplessPlayback: true);
               }
               return placeholder;
             },

@@ -1,54 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../../../core/api_config.dart';
+import '../../../core/local_image_store.dart';
 import '../../../core/user_session.dart';
 
 class ScanService {
-  static Future<http.Response> saveScanResult({
-    required String userId,
-    required File imageFile,
-    required String fishName,
-    required String category,
-    required double percentage,
-    required String area,
-    required String date,
-    required String time,
-  }) async {
-    // Compress to max 400px wide, quality 60 before encoding
-    final Uint8List? compressed = await FlutterImageCompress.compressWithFile(
-      imageFile.absolute.path,
-      minWidth: 400,
-      minHeight: 400,
-      quality: 60,
-    );
-    final imageData = await compute(
-      base64Encode,
-      compressed ?? await imageFile.readAsBytes(),
-    );
-
-    return http.post(
-      Uri.parse(ApiConfig.saveScan),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'userId': userId,
-        'fishName': fishName,
-        'category': category,
-        'percentage': percentage,
-        'area': area,
-        'scanDate': date,
-        'scanTime': time,
-        'imageData': imageData,
-      }),
-    ).timeout(const Duration(seconds: 30));
-  }
-
   static Future<bool> saveScanFromAnalysis({
     required File imageFile,
     required String detectedLabel,
@@ -73,31 +35,42 @@ class ScanService {
     final species = speciesNames[speciesKey] ?? speciesKey.toUpperCase();
 
     final now = DateTime.now();
-    final formattedDate = DateFormat('yyyy-MM-dd').format(now);
-    final formattedTime = DateFormat('hh:mm:ss a').format(now);
+    final tempId = 'tmp_${now.millisecondsSinceEpoch}';
 
     try {
-      if (!await imageFile.exists()) {
-        debugPrint('[ScanService] Image file missing: ${imageFile.path}');
-        return false;
+      if (!await imageFile.exists()) return false;
+
+      // Step 1: Save image locally immediately (no network, instant)
+      await LocalImageStore.saveImage(imageFile, tempId);
+
+      // Step 2: Send metadata only to backend (no image = fast)
+      final response = await http.post(
+        Uri.parse(ApiConfig.saveScan),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': UserSession.userId,
+          'fishName': species,
+          'category': status,
+          'percentage': confidence * 100,
+          'area': scanArea,
+          'scanDate': DateFormat('yyyy-MM-dd').format(now),
+          'scanTime': DateFormat('hh:mm:ss a').format(now),
+          'imageData': 'local',
+        }),
+      ).timeout(const Duration(seconds: 15));
+
+      debugPrint('[ScanService] Save response ${response.statusCode}');
+
+      if (response.statusCode == 201) {
+        // Step 3: Remap temp image to real scan ID in background
+        final data = jsonDecode(response.body);
+        final scanId = data['scan']?['_id'] as String?;
+        if (scanId != null) {
+          LocalImageStore.link(tempId, scanId);
+        }
+        return true;
       }
-
-      final response = await saveScanResult(
-        userId: UserSession.userId!,
-        imageFile: imageFile,
-        fishName: species,
-        category: status,
-        percentage: confidence * 100,
-        area: scanArea,
-        date: formattedDate,
-        time: formattedTime,
-      );
-
-      debugPrint(
-        '[ScanService] Save response ${response.statusCode}: ${response.body}',
-      );
-
-      return response.statusCode == 201;
+      return false;
     } catch (e) {
       debugPrint('[ScanService] Save failed: $e');
       return false;
@@ -106,12 +79,15 @@ class ScanService {
 
   static Future<bool> deleteScan(String scanId) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}/scan/$scanId');
       final response = await http.delete(
-        url,
+        Uri.parse('${ApiConfig.baseUrl}/scan/$scanId'),
         headers: {'Content-Type': 'application/json'},
       );
-      return response.statusCode == 200 || response.statusCode == 204;
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        LocalImageStore.deleteImage(scanId);
+        return true;
+      }
+      return false;
     } catch (e) {
       debugPrint('[ScanService] Delete failed: $e');
       return false;
@@ -120,37 +96,20 @@ class ScanService {
 
   static Future<List<dynamic>> getUserScanHistory(String userId) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}/scan/history/$userId');
       final response = await http.get(
-        url,
+        Uri.parse('${ApiConfig.baseUrl}/scan/history/$userId'),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception(
-          'Failed loading history logs from server pipeline backend.',
-        );
-      }
+      if (response.statusCode == 200) return jsonDecode(response.body);
+      return [];
     } catch (e) {
-      rethrow;
+      debugPrint('[ScanService] History load failed: $e');
+      return [];
     }
   }
 
-  static Future<String?> getScanImage(String scanId) async {
-    try {
-      final response = await http.get(
-        Uri.parse(ApiConfig.scanDetail(scanId)),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['imageData'] as String?;
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
+  static Future<File?> getScanImageFile(String scanId) async {
+    return LocalImageStore.getImage(scanId);
   }
 }

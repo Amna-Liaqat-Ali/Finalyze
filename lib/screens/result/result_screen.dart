@@ -38,6 +38,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
+    // Fire and forget — result screen appears instantly, saves in background
     _saveToHistory();
   }
 
@@ -46,14 +47,13 @@ class _ResultScreenState extends State<ResultScreen> {
     final isLoggedIn = UserSession.isLoggedIn;
 
     if (!isLoggedIn) {
-      // Still count the scan limit even for guests, but no history save
       if (isValid) ScanLimitService.checkAndIncrement();
       if (mounted) setState(() => _saveStatus = _SaveStatus.skipped);
       return;
     }
 
-    // Run scan limit increment and history save in parallel
-    final results = await Future.wait([
+    // Both run in parallel in the background — UI is not blocked
+    Future.wait([
       isValid
           ? ScanLimitService.checkAndIncrement()
           : Future.value(null),
@@ -63,13 +63,12 @@ class _ResultScreenState extends State<ResultScreen> {
         confidence: widget.confidence,
         scanArea: widget.scanArea,
       ),
-    ]);
-
-    if (!mounted) return;
-
-    final saved = results[1] as bool;
-    setState(() => _saveStatus = saved ? _SaveStatus.saved : _SaveStatus.failed);
-    if (saved) widget.onSaved?.call();
+    ]).then((results) {
+      if (!mounted) return;
+      final saved = results[1] as bool;
+      setState(() => _saveStatus = saved ? _SaveStatus.saved : _SaveStatus.failed);
+      if (saved) widget.onSaved?.call();
+    });
   }
 
   @override

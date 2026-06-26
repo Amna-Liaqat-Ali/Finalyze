@@ -1,14 +1,10 @@
-import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 import 'dart:ui';
-
-import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/api_config.dart';
 import '../../core/user_session.dart';
 import 'history_detail_screen.dart';
 import 'services/scan_service.dart';
@@ -91,18 +87,8 @@ class HistoryScreen extends StatefulWidget {
   State<HistoryScreen> createState() => HistoryScreenState();
 }
 
-// Cache decoded image bytes keyed by scan ID
-final Map<String, Uint8List> _imageCache = {};
-
-Future<Uint8List?> _fetchAndCacheImage(String scanId) async {
-  if (_imageCache.containsKey(scanId)) return _imageCache[scanId]!;
-  final base64Data = await ScanService.getScanImage(scanId);
-  if (base64Data == null || base64Data.isEmpty) return null;
-  final clean = base64Data.contains(',') ? base64Data.split(',').last : base64Data;
-  final bytes = await compute(base64Decode, clean);
-  _imageCache[scanId] = bytes;
-  return bytes;
-}
+// Cache local File references keyed by scan ID
+final Map<String, File?> _imageFileCache = {};
 
 class HistoryScreenState extends State<HistoryScreen> {
   ScanHistory? selectedItem;
@@ -209,24 +195,31 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget _buildLazyImage(String scanId, {BoxFit fit = BoxFit.cover, double? width, double? height}) {
     final placeholder = Container(
       width: width, height: height,
-      color: Colors.grey[100],
-      child: const Center(child: SizedBox(width: 18, height: 18,
-        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0891B2)))),
+      color: const Color(0xFFEEF4FF),
+      child: Icon(Icons.set_meal_rounded,
+          color: const Color(0xFF1A5694).withOpacity(0.18), size: 36),
     );
-    if (_imageCache.containsKey(scanId)) {
-      return Image.memory(_imageCache[scanId]!, fit: fit, width: width, height: height, gaplessPlayback: true);
+
+    // Already cached
+    if (_imageFileCache.containsKey(scanId)) {
+      final f = _imageFileCache[scanId];
+      if (f != null) return Image.file(f, fit: fit, width: width, height: height, gaplessPlayback: true);
+      return placeholder;
     }
-    return FutureBuilder<Uint8List?>(
-      future: _fetchAndCacheImage(scanId),
+
+    return FutureBuilder<File?>(
+      future: ScanService.getScanImageFile(scanId).then((f) {
+        _imageFileCache[scanId] = f;
+        return f;
+      }),
       builder: (_, snap) {
-        if (snap.hasData && snap.data != null) {
-          return Image.memory(snap.data!, fit: fit, width: width, height: height, gaplessPlayback: true);
-        }
         if (snap.connectionState == ConnectionState.done) {
-          return Container(width: width, height: height, color: Colors.grey[200],
-            child: const Icon(Icons.broken_image, color: Colors.grey));
+          if (snap.data != null) {
+            return Image.file(snap.data!, fit: fit, width: width, height: height, gaplessPlayback: true);
+          }
+          return placeholder;
         }
-        return placeholder;
+        return placeholder; // show placeholder while loading (no spinner needed — local is instant)
       },
     );
   }
@@ -486,14 +479,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(14),
                       ),
-                      child: Container(
-                        color: const Color(0xFFEEF4FF),
-                        child: Icon(
-                          Icons.set_meal_rounded,
-                          color: const Color(0xFF1A5694).withOpacity(0.18),
-                          size: 40,
-                        ),
-                      ),
+                      child: _buildLazyImage(item.id, fit: BoxFit.cover),
                     ),
                   ),
                   if (_selectMode)
