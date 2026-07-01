@@ -70,6 +70,36 @@ class AuthService {
     );
   }
 
+  static Future<http.Response> updateProfile({
+    required String userId,
+    String? fullName,
+    String? email,
+  }) async {
+    return http.put(
+      Uri.parse(ApiConfig.updateProfile(userId)),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        if (fullName != null) 'fullName': fullName,
+        if (email != null) 'email': email,
+      }),
+    );
+  }
+
+  static Future<http.Response> changePassword({
+    required String userId,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    return http.put(
+      Uri.parse(ApiConfig.changePassword(userId)),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      }),
+    );
+  }
+
   static Future<http.Response> deleteAccount(String userId) async {
     return http.delete(
       Uri.parse(ApiConfig.deleteAccount(userId)),

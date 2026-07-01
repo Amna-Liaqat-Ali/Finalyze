@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../auth/screens/services/auth_service.dart';
 import '../../../core/app_sizes.dart';
-
+import '../../../core/user_session.dart';
 import '../../../widgets/app_toast.dart';
 
 class SecurityScreen extends StatefulWidget {
@@ -77,15 +80,31 @@ class _SecurityScreenState extends State<SecurityScreen> {
   Future<void> _changePassword() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
-    await Future.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-    setState(() {
-      _isSaving = false;
-      _currentPwCtrl.clear();
-      _newPwCtrl.clear();
-      _confirmPwCtrl.clear();
-    });
-    AppToast.success(context, "Password changed successfully");
+
+    try {
+      final response = await AuthService.changePassword(
+        userId: UserSession.userId ?? '',
+        currentPassword: _currentPwCtrl.text.trim(),
+        newPassword: _newPwCtrl.text.trim(),
+      );
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        _currentPwCtrl.clear();
+        _newPwCtrl.clear();
+        _confirmPwCtrl.clear();
+        AppToast.success(context, "Password changed successfully");
+      } else {
+        if (!mounted) return;
+        AppToast.error(context, data['message'] ?? "Failed to change password");
+      }
+    } catch (_) {
+      if (!mounted) return;
+      AppToast.error(context, "Connection error. Try again.");
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override

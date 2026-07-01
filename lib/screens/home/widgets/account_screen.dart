@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../auth/screens/services/auth_service.dart';
 import '../../../core/app_sizes.dart';
 import '../../../core/user_session.dart';
 import '../../../widgets/app_toast.dart';
@@ -51,15 +53,38 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
-    // Update session + persist
+
     final name = _nameCtrl.text.trim();
-    UserSession.name = name;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_name', name);
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    setState(() => _isSaving = false);
-    AppToast.success(context, "Profile updated successfully");
+    final email = _emailCtrl.text.trim();
+    final uid = UserSession.userId ?? '';
+
+    try {
+      final response = await AuthService.updateProfile(
+        userId: uid,
+        fullName: name,
+        email: email != (UserSession.email ?? '') ? email : null,
+      );
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        // Update local session
+        UserSession.name = data['fullName'] ?? name;
+        UserSession.email = data['email'] ?? email;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_name', UserSession.name ?? '');
+        await prefs.setString('user_email', UserSession.email ?? '');
+        if (!mounted) return;
+        AppToast.success(context, "Profile updated successfully");
+      } else {
+        if (!mounted) return;
+        AppToast.error(context, data['message'] ?? "Failed to update profile");
+      }
+    } catch (_) {
+      if (!mounted) return;
+      AppToast.error(context, "Connection error. Try again.");
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -120,7 +145,12 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
                         icon: Icons.email_rounded,
                         hint: "you@example.com",
                         keyboardType: TextInputType.emailAddress,
-                        readOnly: true,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return "Email is required";
+                          final reg = RegExp(r'^[\w\.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$');
+                          if (!reg.hasMatch(v.trim())) return "Enter a valid email";
+                          return null;
+                        },
                       ),
                     ]),
                     SizedBox(height: rsh(context, 32)),
