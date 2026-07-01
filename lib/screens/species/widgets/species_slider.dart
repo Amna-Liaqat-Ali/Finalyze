@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/app_sizes.dart';
 import '../screens/specie_detail_screen.dart';
 import '../models/fish_specie.dart';
 
@@ -137,7 +138,7 @@ class SpeciesSlider extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 240,
+          height: sh(context, 0.285),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -159,14 +160,14 @@ class SpeciesSlider extends StatelessWidget {
         MaterialPageRoute(builder: (_) => SpeciesDetailScreen(fish: fish)),
       ),
       child: Container(
-        width: 180,
-        margin: const EdgeInsets.only(right: 16),
+        width: sw(context, 0.46),
+        margin: EdgeInsets.only(right: rs(context, 16)),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(rs(context, 24)),
           border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(rs(context, 24)),
           child: Stack(
             children: [
               Positioned.fill(
@@ -177,7 +178,7 @@ class SpeciesSlider extends StatelessWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: const Color(0xFF0D2E5C),
-                          child: const Icon(Icons.set_meal_rounded, color: Colors.white54, size: 40),
+                          child: Icon(Icons.set_meal_rounded, color: Colors.white54, size: rs(context, 40)),
                         ),
                       ),
               ),
@@ -193,16 +194,16 @@ class SpeciesSlider extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: EdgeInsets.all(rs(context, 12)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       fish.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 15,
+                        fontSize: rs(context, 15),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -210,15 +211,15 @@ class SpeciesSlider extends StatelessWidget {
                       fish.urduName,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 12,
+                        fontSize: rs(context, 12),
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: rsh(context, 2)),
                     Text(
                       fish.category,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.65),
-                        fontSize: 10,
+                        fontSize: rs(context, 10),
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -229,14 +230,14 @@ class SpeciesSlider extends StatelessWidget {
                 top: 10,
                 right: 10,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(rs(context, 10)),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                     child: Container(
-                      padding: const EdgeInsets.all(7),
+                      padding: EdgeInsets.all(rs(context, 7)),
                       color: Colors.white.withOpacity(0.12),
-                      child: const Icon(Icons.arrow_forward_ios_rounded,
-                          color: Colors.white, size: 14),
+                      child: Icon(Icons.arrow_forward_ios_rounded,
+                          color: Colors.white, size: rs(context, 14)),
                     ),
                   ),
                 ),

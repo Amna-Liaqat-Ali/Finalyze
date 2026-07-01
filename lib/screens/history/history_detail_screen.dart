@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/app_sizes.dart';
 import 'history_screen.dart';
 import 'services/scan_service.dart';
 
@@ -102,13 +103,13 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
   Widget _buildImageArea() {
     final placeholder = Container(
       color: Colors.grey[200],
-      child: const Center(
-        child: Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: 48),
+      child: Center(
+        child: Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: rs(context, 48)),
       ),
     );
 
     return SizedBox(
-      height: 260,
+      height: sh(context, 0.31),
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
@@ -137,7 +138,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           Positioned(
             bottom: 0, left: 0, right: 0,
             child: Container(
-              height: 100,
+              height: rsh(context, 100),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
@@ -171,8 +172,8 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: Colors.white, size: rs(context, 20)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -182,32 +183,32 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           children: [
             _buildImageArea(),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+              padding: EdgeInsets.fromLTRB(rs(context, 20), 0, rs(context, 20), rsh(context, 32)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: rs(context, 14), vertical: rsh(context, 8)),
                         decoration: BoxDecoration(
                           color: _statusColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(rs(context, 30)),
                           border: Border.all(
                               color: _statusColor.withOpacity(0.3)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(_statusIcon, color: _statusColor, size: 16),
-                            const SizedBox(width: 6),
+                            Icon(_statusIcon, color: _statusColor, size: rs(context, 16)),
+                            SizedBox(width: rs(context, 6)),
                             Text(
                               _statusLabel,
                               style: GoogleFonts.poppins(
                                 color: _statusColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                                fontSize: rs(context, 13),
                               ),
                             ),
                           ],
@@ -217,52 +218,52 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                       Text(
                         "${item.confidence}%",
                         style: GoogleFonts.poppins(
-                          fontSize: 28,
+                          fontSize: rs(context, 28),
                           fontWeight: FontWeight.bold,
                           color: _statusColor,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: rs(context, 4)),
                       Padding(
-                        padding: const EdgeInsets.only(top: 6),
+                        padding: EdgeInsets.only(top: rsh(context, 6)),
                         child: Text(
                           "confidence",
                           style: GoogleFonts.poppins(
-                              fontSize: 11, color: Colors.grey),
+                              fontSize: rs(context, 11), color: Colors.grey),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: rsh(context, 16)),
 
                   Text(
                     item.fishName,
                     style: GoogleFonts.poppins(
-                      fontSize: 24,
+                      fontSize: rs(context, 24),
                       fontWeight: FontWeight.bold,
                       color: primaryBlue,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: rsh(context, 8)),
                   Text(
                     _speciesDescription,
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: rs(context, 12),
                       color: Colors.blueGrey.shade500,
                       height: 1.6,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
 
-                  _buildFreshnessBar(),
-                  const SizedBox(height: 12),
-                  _buildConfidenceBar(),
-                  const SizedBox(height: 20),
+                  _buildFreshnessBar(context),
+                  SizedBox(height: rsh(context, 12)),
+                  _buildConfidenceBar(context),
+                  SizedBox(height: rsh(context, 20)),
 
-                  _buildInfoCard(primaryBlue),
-                  const SizedBox(height: 16),
+                  _buildInfoCard(context, primaryBlue),
+                  SizedBox(height: rsh(context, 16)),
 
-                  _buildRecommendation(),
+                  _buildRecommendation(context),
                 ],
               ),
             ),
@@ -272,7 +273,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
     );
   }
 
-  Widget _buildFreshnessBar() {
+  Widget _buildFreshnessBar(BuildContext context) {
     final percent = _freshnessPercent;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,15 +282,15 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("Freshness Level",
-                style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey)),
+                style: GoogleFonts.poppins(fontSize: rs(context, 13), color: Colors.blueGrey)),
             Text("$percent%",
                 style: GoogleFonts.poppins(
-                    fontSize: 13, fontWeight: FontWeight.bold, color: _statusColor)),
+                    fontSize: rs(context, 13), fontWeight: FontWeight.bold, color: _statusColor)),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: rsh(context, 8)),
         ClipRRect(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(rs(context, 6)),
           child: LinearProgressIndicator(
             value: percent / 100,
             minHeight: 10,
@@ -297,20 +298,20 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
             valueColor: AlwaysStoppedAnimation<Color>(_statusColor),
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: rsh(context, 6)),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Spoiled", style: GoogleFonts.poppins(fontSize: 10, color: Colors.red.shade300)),
-            Text("Moderate", style: GoogleFonts.poppins(fontSize: 10, color: Colors.orange.shade300)),
-            Text("Fresh", style: GoogleFonts.poppins(fontSize: 10, color: Colors.green.shade400)),
+            Text("Spoiled", style: GoogleFonts.poppins(fontSize: rs(context, 10), color: Colors.red.shade300)),
+            Text("Moderate", style: GoogleFonts.poppins(fontSize: rs(context, 10), color: Colors.orange.shade300)),
+            Text("Fresh", style: GoogleFonts.poppins(fontSize: rs(context, 10), color: Colors.green.shade400)),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildConfidenceBar() {
+  Widget _buildConfidenceBar(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -318,18 +319,18 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           children: [
             Text("Confidence Score",
                 style: GoogleFonts.poppins(
-                    fontSize: 13, color: Colors.blueGrey)),
+                    fontSize: rs(context, 13), color: Colors.blueGrey)),
             const Spacer(),
             Text("${item.confidence}%",
                 style: GoogleFonts.poppins(
-                    fontSize: 13,
+                    fontSize: rs(context, 13),
                     fontWeight: FontWeight.bold,
                     color: _statusColor)),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: rsh(context, 8)),
         ClipRRect(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(rs(context, 6)),
           child: LinearProgressIndicator(
             value: item.confidence / 100,
             minHeight: 8,
@@ -341,12 +342,12 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
     );
   }
 
-  Widget _buildInfoCard(Color primaryBlue) {
+  Widget _buildInfoCard(BuildContext context, Color primaryBlue) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(rs(context, 18)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(rs(context, 16)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -356,10 +357,10 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
       ),
       child: Column(
         children: [
-          _infoRow(Icons.set_meal_rounded, "Species", item.fishName,
-              primaryBlue),
+          _infoRow(context, Icons.set_meal_rounded, "Species", item.fishName, primaryBlue),
           _divider(),
           _infoRow(
+            context,
             Icons.calendar_today_rounded,
             "Date",
             DateFormat('MMMM d, yyyy').format(item.dateTime),
@@ -367,6 +368,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           ),
           _divider(),
           _infoRow(
+            context,
             Icons.location_on_rounded,
             "Origin",
             _speciesOrigin,
@@ -374,6 +376,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           ),
           _divider(),
           _infoRow(
+            context,
             Icons.access_time_rounded,
             "Time",
             DateFormat('hh:mm a').format(item.dateTime),
@@ -384,21 +387,21 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
     );
   }
 
-  Widget _infoRow(
+  Widget _infoRow(BuildContext context,
       IconData icon, String label, String value, Color primary) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: rsh(context, 10)),
       child: Row(
         children: [
-          Icon(icon, color: primary.withOpacity(0.5), size: 18),
-          const SizedBox(width: 12),
+          Icon(icon, color: primary.withOpacity(0.5), size: rs(context, 18)),
+          SizedBox(width: rs(context, 12)),
           Text(label,
               style: GoogleFonts.poppins(
-                  fontSize: 13, color: Colors.grey)),
+                  fontSize: rs(context, 13), color: Colors.grey)),
           const Spacer(),
           Text(value,
               style: GoogleFonts.poppins(
-                  fontSize: 13,
+                  fontSize: rs(context, 13),
                   fontWeight: FontWeight.w600,
                   color: primary)),
         ],
@@ -408,19 +411,19 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
 
   Widget _divider() => Divider(color: Colors.grey.shade100, height: 1);
 
-  Widget _buildRecommendation() {
+  Widget _buildRecommendation(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(rs(context, 18)),
       decoration: BoxDecoration(
         color: _statusColor.withOpacity(0.07),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(rs(context, 16)),
         border: Border.all(color: _statusColor.withOpacity(0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(_statusIcon, color: _statusColor, size: 22),
-          const SizedBox(width: 12),
+          Icon(_statusIcon, color: _statusColor, size: rs(context, 22)),
+          SizedBox(width: rs(context, 12)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,11 +432,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                     style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: _statusColor,
-                        fontSize: 14)),
-                const SizedBox(height: 4),
+                        fontSize: rs(context, 14))),
+                SizedBox(height: rsh(context, 4)),
                 Text(_recommendation,
                     style: GoogleFonts.poppins(
-                        fontSize: 13,
+                        fontSize: rs(context, 13),
                         color: Colors.blueGrey,
                         height: 1.5)),
               ],

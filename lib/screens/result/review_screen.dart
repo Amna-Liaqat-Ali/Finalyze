@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import '../../core/scan_limit_service.dart';
 import '../Main/analyzing_screen.dart';
 import '../premium/premium_screen.dart';
@@ -29,7 +30,7 @@ class ReviewScreen extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+          icon: Icon(Icons.close_rounded, color: Colors.white, size: rs(context, 22)),
           onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
           tooltip: 'Cancel',
         ),
@@ -38,17 +39,17 @@ class ReviewScreen extends StatelessWidget {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 20), rs(context, 20), 0),
               child: Column(
                 children: [
-                  // Image preview 
+                  // Image preview
                   Expanded(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(rs(context, 22)),
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(22),
+                          borderRadius: BorderRadius.circular(rs(context, 22)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
@@ -59,16 +60,16 @@ class ReviewScreen extends StatelessWidget {
                         ),
                         child: image != null
                             ? Image.file(image!, fit: BoxFit.cover)
-                            : const Center(
+                            : Center(
                                 child: Icon(Icons.image_not_supported_rounded,
-                                    size: 60, color: Colors.grey),
+                                    size: rs(context, 60), color: Colors.grey),
                               ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildTip(),
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 16)),
+                  _buildTip(context),
+                  SizedBox(height: rsh(context, 20)),
                 ],
               ),
             ),
@@ -79,25 +80,25 @@ class ReviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTip() {
+  Widget _buildTip(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 12)),
       decoration: BoxDecoration(
         color: const Color(0xFFEEF6FF),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(rs(context, 14)),
         border: Border.all(color: const Color(0xFF1A5694).withOpacity(0.10)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.tips_and_updates_rounded,
-              color: Color(0xFF2CB88E), size: 18),
-          const SizedBox(width: 10),
+          Icon(Icons.tips_and_updates_rounded,
+              color: const Color(0xFF2CB88E), size: rs(context, 18)),
+          SizedBox(width: rs(context, 10)),
           Expanded(
             child: Text(
               "For best results, center the fish eye or gills and ensure good lighting.",
               style: GoogleFonts.poppins(
                 color: const Color(0xFF1A5694),
-                fontSize: 12,
+                fontSize: rs(context, 12),
               ),
             ),
           ),
@@ -108,7 +109,7 @@ class ReviewScreen extends StatelessWidget {
 
   Widget _buildActionBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
+      padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 14), rs(context, 20), rsh(context, 32)),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -132,22 +133,22 @@ class ReviewScreen extends StatelessWidget {
                   nav.pop(); // pop ReviewScreen
                   nav.pop(); // pop back to ScanScreen
                 },
-                icon: const Icon(Icons.refresh_rounded, size: 17),
+                icon: Icon(Icons.refresh_rounded, size: rs(context, 17)),
                 label: Text(
                   "Retake",
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: rs(context, 14)),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF1A5694),
                   side: const BorderSide(color: Color(0xFFDDE3ED), width: 1.5),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(rs(context, 14)),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(vertical: rsh(context, 14)),
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: rs(context, 14)),
             Expanded(
               flex: 3,
               child: GestureDetector(
@@ -174,7 +175,7 @@ class ReviewScreen extends StatelessWidget {
                         );
                       },
                 child: Container(
-                  height: 50,
+                  height: rsh(context, 50),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: image == null
@@ -186,7 +187,7 @@ class ReviewScreen extends StatelessWidget {
                               Color(0xFF2CB88E),
                             ],
                     ),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(rs(context, 14)),
                     boxShadow: image == null
                         ? []
                         : [
@@ -200,15 +201,15 @@ class ReviewScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.biotech_rounded,
-                          color: Colors.white, size: 19),
-                      const SizedBox(width: 8),
+                      Icon(Icons.biotech_rounded,
+                          color: Colors.white, size: rs(context, 19)),
+                      SizedBox(width: rs(context, 8)),
                       Text(
                         "Analyze",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                          fontSize: rs(context, 15),
                         ),
                       ),
                     ],
@@ -266,60 +267,60 @@ class _ScanLimitSheetState extends State<_ScanLimitSheet> {
         color: Color(0xFFF8FAFC),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+      padding: EdgeInsets.fromLTRB(rs(context, 24), rsh(context, 16), rs(context, 24), rsh(context, 40)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 40, height: 4,
+            width: rs(context, 40), height: rsh(context, 4),
             decoration: BoxDecoration(
               color: Colors.blueGrey.shade200,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(rs(context, 4)),
             ),
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: rsh(context, 28)),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(rs(context, 20)),
             decoration: BoxDecoration(
               color: Colors.orange.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.lock_clock_rounded,
-                color: Colors.orange, size: 48),
+            child: Icon(Icons.lock_clock_rounded,
+                color: Colors.orange, size: rs(context, 48)),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: rsh(context, 20)),
           Text("Daily Limit Reached",
               style: GoogleFonts.poppins(
-                  fontSize: 20,
+                  fontSize: rs(context, 20),
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF0D2E5C))),
-          const SizedBox(height: 8),
+          SizedBox(height: rsh(context, 8)),
           Text(
             "You've used all 15 free scans for today.\nScanner resets in:",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-                fontSize: 13, color: Colors.blueGrey, height: 1.6),
+                fontSize: rs(context, 13), color: Colors.blueGrey, height: 1.6),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: rsh(context, 24)),
           // Countdown timer
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: rs(context, 32), vertical: rsh(context, 16)),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(rs(context, 16)),
             ),
             child: Text(
               "$h : $m : $s",
               style: GoogleFonts.poppins(
-                  fontSize: 32,
+                  fontSize: rs(context, 32),
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   letterSpacing: 4),
             ),
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: rsh(context, 28)),
           // Upgrade button
           GestureDetector(
             onTap: () {
@@ -328,12 +329,12 @@ class _ScanLimitSheetState extends State<_ScanLimitSheet> {
             },
             child: Container(
               width: double.infinity,
-              height: 54,
+              height: rsh(context, 54),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2)],
                 ),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(rs(context, 14)),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF0891B2).withOpacity(0.35),
@@ -347,11 +348,11 @@ class _ScanLimitSheetState extends State<_ScanLimitSheet> {
                     style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 15)),
+                        fontSize: rs(context, 15))),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: rsh(context, 12)),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text("Wait for Reset",

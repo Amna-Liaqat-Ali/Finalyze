@@ -125,7 +125,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   _buildScanDetails(scanDate, speciesOrigin, scanTime, widget.scanArea, primaryBlue),
                   const SizedBox(height: 20),
                   _buildSaveStatusBanner(primaryBlue),
-                  const SizedBox(height: 24),
+                  SizedBox(height: rsh(context, 24)),
                   Row(
                     children: [
                       _buildChip(
@@ -133,7 +133,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         primaryBlue.withOpacity(0.08),
                         primaryBlue,
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: rs(context, 10)),
                       _buildChip(
                         status,
                         statusColor.withOpacity(0.12),
@@ -141,7 +141,7 @@ class _ResultScreenState extends State<ResultScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: rsh(context, 24)),
                   Text(
                     species,
                     style: GoogleFonts.poppins(
@@ -168,9 +168,9 @@ class _ResultScreenState extends State<ResultScreen> {
                       height: 1.6,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: rsh(context, 28)),
                   _buildFreshnessBar(context, freshnessPercent.clamp(0, 100), statusColor),
-                  const SizedBox(height: 24),
+                  SizedBox(height: rsh(context, 24)),
                   Row(
                     children: [
                       _buildMetricCard(
@@ -180,7 +180,7 @@ class _ResultScreenState extends State<ResultScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  SizedBox(height: rsh(context, 40)),
                   _buildActionRow(context, primaryBlue),
                   _buildDismissButton(context),
                 ],
@@ -226,92 +226,92 @@ class _ResultScreenState extends State<ResultScreen> {
         message = "Log in to save scans to your history.";
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Builder(builder: (context) => Container(
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 12)),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(rs(context, 14)),
         border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
           if (_saveStatus == _SaveStatus.saving)
             SizedBox(
-              width: 22,
-              height: 22,
+              width: rs(context, 22),
+              height: rs(context, 22),
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 color: iconColor,
               ),
             )
           else
-            Icon(icon, color: iconColor, size: 22),
-          const SizedBox(width: 12),
+            Icon(icon, color: iconColor, size: rs(context, 22)),
+          SizedBox(width: rs(context, 12)),
           Expanded(
             child: Text(
               message,
               style: GoogleFonts.poppins(
                 color: primaryBlue,
-                fontSize: 13,
+                fontSize: rs(context, 13),
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildInvalidScanUI(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        padding: const EdgeInsets.all(40),
+        padding: EdgeInsets.all(rs(context, 40)),
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(rs(context, 20)),
               decoration: BoxDecoration(
                 color: Colors.red.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.no_photography_outlined,
-                size: 80,
+                size: rs(context, 80),
                 color: Colors.redAccent,
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: rsh(context, 30)),
             Text(
               "Invalid Object!",
               style: GoogleFonts.poppins(
-                fontSize: 24,
+                fontSize: rs(context, 24),
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1A5694),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: rsh(context, 15)),
             Text(
               "We couldn't identify a fish in this image. Please take a clear photo focusing on the eyes and gills.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 15,
+                fontSize: rs(context, 15),
                 color: Colors.blueGrey,
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: rsh(context, 40)),
             SizedBox(
               width: double.infinity,
-              height: 55,
+              height: rsh(context, 55),
               child: ElevatedButton(
                 onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A5694),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(rs(context, 15)),
                   ),
                   elevation: 0,
                 ),
@@ -379,13 +379,13 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget _infoColumn(String title, String value, Color color) {
-    return Column(
+    return Builder(builder: (context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 10,
+          style: TextStyle(
+            fontSize: rs(context, 10),
             fontWeight: FontWeight.bold,
             color: Colors.grey,
           ),
@@ -393,31 +393,31 @@ class _ResultScreenState extends State<ResultScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: rs(context, 12),
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
       ],
-    );
+    ));
   }
 
   Widget _buildChip(String label, Color bg, Color text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Builder(builder: (context) => Container(
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 8)),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(rs(context, 12)),
       ),
       child: Text(
         label,
         style: GoogleFonts.poppins(
           color: text,
-          fontSize: 12,
+          fontSize: rs(context, 12),
           fontWeight: FontWeight.w800,
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildMetricCard(String title, String value, Color color) {
@@ -473,9 +473,9 @@ class _ResultScreenState extends State<ResultScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: rsh(context, 8)),
         ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(rs(context, 8)),
           child: LinearProgressIndicator(
             value: percent / 100,
             minHeight: 10,
@@ -483,13 +483,13 @@ class _ResultScreenState extends State<ResultScreen> {
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: rsh(context, 6)),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Spoiled", style: GoogleFonts.poppins(fontSize: 10, color: Colors.red.shade300)),
-            Text("Moderate", style: GoogleFonts.poppins(fontSize: 10, color: Colors.orange.shade300)),
-            Text("Fresh", style: GoogleFonts.poppins(fontSize: 10, color: Colors.green.shade400)),
+            Text("Spoiled", style: GoogleFonts.poppins(fontSize: rs(context, 10), color: Colors.red.shade300)),
+            Text("Moderate", style: GoogleFonts.poppins(fontSize: rs(context, 10), color: Colors.orange.shade300)),
+            Text("Fresh", style: GoogleFonts.poppins(fontSize: rs(context, 10), color: Colors.green.shade400)),
           ],
         ),
       ],
@@ -509,12 +509,12 @@ class _ResultScreenState extends State<ResultScreen> {
       ),
       child: Container(
         width: double.infinity,
-        height: 52,
+        height: rsh(context, 52),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF0D2E5C), Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
           ),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(rs(context, 14)),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF0891B2).withOpacity(0.30),
@@ -526,14 +526,14 @@ class _ResultScreenState extends State<ResultScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.restaurant_menu_rounded, color: Colors.white, size: 18),
-            const SizedBox(width: 10),
+            Icon(Icons.restaurant_menu_rounded, color: Colors.white, size: rs(context, 18)),
+            SizedBox(width: rs(context, 10)),
             Text(
               "View Recipes",
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: rs(context, 15),
               ),
             ),
           ],

@@ -166,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: rsh(context, 32)),
 
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(rs(context, 24)),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                           child: Container(
@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white.withOpacity(
                                 0.3,
                               ), // Lowered opacity
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(rs(context, 24)),
                               border: Border.all(
                                 color: Colors.white.withOpacity(0.4),
                                 width: 1.5,
@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       'Forgot password?',
                                       style: GoogleFonts.poppins(
                                         color: primaryBlue,
-                                        fontSize: 13,
+                                        fontSize: rs(context, 13),
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -223,12 +223,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                 InkWell(
                                   onTap: _isLoading ? null : _handleLogin,
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(rs(context, 16)),
                                   child: Container(
                                     width: double.infinity,
                                     height: rsh(context, 52),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(rs(context, 16)),
                                       color: primaryBlue,
                                       boxShadow: [
                                         BoxShadow(
@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           : Text(
                                               "Login",
                                               style: GoogleFonts.lexend(
-                                                fontSize: 14,
+                                                fontSize: rs(context, 14),
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white,
                                                 letterSpacing: 2,
@@ -291,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: rsh(context, 10)),
                     ],
                   ),
                 ),
@@ -353,31 +353,31 @@ class _LoginScreenState extends State<LoginScreen> {
     TextEditingController controller, {
     bool isPassword = false,
   }) {
-    return Container(
+    return Builder(builder: (context) => Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(rs(context, 16)),
         border: Border.all(color: Colors.white.withOpacity(0.4)),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword ? _obscurePassword : false,
-        style: const TextStyle(color: primaryBlue, fontSize: 15),
+        style: TextStyle(color: primaryBlue, fontSize: rs(context, 15)),
         decoration: InputDecoration(
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: rs(context, 20),
+            vertical: rsh(context, 18),
           ),
           hintText: hint,
           hintStyle: TextStyle(color: primaryBlue.withOpacity(0.4)),
-          prefixIcon: Icon(icon, color: primaryBlue.withOpacity(0.7), size: 20),
+          prefixIcon: Icon(icon, color: primaryBlue.withOpacity(0.7), size: rs(context, 20)),
           suffixIcon: isPassword
               ? IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off : Icons.visibility,
                     color: primaryBlue.withOpacity(0.4),
-                    size: 18,
+                    size: rs(context, 18),
                   ),
                   onPressed: () =>
                       setState(() => _obscurePassword = !_obscurePassword),
@@ -385,6 +385,6 @@ class _LoginScreenState extends State<LoginScreen> {
               : null,
         ),
       ),
-    );
+    ));
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../constants/colors.dart';
+import '../../core/app_sizes.dart';
 
 class OnboardingPage extends StatelessWidget {
   final IconData icon;
@@ -17,13 +18,13 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 24)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            height: 140,
-            width: 140,
+            height: rs(context, 140),
+            width: rs(context, 140),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
@@ -33,24 +34,24 @@ class OnboardingPage extends StatelessWidget {
                 ],
               ),
             ),
-            child: Icon(icon, size: 60, color: AppColors.primary),
+            child: Icon(icon, size: rs(context, 60), color: AppColors.primary),
           ),
-          const SizedBox(height: 40),
+          SizedBox(height: rsh(context, 40)),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 26,
+            style: TextStyle(
+              fontSize: rs(context, 26),
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: rsh(context, 16)),
           Text(
             description,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: rs(context, 16),
               color: AppColors.textLight,
               height: 1.5,
             ),

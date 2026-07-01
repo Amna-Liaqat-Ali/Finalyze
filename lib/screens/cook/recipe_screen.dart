@@ -2,6 +2,7 @@ import 'package:Finalyze/screens/cook/widgets/recipe_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import 'data/recipe_data.dart';
 import 'models/recipe.dart';
 
@@ -72,20 +73,20 @@ class _RecipeScreenState extends State<RecipeScreen> {
         automaticallyImplyLeading: false,
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 20),
+                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white, size: rs(context, 20)),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search_rounded, color: Colors.white, size: 22),
+            icon: Icon(Icons.search_rounded, color: Colors.white, size: rs(context, 22)),
             onPressed: () => showSearch(
               context: context,
               delegate: RecipeSearchDelegate(allRecipes: _allRecipes),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: rs(context, 4)),
         ],
       ),
       body: isSpoiled ? _buildSpoiledWarning() : Column(
@@ -101,7 +102,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   )
                 : ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                    padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 8), rs(context, 20), rsh(context, 24)),
                     itemCount: _displayRecipes.length,
                     itemBuilder: (context, index) {
                       final recipe = _displayRecipes[index];
@@ -126,17 +127,17 @@ class _RecipeScreenState extends State<RecipeScreen> {
         : "These recipes use thorough cooking methods suited for your scan result.";
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      padding: const EdgeInsets.all(14),
+      margin: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 16), rs(context, 20), 0),
+      padding: EdgeInsets.all(rs(context, 14)),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(rs(context, 14)),
         border: Border.all(color: color.withOpacity(0.25)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(width: 12),
+          Icon(icon, color: color, size: rs(context, 22)),
+          SizedBox(width: rs(context, 12)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,10 +146,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: color,
-                        fontSize: 13)),
+                        fontSize: rs(context, 13))),
                 Text(subtitle,
                     style: GoogleFonts.poppins(
-                        fontSize: 11,
+                        fontSize: rs(context, 11),
                         color: Colors.blueGrey,
                         height: 1.4)),
               ],
@@ -162,12 +163,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget _buildCategoryChips() {
     const cats = ['All', 'Fried', 'Curry', 'Grilled', 'Regional'];
     return SizedBox(
-      height: 52,
+      height: rsh(context, 52),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 12), rs(context, 20), 0),
         itemCount: cats.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => SizedBox(width: rs(context, 8)),
         itemBuilder: (_, i) {
           final cat = cats[i];
           final active = _selectedCategory == cat;
@@ -175,10 +176,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
             onTap: () => _applyFilter(cat),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: rs(context, 18), vertical: rsh(context, 6)),
               decoration: BoxDecoration(
                 color: active ? primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(rs(context, 20)),
                 border: Border.all(
                     color: active ? primaryBlue : Colors.blueGrey.shade100),
               ),
@@ -187,7 +188,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       color: active ? Colors.white : Colors.blueGrey,
                       fontWeight:
                           active ? FontWeight.bold : FontWeight.normal,
-                      fontSize: 12)),
+                      fontSize: rs(context, 12))),
             ),
           );
         },
@@ -198,47 +199,47 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget _buildSpoiledWarning() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: EdgeInsets.all(rs(context, 40)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(rs(context, 24)),
               decoration: BoxDecoration(
                 color: Colors.redAccent.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.no_meals_rounded,
-                  color: Colors.redAccent, size: 64),
+              child: Icon(Icons.no_meals_rounded,
+                  color: Colors.redAccent, size: rs(context, 64)),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: rsh(context, 24)),
             Text("Not Safe to Cook",
                 style: GoogleFonts.poppins(
-                    fontSize: 22,
+                    fontSize: rs(context, 22),
                     fontWeight: FontWeight.bold,
                     color: Colors.redAccent)),
-            const SizedBox(height: 12),
+            SizedBox(height: rsh(context, 12)),
             Text(
               "The scanned fish was identified as spoiled. It is not suitable for consumption or cooking. Please discard it immediately.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                  fontSize: 14,
+                  fontSize: rs(context, 14),
                   color: Colors.blueGrey,
                   height: 1.6),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: rsh(context, 32)),
             OutlinedButton.icon(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, size: rs(context, 16)),
               label: Text("Go Back",
                   style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
               style: OutlinedButton.styleFrom(
                 foregroundColor: primaryBlue,
                 side: const BorderSide(color: Color(0xFF1A5694)),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                    EdgeInsets.symmetric(horizontal: rs(context, 28), vertical: rsh(context, 14)),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
+                    borderRadius: BorderRadius.circular(rs(context, 14))),
               ),
             ),
           ],
@@ -249,10 +250,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   Widget _buildRecipeCard(Recipe recipe, {bool highlight = false}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.only(bottom: rsh(context, 20)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(rs(context, 20)),
         boxShadow: [
           BoxShadow(
             color: highlight
@@ -270,7 +271,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(rs(context, 20)),
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -281,8 +282,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(rs(context, 20)),
                 ),
                 child: Stack(
                   children: [
@@ -311,22 +312,22 @@ class _RecipeScreenState extends State<RecipeScreen> {
                         top: 12,
                         left: 12,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: rs(context, 10), vertical: rsh(context, 5)),
                           decoration: BoxDecoration(
                             color: accentTeal,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(rs(context, 20)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.check_circle_rounded,
-                                  color: Colors.white, size: 12),
-                              const SizedBox(width: 4),
+                              Icon(Icons.check_circle_rounded,
+                                  color: Colors.white, size: rs(context, 12)),
+                              SizedBox(width: rs(context, 4)),
                               Text("Best Match",
                                   style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 10,
+                                      fontSize: rs(context, 10),
                                       fontWeight: FontWeight.bold)),
                             ],
                           ),
@@ -339,7 +340,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                         onTap: () => setState(
                             () => recipe.isFavorite = !recipe.isFavorite),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(rs(context, 8)),
                           decoration: const BoxDecoration(
                               color: Colors.white, shape: BoxShape.circle),
                           child: Icon(
@@ -347,7 +348,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             color: const Color(0xFFFF1744),
-                            size: 18,
+                            size: rs(context, 18),
                           ),
                         ),
                       ),
@@ -357,19 +358,19 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ),
 
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(rs(context, 20)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       recipe.title,
                       style: GoogleFonts.poppins(
-                        fontSize: 16,
+                        fontSize: rs(context, 16),
                         fontWeight: FontWeight.bold,
                         color: primaryBlue,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: rsh(context, 12)),
                     Row(
                       children: [
                         _buildStat(
@@ -377,7 +378,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                           '${recipe.cookTimeMinutes} min',
                           accentTeal,
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: rs(context, 16)),
                         _buildStat(
                           Icons.bar_chart_rounded,
                           recipe.difficulty.name.toUpperCase(),
@@ -400,13 +401,13 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget _buildStat(IconData icon, String label, Color color) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: color),
-        const SizedBox(width: 4),
+        Icon(icon, size: rs(context, 14), color: color),
+        SizedBox(width: rs(context, 4)),
         Text(
           label,
           style: GoogleFonts.poppins(
             color: Colors.blueGrey,
-            fontSize: 11,
+            fontSize: rs(context, 11),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -420,7 +421,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
         3,
         (i) => Icon(
           Icons.whatshot_rounded,
-          size: 14,
+          size: rs(context, 14),
           color: i < level ? Colors.orange : Colors.blueGrey.withOpacity(0.2),
         ),
       ),
@@ -461,7 +462,7 @@ class RecipeSearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) => IconButton(
-    icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+    icon: Icon(Icons.arrow_back_ios_new_rounded, size: rs(context, 20)),
     onPressed: () => close(context, null),
   );
 
@@ -483,7 +484,7 @@ class RecipeSearchDelegate extends SearchDelegate {
           results[index].title,
           style: GoogleFonts.poppins(
             color: const Color(0xFF1A5694),
-            fontSize: 14,
+            fontSize: rs(context, 14),
           ),
         ),
         onTap: () {

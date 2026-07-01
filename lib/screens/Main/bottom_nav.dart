@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_sizes.dart';
+
 class BottomNav extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -9,10 +11,10 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 25),
+      margin: EdgeInsets.fromLTRB(rs(context, 20), 0, rs(context, 20), rsh(context, 25)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(rs(context, 30)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -22,7 +24,7 @@ class BottomNav extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(rs(context, 30)),
         child: BottomNavigationBar(
           currentIndex: currentIndex,
           onTap: onTap,
@@ -33,11 +35,11 @@ class BottomNav extends StatelessWidget {
           unselectedItemColor: Colors.blueGrey.shade300,
           showSelectedLabels: true,
           showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(
+          selectedLabelStyle: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 12,
+            fontSize: rs(context, 12),
           ),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
+          unselectedLabelStyle: TextStyle(fontSize: rs(context, 12)),
           items: [
             const BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded),

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/app_sizes.dart';
 import '../../../core/user_session.dart';
 import '../../../widgets/app_toast.dart';
 
@@ -78,12 +79,12 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: Builder(builder: (context) => Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: rs(context, 20))),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check_rounded, color: Colors.white, size: 24),
+            icon: Builder(builder: (context) => Icon(Icons.check_rounded, color: Colors.white, size: rs(context, 24))),
             tooltip: 'Save',
             onPressed: _save,
           ),
@@ -98,7 +99,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
             children: [
               _buildAvatarSection(),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 40),
+                padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 28), rs(context, 20), rsh(context, 40)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -122,7 +123,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
                         readOnly: true,
                       ),
                     ]),
-                    const SizedBox(height: 32),
+                    SizedBox(height: rsh(context, 32)),
                     _buildSaveButton(),
                   ],
                 ),
@@ -137,7 +138,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   Widget _buildAvatarSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 32),
+      padding: EdgeInsets.symmetric(vertical: rsh(context, 32)),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF0D2E5C), Color(0xFF0891B2), Color(0xFF2CB88E)],
@@ -152,8 +153,8 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
             child: Stack(
               children: [
                 Container(
-                  width: 96,
-                  height: 96,
+                  width: rs(context, 96),
+                  height: rs(context, 96),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
@@ -167,8 +168,8 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
                         ? Image.file(_profileImage!, fit: BoxFit.cover)
                         : Container(
                             color: Colors.white.withOpacity(0.15),
-                            child: const Icon(Icons.person_rounded,
-                                color: Colors.white70, size: 50),
+                            child: Icon(Icons.person_rounded,
+                                color: Colors.white70, size: rs(context, 50)),
                           ),
                   ),
                 ),
@@ -176,29 +177,29 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
                   bottom: 0,
                   right: 0,
                   child: Container(
-                    width: 30,
-                    height: 30,
+                    width: rs(context, 30),
+                    height: rs(context, 30),
                     decoration: BoxDecoration(
                       color: _teal,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
-                    child: const Icon(Icons.camera_alt_rounded,
-                        color: Colors.white, size: 15),
+                    child: Icon(Icons.camera_alt_rounded,
+                        color: Colors.white, size: rs(context, 15)),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: rsh(context, 10)),
           Text(UserSession.name ?? 'User',
               style: GoogleFonts.poppins(
                   color: Colors.white,
-                  fontSize: 17,
+                  fontSize: rs(context, 17),
                   fontWeight: FontWeight.bold)),
           Text(UserSession.email ?? '',
               style: GoogleFonts.poppins(
-                  color: Colors.white60, fontSize: 12)),
+                  color: Colors.white60, fontSize: rs(context, 12))),
         ],
       ),
     );
@@ -229,79 +230,79 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
     String? Function(String?)? validator,
     bool readOnly = false,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 14)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
               style: GoogleFonts.poppins(
-                  fontSize: 11,
+                  fontSize: rs(context, 11),
                   fontWeight: FontWeight.w700,
                   color: Colors.blueGrey.shade400,
                   letterSpacing: 0.5)),
-          const SizedBox(height: 8),
+          SizedBox(height: rsh(context, 8)),
           TextFormField(
             controller: controller,
             keyboardType: keyboardType,
             validator: validator,
             readOnly: readOnly,
             style: GoogleFonts.poppins(
-                fontSize: 14,
+                fontSize: rs(context, 14),
                 fontWeight: FontWeight.w500,
                 color: readOnly ? Colors.blueGrey : const Color(0xFF1A5694)),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle:
-                  GoogleFonts.poppins(color: Colors.blueGrey.shade200, fontSize: 13),
-              prefixIcon: Icon(icon, color: _blue, size: 20),
+                  GoogleFonts.poppins(color: Colors.blueGrey.shade200, fontSize: rs(context, 13)),
+              prefixIcon: Icon(icon, color: _blue, size: rs(context, 20)),
               filled: true,
               fillColor:
                   readOnly ? const Color(0xFFEDF1F7) : const Color(0xFFF4F7FB),
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  EdgeInsets.symmetric(vertical: rsh(context, 14), horizontal: rs(context, 16)),
               border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(rs(context, 12)),
                   borderSide: BorderSide.none),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(rs(context, 12)),
                   borderSide: BorderSide(color: _blue.withOpacity(0.4), width: 1.5)),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _fieldDivider() =>
       Divider(height: 1, indent: 68, endIndent: 16, color: Colors.grey.shade100);
 
   Widget _sectionLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 4),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.only(bottom: rsh(context, 10), left: rs(context, 4)),
       child: Text(
         text,
         style: GoogleFonts.poppins(
-          fontSize: 11,
+          fontSize: rs(context, 11),
           fontWeight: FontWeight.w800,
           color: _blue.withOpacity(0.5),
           letterSpacing: 1.4,
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildSaveButton() {
-    return GestureDetector(
+    return Builder(builder: (context) => GestureDetector(
       onTap: _isSaving ? null : _save,
       child: Container(
         width: double.infinity,
-        height: 54,
+        height: rsh(context, 54),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(rs(context, 16)),
           boxShadow: [
             BoxShadow(
                 color: _teal.withOpacity(0.30),
@@ -311,25 +312,25 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
         ),
         child: Center(
           child: _isSaving
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
+              ? SizedBox(
+                  width: rs(context, 22),
+                  height: rs(context, 22),
+                  child: const CircularProgressIndicator(
                       color: Colors.white, strokeWidth: 2.5))
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.check_rounded, color: Colors.white, size: 18),
-                    const SizedBox(width: 8),
+                    Icon(Icons.check_rounded, color: Colors.white, size: rs(context, 18)),
+                    SizedBox(width: rs(context, 8)),
                     Text("Save Changes",
                         style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 15)),
+                            fontSize: rs(context, 15))),
                   ],
                 ),
         ),
       ),
-    );
+    ));
   }
 }

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/app_sizes.dart';
 import '../models/youtube_Blog.dart';
 
 class YouTubeBlogSlider extends StatelessWidget {
@@ -31,17 +32,17 @@ class YouTubeBlogSlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Expert Guides",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: rs(context, 20),
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 15),
+        SizedBox(height: rsh(context, 15)),
         SizedBox(
-          height: 180,
+          height: sh(context, 0.213),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: blogs.length,
@@ -49,10 +50,10 @@ class YouTubeBlogSlider extends StatelessWidget {
               return GestureDetector(
                 onTap: () => _launchURL(blogs[index].videoUrl),
                 child: Container(
-                  width: 280,
-                  margin: const EdgeInsets.only(right: 16),
+                  width: sw(context, 0.718),
+                  margin: EdgeInsets.only(right: rs(context, 16)),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(rs(context, 20)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.3),
@@ -61,25 +62,25 @@ class YouTubeBlogSlider extends StatelessWidget {
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(rs(context, 20)),
                     child: Stack(
                       children: [
                         //Thumbnail Image
                         Image.network(
                           blogs[index].thumbnailUrl,
                           fit: BoxFit.cover,
-                          width: 280,
-                          height: 180,
+                          width: sw(context, 0.718),
+                          height: sh(context, 0.213),
                         ),
 
                         Center(
                           child: CircleAvatar(
                             backgroundColor: Colors.white.withOpacity(0.3),
-                            radius: 25,
-                            child: const Icon(
+                            radius: rs(context, 25),
+                            child: Icon(
                               Icons.play_arrow,
                               color: Colors.white,
-                              size: 35,
+                              size: rs(context, 35),
                             ),
                           ),
                         ),
@@ -92,13 +93,14 @@ class YouTubeBlogSlider extends StatelessWidget {
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                               child: Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(rs(context, 12)),
                                 color: Colors.black.withOpacity(0.5),
                                 child: Text(
                                   blogs[index].title,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: rs(context, 13),
                                   ),
                                 ),
                               ),

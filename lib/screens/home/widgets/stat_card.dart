@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/app_sizes.dart';
 
 class StatCard extends StatelessWidget {
   final String label;
@@ -54,13 +55,13 @@ class StatCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: rsh(context, 6)),
           Text(
             label,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               color: Colors.grey.shade500,
-              fontSize: 11,
+              fontSize: rs(context, 11),
               fontWeight: FontWeight.w500,
             ),
           ),

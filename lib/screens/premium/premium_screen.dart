@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/app_sizes.dart';
 import '../Main/MainScreen.dart';
 
 class PremiumScreen extends StatefulWidget {
@@ -198,30 +199,30 @@ class _PremiumScreenState extends State<PremiumScreen>
 
   Widget _buildTopBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 10)),
       child: Row(
         children: [
           if (widget.standalone)
             GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
-                width: 38,
-                height: 38,
+                width: rs(context, 38),
+                height: rs(context, 38),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.10),
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white.withOpacity(0.18)),
                 ),
-                child: const Icon(Icons.close_rounded,
-                    color: Colors.white70, size: 18),
+                child: Icon(Icons.close_rounded,
+                    color: Colors.white70, size: rs(context, 18)),
               ),
             )
           else
-            const SizedBox(width: 38),
+            SizedBox(width: rs(context, 38)),
           const Spacer(),
           _pillBadge("LIMITED OFFER", const Color(0xFFFFB74D)),
           const Spacer(),
-          const SizedBox(width: 38),
+          SizedBox(width: rs(context, 38)),
         ],
       ),
     );
@@ -257,8 +258,8 @@ class _PremiumScreenState extends State<PremiumScreen>
           alignment: Alignment.center,
           children: [
             Container(
-              width: 90,
-              height: 90,
+              width: rs(context, 90),
+              height: rs(context, 90),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -271,8 +272,8 @@ class _PremiumScreenState extends State<PremiumScreen>
               ),
             ),
             Container(
-              width: 72,
-              height: 72,
+              width: rs(context, 72),
+              height: rs(context, 72),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(
@@ -288,29 +289,29 @@ class _PremiumScreenState extends State<PremiumScreen>
                   ),
                 ],
               ),
-              child: const Icon(Icons.workspace_premium_rounded,
-                  color: Colors.white, size: 36),
+              child: Icon(Icons.workspace_premium_rounded,
+                  color: Colors.white, size: rs(context, 36)),
             ),
           ],
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: rsh(context, 18)),
         Text(
           "Unlock Premium",
           style: GoogleFonts.poppins(
             color: Colors.white,
-            fontSize: 28,
+            fontSize: rs(context, 28),
             fontWeight: FontWeight.bold,
             letterSpacing: -0.3,
             height: 1.1,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: rsh(context, 8)),
         Text(
           "Scan unlimited fish with full AI power.\nNo restrictions, no limits.",
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
             color: Colors.white.withOpacity(0.60),
-            fontSize: 14,
+            fontSize: rs(context, 14),
             height: 1.5,
           ),
         ),
@@ -571,12 +572,12 @@ class _PremiumScreenState extends State<PremiumScreen>
       onTap: _subscribe,
       child: Container(
         width: double.infinity,
-        height: 56,
+        height: rsh(context, 56),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(rs(context, 16)),
           boxShadow: [
             BoxShadow(
               color: _teal.withOpacity(0.38),
@@ -588,9 +589,9 @@ class _PremiumScreenState extends State<PremiumScreen>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.workspace_premium_rounded,
-                color: Colors.white, size: 20),
-            const SizedBox(width: 10),
+            Icon(Icons.workspace_premium_rounded,
+                color: Colors.white, size: rs(context, 20)),
+            SizedBox(width: rs(context, 10)),
             Text(
               _selectedPlan == "business"
                   ? "Start Business Plan — Rs. 5,000/mo"
@@ -600,7 +601,7 @@ class _PremiumScreenState extends State<PremiumScreen>
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
+                fontSize: rs(context, 14),
               ),
             ),
           ],

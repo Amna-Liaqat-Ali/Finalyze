@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import '../../widgets/app_back_button.dart';
 import 'services/auth_service.dart';
 
@@ -202,52 +203,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: rs(context, 24)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
                   AppBackButton(isGlass: true, onTap: () => Navigator.pop(context)),
-                  const SizedBox(height: 24),
+                  SizedBox(height: rsh(context, 24)),
                   Text(
                     'RESET PASSWORD',
                     style: GoogleFonts.lexend(
-                      fontSize: 14,
+                      fontSize: rs(context, 14),
                       color: primaryBlue,
                       letterSpacing: 8,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: rsh(context, 10)),
                   Text(
                     _codeSent ? 'Enter Code' : 'Forgot Password?',
                     style: GoogleFonts.poppins(
-                      fontSize: 34,
+                      fontSize: rs(context, 34),
                       color: primaryBlue,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: rsh(context, 12)),
                   Text(
                     _codeSent
                         ? 'Enter the code sent to ${_emailController.text.trim()} and choose a new password.'
                         : 'Enter your email and we will send you a reset code.',
                     style: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: rs(context, 14),
                       color: Colors.blueGrey.shade700,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: rsh(context, 28)),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(rs(context, 24)),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                       child: Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(rs(context, 24)),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(rs(context, 24)),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.4),
                             width: 1.5,
@@ -272,7 +273,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: List.generate(6, (index) {
                                   return SizedBox(
-                                    width: 44,
+                                    width: rs(context, 44),
                                     child: TextField(
                                       controller: _otpControllers[index],
                                       focusNode: _otpFocusNodes[index],
@@ -280,7 +281,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                       keyboardType: TextInputType.number,
                                       maxLength: 1,
                                       style: GoogleFonts.poppins(
-                                        fontSize: 22,
+                                        fontSize: rs(context, 22),
                                         fontWeight: FontWeight.bold,
                                         color: primaryBlue,
                                       ),
@@ -292,7 +293,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         filled: true,
                                         fillColor: Colors.white.withOpacity(0.6),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(rs(context, 12)),
                                           borderSide: BorderSide.none,
                                         ),
                                       ),
@@ -302,7 +303,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   );
                                 }),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: rsh(context, 20)),
                               _buildInput(
                                 'New Password',
                                 Icons.lock_outline_rounded,
@@ -313,7 +314,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   () => _obscurePassword = !_obscurePassword,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: rsh(context, 16)),
                               _buildInput(
                                 'Confirm Password',
                                 Icons.lock_outline_rounded,
@@ -324,19 +325,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   () => _obscureConfirm = !_obscureConfirm,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: rsh(context, 20)),
                               _buildActionButton(
                                 label: 'RESET PASSWORD',
                                 isLoading: _isResetting,
                                 onTap: _resetPassword,
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: rsh(context, 12)),
                               _secondsRemaining > 0
                                   ? Text(
                                       'Resend code in $_secondsRemaining s',
                                       style: GoogleFonts.poppins(
                                         color: Colors.grey,
-                                        fontSize: 13,
+                                        fontSize: rs(context, 13),
                                       ),
                                     )
                                   : TextButton(
@@ -363,7 +364,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: rsh(context, 30)),
                 ],
               ),
             ),
@@ -420,14 +421,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     required bool isLoading,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return Builder(builder: (context) => InkWell(
       onTap: isLoading ? null : onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(rs(context, 16)),
       child: Container(
         width: double.infinity,
-        height: 55,
+        height: rsh(context, 55),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(rs(context, 16)),
           color: primaryBlue,
         ),
         child: Center(
@@ -443,7 +444,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               : Text(
                   label,
                   style: GoogleFonts.lexend(
-                    fontSize: 14,
+                    fontSize: rs(context, 14),
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     letterSpacing: 1.5,
@@ -451,6 +452,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
         ),
       ),
-    );
+    ));
   }
 }

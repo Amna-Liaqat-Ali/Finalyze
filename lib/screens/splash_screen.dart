@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Finalyze/auth/screens/welcome_screen.dart';
+import 'package:Finalyze/core/app_sizes.dart';
 import 'package:Finalyze/core/user_session.dart'; // Imported to check session
 import 'package:Finalyze/screens/Main/MainScreen.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -108,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     Text(
                       "Finalyze",
                       style: GoogleFonts.poppins(
-                        fontSize: 50,
+                        fontSize: rs(context, 50),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 4,
@@ -121,11 +122,11 @@ class _SplashScreenState extends State<SplashScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: rsh(context, 5)),
                     Text(
                       "SMART GUIDE TO FRESH SEAFOOD",
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
+                        fontSize: rs(context, 14),
                         color: Colors.white.withOpacity(0.8),
                         letterSpacing: 2,
                         fontWeight: FontWeight.w300,

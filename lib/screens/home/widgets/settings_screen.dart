@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../auth/screens/services/auth_service.dart';
 import '../../../auth/screens/welcome_screen.dart';
+import '../../../core/app_sizes.dart';
 import '../../../core/user_session.dart';
 import '../../history/history_screen.dart';
 import '../../premium/premium_screen.dart';
@@ -61,13 +62,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+              padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 24), rs(context, 20), rsh(context, 40)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Premium banner
                   _buildPremiumCard(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: rsh(context, 24)),
 
                   _sectionLabel("ACCOUNT"),
                   _buildCard([
@@ -87,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () => _push(const SecurityScreen()),
                     ),
                   ]),
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
 
                   _sectionLabel("PREFERENCES"),
                   _buildCard([
@@ -109,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onChanged: (v) => setState(() => _notifications = v),
                     ),
                   ]),
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
 
                   _sectionLabel("HISTORY"),
                   _buildCard([
@@ -122,7 +123,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           HistoryScreen(userId: UserSession.userId ?? '')),
                     ),
                   ]),
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
 
                   _sectionLabel("DANGER ZONE"),
                   _buildCard([
@@ -134,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: _confirmDeleteAccount,
                     ),
                   ]),
-                  const SizedBox(height: 28),
+                  SizedBox(height: rsh(context, 28)),
 
                   _buildSignOut(),
                 ],
@@ -159,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ClipPath(
       clipper: _WaveClipper(),
       child: SizedBox(
-        height: 220 + topPad,
+        height: rsh(context, 220) + topPad,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -193,8 +194,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white, size: 20),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white, size: rs(context, 20)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -204,8 +205,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Stack(
                       children: [
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: rs(context, 80),
+                          height: rs(context, 80),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2.5),
@@ -221,8 +222,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? Image.file(_profileImage!, fit: BoxFit.cover)
                                 : Container(
                                     color: Colors.white.withOpacity(0.15),
-                                    child: const Icon(Icons.person_rounded,
-                                        color: Colors.white70, size: 42),
+                                    child: Icon(Icons.person_rounded,
+                                        color: Colors.white70, size: rs(context, 42)),
                                   ),
                           ),
                         ),
@@ -230,26 +231,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           bottom: 0,
                           right: 0,
                           child: Container(
-                            width: 24,
-                            height: 24,
+                            width: rs(context, 24),
+                            height: rs(context, 24),
                             decoration: BoxDecoration(
                               color: _teal,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
-                            child: const Icon(Icons.camera_alt_rounded,
-                                color: Colors.white, size: 12),
+                            child: Icon(Icons.camera_alt_rounded,
+                                color: Colors.white, size: rs(context, 12)),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: rsh(context, 10)),
                   Text(
                     displayName,
                     style: GoogleFonts.poppins(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: rs(context, 18),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -258,7 +259,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       UserSession.email!,
                       style: GoogleFonts.poppins(
                         color: Colors.white.withOpacity(0.68),
-                        fontSize: 12,
+                        fontSize: rs(context, 12),
                       ),
                     ),
                 ],
@@ -273,15 +274,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // ── Premium card ──────────────────────────────────────────────────────────
 
   Widget _buildPremiumCard() {
-    return GestureDetector(
+    return Builder(builder: (context) => GestureDetector(
       onTap: () => _push(const PremiumScreen(standalone: true)),
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(rs(context, 18)),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF0D2E5C), Color(0xFF0891B2), Color(0xFF2CB88E)],
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(rs(context, 20)),
           boxShadow: [
             BoxShadow(
               color: _ocean.withOpacity(0.30),
@@ -293,16 +294,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Row(
           children: [
             Container(
-              width: 46,
-              height: 46,
+              width: rs(context, 46),
+              height: rs(context, 46),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.workspace_premium_rounded,
-                  color: Colors.white, size: 24),
+              child: Icon(Icons.workspace_premium_rounded,
+                  color: Colors.white, size: rs(context, 24)),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: rs(context, 14)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,47 +312,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14)),
+                          fontSize: rs(context, 14))),
                   Text(_isPremium ? "You have unlimited access" : "Unlimited scans + full AI power",
                       style: GoogleFonts.poppins(
-                          color: Colors.white70, fontSize: 11)),
+                          color: Colors.white70, fontSize: rs(context, 11))),
                 ],
               ),
             ),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              padding: EdgeInsets.symmetric(horizontal: rs(context, 14), vertical: rsh(context, 7)),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(rs(context, 20)),
               ),
               child: Text(_isPremium ? "View" : "Upgrade",
                   style: GoogleFonts.poppins(
                       color: _blue,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12)),
+                      fontSize: rs(context, 12))),
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 
   // ── Shared helpers ────────────────────────────────────────────────────────
 
   Widget _sectionLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 4),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.only(bottom: rsh(context, 10), left: rs(context, 4)),
       child: Text(
         text,
         style: GoogleFonts.poppins(
-          fontSize: 11,
+          fontSize: rs(context, 11),
           fontWeight: FontWeight.w800,
           color: const Color(0xFF1A5694),
           letterSpacing: 1.4,
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildCard(List<Widget> children) {
@@ -373,23 +373,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     VoidCallback? onTap,
     Widget? trailing,
   }) {
-    return InkWell(
+    return Builder(builder: (context) => InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(rs(context, 18)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 14)),
         child: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: rs(context, 40),
+              height: rs(context, 40),
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(rs(context, 12)),
               ),
-              child: Icon(icon, color: iconColor, size: 20),
+              child: Icon(icon, color: iconColor, size: rs(context, 20)),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: rs(context, 14)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,11 +397,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(title,
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                          fontSize: rs(context, 14),
                           color: const Color(0xFF1A5694))),
                   Text(subtitle,
                       style: GoogleFonts.poppins(
-                          fontSize: 11,
+                          fontSize: rs(context, 11),
                           color: const Color(0xFF1A5694).withOpacity(0.45))),
                 ],
               ),
@@ -409,12 +409,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing ??
                 (onTap != null
                     ? Icon(Icons.arrow_forward_ios_rounded,
-                        size: 13, color: const Color(0xFF1A5694).withOpacity(0.3))
+                        size: rs(context, 13), color: const Color(0xFF1A5694).withOpacity(0.3))
                     : const SizedBox()),
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _switchTile({
@@ -425,20 +425,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 12)),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: rs(context, 40),
+            height: rs(context, 40),
             decoration: BoxDecoration(
               color: iconColor.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(rs(context, 12)),
             ),
-            child: Icon(icon, color: iconColor, size: 20),
+            child: Icon(icon, color: iconColor, size: rs(context, 20)),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: rs(context, 14)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,11 +446,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Text(title,
                     style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontSize: rs(context, 14),
                         color: const Color(0xFF1A5694))),
                 Text(subtitle,
                     style: GoogleFonts.poppins(
-                        fontSize: 11, color: const Color(0xFF1A5694).withOpacity(0.45))),
+                        fontSize: rs(context, 11), color: const Color(0xFF1A5694).withOpacity(0.45))),
               ],
             ),
           ),
@@ -462,7 +462,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _divider() => Divider(
@@ -581,10 +581,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: rsh(context, 16)),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(rs(context, 18)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -596,13 +596,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
-            const SizedBox(width: 10),
+            Icon(Icons.logout_rounded, color: Colors.redAccent, size: rs(context, 20)),
+            SizedBox(width: rs(context, 10)),
             Text("Sign Out",
                 style: GoogleFonts.poppins(
                     color: Colors.redAccent,
                     fontWeight: FontWeight.bold,
-                    fontSize: 15)),
+                    fontSize: rs(context, 15))),
           ],
         ),
       ),

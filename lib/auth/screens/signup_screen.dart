@@ -172,14 +172,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     SizedBox(height: rsh(context, 20)),
 
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(rs(context, 24)),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                         child: Container(
                           padding: EdgeInsets.all(rs(context, 20)),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(rs(context, 24)),
                             border: Border.all(
                               color: Colors.white.withOpacity(0.4),
                               width: 1.5,
@@ -209,13 +209,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                               // User Role Dropdown
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 4,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: rs(context, 20),
+                                  vertical: rsh(context, 4),
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.6),
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(rs(context, 16)),
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.4),
                                   ),
@@ -227,9 +227,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     dropdownColor: Colors.white.withOpacity(
                                       0.95,
                                     ),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: primaryBlue,
-                                      fontSize: 15,
+                                      fontSize: rs(context, 15),
                                       fontWeight: FontWeight.w500,
                                     ),
                                     icon: const Icon(
@@ -272,12 +272,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                               InkWell(
                                 onTap: _isLoading ? null : _handleRegister,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(rs(context, 16)),
                                 child: Container(
                                   width: double.infinity,
                                   height: rsh(context, 52),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(rs(context, 16)),
                                     color: primaryBlue,
                                     boxShadow: [
                                       BoxShadow(
@@ -300,7 +300,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         : Text(
                                             "Register",
                                             style: GoogleFonts.lexend(
-                                              fontSize: 14,
+                                              fontSize: rs(context, 14),
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
                                               letterSpacing: 2,
@@ -339,7 +339,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    SizedBox(height: rsh(context, 30)),
                   ],
                 ),
               ),
@@ -356,28 +356,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     TextEditingController controller, {
     bool isPassword = false,
   }) {
-    return Container(
+    return Builder(builder: (context) => Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(rs(context, 16)),
         border: Border.all(color: Colors.white.withOpacity(0.4)),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
-        style: const TextStyle(color: primaryBlue, fontSize: 15),
+        style: TextStyle(color: primaryBlue, fontSize: rs(context, 15)),
         decoration: InputDecoration(
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: rs(context, 20),
+            vertical: rsh(context, 18),
           ),
           hintText: hint,
           hintStyle: TextStyle(color: primaryBlue.withOpacity(0.4)),
-          prefixIcon: Icon(icon, color: primaryBlue.withOpacity(0.7), size: 20),
+          prefixIcon: Icon(icon, color: primaryBlue.withOpacity(0.7), size: rs(context, 20)),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildBackButton(VoidCallback onTap) {

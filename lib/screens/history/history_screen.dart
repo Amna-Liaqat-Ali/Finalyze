@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/app_sizes.dart';
 import '../../core/user_session.dart';
 import 'history_detail_screen.dart';
 import 'services/scan_service.dart';
@@ -234,14 +235,14 @@ class HistoryScreenState extends State<HistoryScreen> {
           icon: const Icon(Icons.close_rounded, color: Colors.white),
           onPressed: _exitSelectMode,
         ),
-        title: Text(
+        title: Builder(builder: (context) => Text(
           "${_selectedIds.length} selected",
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: rs(context, 16),
           ),
-        ),
+        )),
         actions: [
           if (_isDeleting)
             const Padding(
@@ -386,38 +387,38 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget _buildEmpty() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
+        padding: EdgeInsets.symmetric(horizontal: rs(context, 40)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(28),
+              padding: EdgeInsets.all(rs(context, 28)),
               decoration: BoxDecoration(
                 color: primaryBlue.withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.analytics_outlined,
-                size: 74,
+                size: rs(context, 74),
                 color: primaryBlue.withOpacity(0.4),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: rsh(context, 24)),
             Text(
               "No Scan Records Found",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 18,
+                fontSize: rs(context, 18),
                 fontWeight: FontWeight.bold,
                 color: primaryBlue,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: rsh(context, 10)),
             Text(
               "Scan a fish and the results will appear here.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 13,
+                fontSize: rs(context, 13),
                 color: Colors.grey.shade500,
                 height: 1.5,
               ),
@@ -432,7 +433,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget _buildGalleryView(List<ScanHistory> items) {
     return GridView.builder(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16)),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 12,
@@ -462,7 +463,7 @@ class HistoryScreenState extends State<HistoryScreen> {
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(rs(context, 15)),
           border: Border.all(
             color: selected ? primaryBlue : Colors.grey.shade100,
             width: selected ? 2 : 1,
@@ -487,8 +488,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                       top: 6,
                       right: 6,
                       child: Container(
-                        width: 22,
-                        height: 22,
+                        width: rs(context, 22),
+                        height: rs(context, 22),
                         decoration: BoxDecoration(
                           color: selected
                               ? primaryBlue
@@ -501,10 +502,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                           ),
                         ),
                         child: selected
-                            ? const Icon(
+                            ? Icon(
                                 Icons.check_rounded,
                                 color: Colors.white,
-                                size: 14,
+                                size: rs(context, 14),
                               )
                             : null,
                       ),
@@ -514,7 +515,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                       top: 8,
                       right: 8,
                       child: CircleAvatar(
-                        radius: 4,
+                        radius: rs(context, 4),
                         backgroundColor: _getStatusColor(item.status),
                       ),
                     ),
@@ -522,18 +523,18 @@ class HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(rs(context, 8)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     DateFormat('MMM d').format(item.dateTime),
-                    style: const TextStyle(fontSize: 8, color: Colors.grey),
+                    style: TextStyle(fontSize: rs(context, 8), color: Colors.grey),
                   ),
                   Text(
                     item.fishName,
-                    style: const TextStyle(
-                      fontSize: 10,
+                    style: TextStyle(
+                      fontSize: rs(context, 10),
                       fontWeight: FontWeight.bold,
                       color: primaryBlue,
                     ),
@@ -561,10 +562,10 @@ class HistoryScreenState extends State<HistoryScreen> {
           child: GestureDetector(
             onTap: () {},
             child: Container(
-              width: 310,
+              width: sw(context, 0.8),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(rs(context, 28)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -576,18 +577,18 @@ class HistoryScreenState extends State<HistoryScreen> {
                     child: _buildLazyImage(
                       item.id,
                       fit: BoxFit.cover,
-                      height: 190,
+                      height: rsh(context, 190),
                       width: double.infinity,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(rs(context, 24)),
                     child: Column(
                       children: [
                         Text(
                           "Finalyze Result",
                           style: GoogleFonts.poppins(
-                            fontSize: 22,
+                            fontSize: rs(context, 22),
                             fontWeight: FontWeight.bold,
                             color: primaryBlue,
                           ),
@@ -597,19 +598,20 @@ class HistoryScreenState extends State<HistoryScreen> {
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             color: _getStatusColor(item.status),
+                            fontSize: rs(context, 14),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: rsh(context, 16)),
                         _infoRow("Species", item.fishName),
                         _infoRow(
                           "Scanned",
                           DateFormat('MMM d • hh:mm a').format(item.dateTime),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: rsh(context, 20)),
                         // Full Report button
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: rsh(context, 50),
                           child: ElevatedButton(
                             child: Text(
                               "Full Report",
@@ -632,16 +634,16 @@ class HistoryScreenState extends State<HistoryScreen> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(rs(context, 12)),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: rsh(context, 10)),
                         // Close button
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: rsh(context, 50),
                           child: OutlinedButton(
                             onPressed: () =>
                                 setState(() => selectedItem = null),
@@ -649,7 +651,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                               foregroundColor: Colors.grey.shade600,
                               side: BorderSide(color: Colors.grey.shade200),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(rs(context, 12)),
                               ),
                             ),
                             child: Text(
@@ -674,16 +676,17 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   Widget _infoRow(String label, String val) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: EdgeInsets.symmetric(vertical: rsh(context, 4)),
       child: Row(
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(label, style: TextStyle(color: Colors.grey, fontSize: rs(context, 13))),
           const Spacer(),
           Text(
             val,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               color: primaryBlue,
+              fontSize: rs(context, 13),
             ),
           ),
         ],

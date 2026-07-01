@@ -127,13 +127,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       StatCard(label: "Avg. Score", value: _accuracy),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: rsh(context, 16)),
                   if (_scanLimit != null && !_scanLimit!.isPremium)
                     _buildScanLimitBanner(),
-                  const SizedBox(height: 16),
+                  SizedBox(height: rsh(context, 16)),
 
                   _buildScanButton(),
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
 
                   Row(
                     children: [
@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           () => _pickImage(ImageSource.gallery),
                         ),
                       ),
-                      const SizedBox(width: 15),
+                      SizedBox(width: rs(context, 15)),
                       Expanded(
                         child: _actionButton(Icons.history_rounded, "View History", () async {
                           await Navigator.push(
@@ -159,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: rsh(context, 30)),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         "Discover Species",
                         style: GoogleFonts.poppins(
-                          fontSize: 18,
+                          fontSize: rs(context, 18),
                           fontWeight: FontWeight.bold,
                           color: _primaryBlue,
                         ),
@@ -184,15 +184,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: GoogleFonts.poppins(
                             color: _teal,
                             fontWeight: FontWeight.w600,
-                            fontSize: 13,
+                            fontSize: rs(context, 13),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15),
+                  SizedBox(height: rsh(context, 15)),
                   const SpeciesSlider(),
-                  const SizedBox(height: 15),
+                  SizedBox(height: rsh(context, 15)),
                   YouTubeBlogSlider(),
                 ],
               ),
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 20, 58),
+                padding: EdgeInsets.fromLTRB(rs(context, 24), rsh(context, 20), rs(context, 20), rsh(context, 58)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -249,17 +249,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             ClipOval(
                               child: Image.asset(
                                 'assets/icon/app_icon.png',
-                                width: 22,
-                                height: 22,
+                                width: rs(context, 22),
+                                height: rs(context, 22),
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            SizedBox(width: rs(context, 6)),
                             Text(
                               'FINALYZE',
                               style: GoogleFonts.lexend(
                                 color: Colors.white.withOpacity(0.55),
-                                fontSize: 11,
+                                fontSize: rs(context, 11),
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 5,
                               ),
@@ -276,20 +276,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 1.15,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: rsh(context, 6)),
                         Text(
                           'Scan. Verify. Trust.',
                           style: GoogleFonts.poppins(
                             color: Colors.white.withOpacity(0.65),
-                            fontSize: 12,
+                            fontSize: rs(context, 12),
                             fontWeight: FontWeight.w300,
                             letterSpacing: 0.3,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: rsh(context, 8)),
                         Container(
-                          width: 44,
-                          height: 2.5,
+                          width: rs(context, 44),
+                          height: rs(context, 2.5),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -312,8 +312,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
                           child: Container(
-                            width: 48,
-                            height: 48,
+                            width: rs(context, 48),
+                            height: rs(context, 48),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.18),
                               shape: BoxShape.circle,
@@ -322,10 +322,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 1.3,
                               ),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.settings_outlined,
                               color: Colors.white,
-                              size: 21,
+                              size: rs(context, 21),
                             ),
                           ),
                         ),
@@ -347,11 +347,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final isFull = limit.isLimited;
     final color = isFull ? Colors.redAccent : (remaining <= 5 ? Colors.orange : _teal);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Builder(builder: (context) => Container(
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 12)),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(rs(context, 14)),
         border: Border.all(color: color.withOpacity(0.25)),
       ),
       child: Row(
@@ -359,16 +359,16 @@ class _HomeScreenState extends State<HomeScreen> {
           Icon(
             isFull ? Icons.lock_clock_rounded : Icons.query_stats_rounded,
             color: color,
-            size: 20,
+            size: rs(context, 20),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: rs(context, 12)),
           Expanded(
             child: isFull && limit.resetAt != null
                 ? _ScanResetCountdown(resetAt: limit.resetAt!, color: color, onExpired: _loadScanLimit)
                 : Text(
                     "$remaining / ${limit.max} scans remaining today",
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: rs(context, 12),
                       fontWeight: FontWeight.w600,
                       color: color,
                     ),
@@ -376,15 +376,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (!isFull)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: rs(context, 10), vertical: rsh(context, 4)),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(rs(context, 20)),
               ),
               child: Text(
                 "${(remaining / limit.max * 100).toInt()}%",
                 style: GoogleFonts.poppins(
-                  fontSize: 11,
+                  fontSize: rs(context, 11),
                   fontWeight: FontWeight.bold,
                   color: color,
                 ),
@@ -392,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildScanButton() {
@@ -402,7 +402,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: double.infinity,
         height: rsh(context, 110),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(rs(context, 24)),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF1565C0).withOpacity(0.28),
@@ -412,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(rs(context, 24)),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -450,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Content row
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: rs(context, 24)),
                 child: Row(
                   children: [
                     // Camera icon in frosted circle
@@ -458,8 +458,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
-                          width: 64,
-                          height: 64,
+                          width: rs(context, 64),
+                          height: rs(context, 64),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.18),
                             shape: BoxShape.circle,
@@ -468,15 +468,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 1.5,
                             ),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.camera_alt_rounded,
                             color: Colors.white,
-                            size: 30,
+                            size: rs(context, 30),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    SizedBox(width: rs(context, 20)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 1.2,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: rsh(context, 4)),
                           Text(
                             'AI-powered freshness analysis',
                             style: GoogleFonts.poppins(
@@ -505,17 +505,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     // Arrow indicator
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: rs(context, 36),
+                      height: rs(context, 36),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white.withOpacity(0.3)),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_forward_ios_rounded,
                         color: Colors.white,
-                        size: 14,
+                        size: rs(context, 14),
                       ),
                     ),
                   ],
@@ -540,32 +540,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _actionButton(IconData icon, String label, VoidCallback onTap) {
-    return InkWell(
+    return Builder(builder: (context) => InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(rs(context, 15)),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15),
+        padding: EdgeInsets.symmetric(vertical: rsh(context, 15)),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.blue.shade100),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(rs(context, 15)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.teal, size: 20),
-            const SizedBox(width: 8),
+            Icon(icon, color: Colors.teal, size: rs(context, 20)),
+            SizedBox(width: rs(context, 8)),
             Text(
               label,
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
-                fontSize: 13,
+                fontSize: rs(context, 13),
                 color: const Color(0xFF1A5694),
               ),
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import '../home/widgets/settings_screen.dart';
 import '../result/photo_edit_screen.dart';
 
@@ -97,7 +98,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
           if (widget.onScanCompleted != null) {
             widget.onScanCompleted!();
           }
-          // Reinitialize camera when returning 
+          // Reinitialize camera when returning
           if (mounted && widget.cameras.isNotEmpty) {
             _initCamera(widget.cameras.first);
           }
@@ -166,8 +167,8 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
             _corner(bottom: 0, right: 0, rot: 3.14, color: tealFrameColor),
             Center(
               child: Container(
-                width: 12,
-                height: 12,
+                width: rs(context, 12),
+                height: rs(context, 12),
                 decoration: BoxDecoration(
                   color: tealFrameColor.withOpacity(0.8),
                   shape: BoxShape.circle,
@@ -189,7 +190,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
   Widget _buildBottomControls() {
     return Positioned(
-      bottom: 40,
+      bottom: rsh(context, 40),
       left: 0,
       right: 0,
       child: Column(
@@ -204,20 +205,20 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                   isActive: _isFlashOn,
                 ),
               ),
-              const SizedBox(width: 20),
+              SizedBox(width: rs(context, 20)),
               _statusChip("READY"),
-              const SizedBox(width: 20),
+              SizedBox(width: rs(context, 20)),
               _controlIcon(Icons.hd),
             ],
           ),
-          const SizedBox(height: 30),
+          SizedBox(height: rsh(context, 30)),
           GestureDetector(
             onTap: _takePicture,
             behavior: HitTestBehavior.opaque,
             child: Container(
-              height: 80,
-              width: 80,
-              padding: const EdgeInsets.all(4),
+              height: rs(context, 80),
+              width: rs(context, 80),
+              padding: EdgeInsets.all(rs(context, 4)),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 3),
@@ -227,10 +228,10 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                   color: Color(0xFF006D77),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.qr_code_scanner_rounded,
                   color: Colors.white,
-                  size: 32,
+                  size: rs(context, 32),
                 ),
               ),
             ),
@@ -256,13 +257,13 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       automaticallyImplyLeading: false,
       actions: [
         IconButton(
-          icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 22),
+          icon: Icon(Icons.settings_outlined, color: Colors.white, size: rs(context, 22)),
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const SettingsScreen()),
           ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: rs(context, 4)),
       ],
     );
   }
@@ -283,8 +284,8 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       child: Transform.rotate(
         angle: rot,
         child: Container(
-          width: 35,
-          height: 35,
+          width: rs(context, 35),
+          height: rs(context, 35),
           decoration: BoxDecoration(
             border: Border(
               top: BorderSide(color: color, width: 4),
@@ -297,32 +298,32 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   }
 
   Widget _controlIcon(IconData icon, {bool isActive = false}) => Container(
-    padding: const EdgeInsets.all(10),
+    padding: EdgeInsets.all(rs(context, 10)),
     decoration: BoxDecoration(
       color: isActive ? Colors.white.withOpacity(0.3) : Colors.black26,
       shape: BoxShape.circle,
       border: Border.all(color: Colors.white24),
     ),
-    child: Icon(icon, color: Colors.white, size: 20),
+    child: Icon(icon, color: Colors.white, size: rs(context, 20)),
   );
 
   Widget _statusChip(String text) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 8)),
     decoration: BoxDecoration(
       color: Colors.black26,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(rs(context, 20)),
       border: Border.all(color: Colors.white24),
     ),
     child: Row(
       children: [
-        const CircleAvatar(backgroundColor: Color(0xFF4EE3AA), radius: 4),
-        const SizedBox(width: 8),
+        CircleAvatar(backgroundColor: const Color(0xFF4EE3AA), radius: rs(context, 4)),
+        SizedBox(width: rs(context, 8)),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 12,
+            fontSize: rs(context, 12),
           ),
         ),
       ],

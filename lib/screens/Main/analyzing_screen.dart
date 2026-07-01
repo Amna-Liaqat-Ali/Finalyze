@@ -205,20 +205,20 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
       ),
       child: Row(
         children: [
-          const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
+          SizedBox(
+            width: rs(context, 18),
+            height: rs(context, 18),
+            child: const CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2CB88E)),
             ),
           ),
-          const SizedBox(width: 15),
+          SizedBox(width: rs(context, 15)),
           Expanded(
             child: Text(
               _progressSteps[_stepIndex],
               style: GoogleFonts.poppins(
-                fontSize: 14,
+                fontSize: rs(context, 14),
                 color: primary.withOpacity(0.7),
                 fontWeight: FontWeight.w500,
               ),
@@ -227,7 +227,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
           Text(
             "${(progress * 100).toInt()}%",
             style: GoogleFonts.poppins(
-              fontSize: 12,
+              fontSize: rs(context, 12),
               fontWeight: FontWeight.bold,
               color: accent,
             ),

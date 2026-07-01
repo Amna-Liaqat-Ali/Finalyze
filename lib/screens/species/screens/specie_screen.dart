@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/app_sizes.dart';
 import '../models/fish_specie.dart';
 import '../screens/specie_detail_screen.dart';
 import '../../species/widgets/species_slider.dart';
@@ -45,22 +46,22 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: rs(context, 20)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            _buildSearchBar(),
+            _buildSearchBar(context),
 
-            _buildCategoryFilters(primaryBlue),
+            _buildCategoryFilters(context, primaryBlue),
 
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                padding: EdgeInsets.symmetric(
+                  horizontal: rs(context, 20),
+                  vertical: rsh(context, 10),
                 ),
                 itemCount: speciesList.length,
                 physics: const BouncingScrollPhysics(),
@@ -88,9 +89,9 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 20), rs(context, 20), rsh(context, 10)),
       child: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -106,11 +107,11 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
           onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
           decoration: InputDecoration(
             hintText: "Search species or region...",
-            hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
-            prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 22),
+            hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: rs(context, 14)),
+            prefixIcon: Icon(Icons.search, color: Colors.grey, size: rs(context, 22)),
             suffixIcon: _searchQuery.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.grey, size: 20),
+                    icon: Icon(Icons.close_rounded, color: Colors.grey, size: rs(context, 20)),
                     onPressed: () {
                       _searchController.clear();
                       setState(() => _searchQuery = "");
@@ -119,9 +120,9 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                 : null,
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(vertical: 15),
+            contentPadding: EdgeInsets.symmetric(vertical: rsh(context, 15)),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(rs(context, 15)),
               borderSide: BorderSide.none,
             ),
           ),
@@ -130,13 +131,13 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
     );
   }
 
-  Widget _buildCategoryFilters(Color primary) {
+  Widget _buildCategoryFilters(BuildContext context, Color primary) {
     return Container(
-      height: 65,
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      height: rsh(context, 65),
+      padding: EdgeInsets.symmetric(vertical: rsh(context, 10)),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: rs(context, 20)),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           bool isSelected = selectedCategory == categories[index];
@@ -144,11 +145,11 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
             onTap: () => setState(() => selectedCategory = categories[index]),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+              margin: EdgeInsets.only(right: rs(context, 12)),
+              padding: EdgeInsets.symmetric(horizontal: rs(context, 30)),
               decoration: BoxDecoration(
                 color: isSelected ? primary : Colors.white,
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(rs(context, 25)),
                 border: Border.all(
                   color: isSelected ? primary : Colors.grey.shade200,
                 ),
@@ -159,7 +160,7 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                   style: GoogleFonts.poppins(
                     color: isSelected ? Colors.white : Colors.grey.shade600,
                     fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                    fontSize: rs(context, 13),
                   ),
                 ),
               ),
@@ -181,10 +182,10 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 25),
+        margin: EdgeInsets.only(bottom: rsh(context, 25)),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(rs(context, 20)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -199,27 +200,27 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(rs(context, 20)),
                   ),
                   child: fish.imagePath.startsWith('assets/')
-                      ? Image.asset(fish.imagePath, height: 200, width: double.infinity, fit: BoxFit.cover)
+                      ? Image.asset(fish.imagePath, height: rsh(context, 200), width: double.infinity, fit: BoxFit.cover)
                       : Image.network(
                           fish.imagePath,
-                          height: 200,
+                          height: rsh(context, 200),
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            height: 200,
+                            height: rsh(context, 200),
                             color: const Color(0xFF0D2E5C),
-                            child: const Icon(Icons.set_meal_rounded, color: Colors.white38, size: 60),
+                            child: Icon(Icons.set_meal_rounded, color: Colors.white38, size: rs(context, 60)),
                           ),
                         ),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(rs(context, 16)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -227,12 +228,12 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                     fish.category.toUpperCase(),
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF1A5694),
-                      fontSize: 10,
+                      fontSize: rs(context, 10),
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: rsh(context, 4)),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
@@ -240,30 +241,30 @@ class _DiscoverSpeciesScreenState extends State<DiscoverSpeciesScreen> {
                       Text(
                         fish.name,
                         style: GoogleFonts.poppins(
-                          fontSize: 18,
+                          fontSize: rs(context, 18),
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF1A5694),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: rs(context, 8)),
                       Text(
                         fish.urduName,
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
+                          fontSize: rs(context, 14),
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF1A5694).withOpacity(0.55),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: rsh(context, 2)),
                   Text(
                     fish.tip,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
                       color: Colors.blueGrey,
-                      fontSize: 12,
+                      fontSize: rs(context, 12),
                     ),
                   ),
                 ],

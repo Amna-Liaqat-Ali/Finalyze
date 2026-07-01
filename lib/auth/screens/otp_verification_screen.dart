@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/app_sizes.dart';
 import '../../widgets/app_back_button.dart';
 import '../../widgets/app_toast.dart';
 import 'services/auth_service.dart';
@@ -176,50 +177,50 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           ),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: rs(context, 24)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  SizedBox(height: rsh(context, 20)),
                   AppBackButton(isGlass: true, onTap: () => Navigator.pop(context)),
-                  const SizedBox(height: 24),
+                  SizedBox(height: rsh(context, 24)),
                   Text(
                     'VERIFY EMAIL',
                     style: GoogleFonts.lexend(
-                      fontSize: 14,
+                      fontSize: rs(context, 14),
                       color: primaryBlue,
                       letterSpacing: 8,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: rsh(context, 10)),
                   Text(
                     'Enter OTP',
                     style: GoogleFonts.poppins(
-                      fontSize: 38,
+                      fontSize: rs(context, 38),
                       color: primaryBlue,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: rsh(context, 12)),
                   Text(
                     'We sent a 6-digit code to\n${widget.email}',
                     style: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: rs(context, 14),
                       color: Colors.blueGrey.shade700,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: rsh(context, 32)),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(rs(context, 24)),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                       child: Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(rs(context, 24)),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(rs(context, 24)),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.4),
                             width: 1.5,
@@ -231,7 +232,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: List.generate(6, (index) {
                                 return SizedBox(
-                                  width: 44,
+                                  width: rs(context, 44),
                                   child: TextField(
                                     controller: _controllers[index],
                                     focusNode: _focusNodes[index],
@@ -239,7 +240,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                     keyboardType: TextInputType.number,
                                     maxLength: 1,
                                     style: GoogleFonts.poppins(
-                                      fontSize: 22,
+                                      fontSize: rs(context, 22),
                                       fontWeight: FontWeight.bold,
                                       color: primaryBlue,
                                     ),
@@ -251,11 +252,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                       filled: true,
                                       fillColor: Colors.white.withOpacity(0.65),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(rs(context, 12)),
                                         borderSide: BorderSide.none,
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(rs(context, 12)),
                                         borderSide: const BorderSide(
                                             color: Color(0xFF1A5694), width: 2),
                                       ),
@@ -266,15 +267,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 );
                               }),
                             ),
-                            const SizedBox(height: 24),
+                            SizedBox(height: rsh(context, 24)),
                             InkWell(
                               onTap: _isVerifying ? null : _verifyOtp,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(rs(context, 16)),
                               child: Container(
                                 width: double.infinity,
-                                height: 55,
+                                height: rsh(context, 55),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(rs(context, 16)),
                                   color: primaryBlue,
                                 ),
                                 child: Center(
@@ -290,7 +291,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                       : Text(
                                           'VERIFY',
                                           style: GoogleFonts.lexend(
-                                            fontSize: 14,
+                                            fontSize: rs(context, 14),
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
                                             letterSpacing: 2,
@@ -299,13 +300,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: rsh(context, 16)),
                             _secondsRemaining > 0
                                 ? Text(
                                     'Resend code in $_secondsRemaining s',
                                     style: GoogleFonts.poppins(
                                       color: Colors.grey,
-                                      fontSize: 13,
+                                      fontSize: rs(context, 13),
                                     ),
                                   )
                                 : TextButton(

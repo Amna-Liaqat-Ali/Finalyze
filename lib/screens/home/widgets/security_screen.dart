@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/app_sizes.dart';
+
 import '../../../widgets/app_toast.dart';
 
 class SecurityScreen extends StatefulWidget {
@@ -95,7 +97,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
       appBar: _gradientBar(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+        padding: EdgeInsets.fromLTRB(rs(context, 20), rsh(context, 24), rs(context, 20), rsh(context, 40)),
         child: Form(
           key: _formKey,
           child: Column(
@@ -138,9 +140,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   },
                 ),
               ]),
-              const SizedBox(height: 8),
+              SizedBox(height: rsh(context, 8)),
               _buildPasswordTip(),
-              const SizedBox(height: 20),
+              SizedBox(height: rsh(context, 20)),
               _buildChangePwButton(),
             ],
           ),
@@ -157,65 +159,65 @@ class _SecurityScreenState extends State<SecurityScreen> {
     String? Function(String?)? validator,
     ValueChanged<String>? onChanged,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 14)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
               style: GoogleFonts.poppins(
-                  fontSize: 11,
+                  fontSize: rs(context, 11),
                   fontWeight: FontWeight.w700,
                   color: Colors.blueGrey.shade400,
                   letterSpacing: 0.5)),
-          const SizedBox(height: 8),
+          SizedBox(height: rsh(context, 8)),
           TextFormField(
             controller: controller,
             obscureText: !show,
             validator: validator,
             onChanged: onChanged,
             style: GoogleFonts.poppins(
-                fontSize: 14,
+                fontSize: rs(context, 14),
                 fontWeight: FontWeight.w500,
                 color: const Color(0xFF1A5694)),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.lock_rounded, color: _blue, size: 20),
+              prefixIcon: Icon(Icons.lock_rounded, color: _blue, size: rs(context, 20)),
               suffixIcon: IconButton(
                 icon: Icon(
                   show ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                   color: Colors.blueGrey.shade300,
-                  size: 20,
+                  size: rs(context, 20),
                 ),
                 onPressed: onToggle,
               ),
               hintText: "••••••••",
               hintStyle:
-                  GoogleFonts.poppins(color: Colors.blueGrey.shade200, fontSize: 13),
+                  GoogleFonts.poppins(color: Colors.blueGrey.shade200, fontSize: rs(context, 13)),
               filled: true,
               fillColor: const Color(0xFFF4F7FB),
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  EdgeInsets.symmetric(vertical: rsh(context, 14), horizontal: rs(context, 16)),
               border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(rs(context, 12)),
                   borderSide: BorderSide.none),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(rs(context, 12)),
                   borderSide: BorderSide(color: _blue.withOpacity(0.4), width: 1.5)),
               errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(rs(context, 12)),
                   borderSide:
                       const BorderSide(color: Colors.redAccent, width: 1.2)),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildStrengthBar(int strength) {
     final color = _strengthColor(strength);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.fromLTRB(rs(context, 16), 0, rs(context, 16), rsh(context, 12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -223,63 +225,63 @@ class _SecurityScreenState extends State<SecurityScreen> {
             children: List.generate(4, (i) {
               return Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(right: i < 3 ? 4 : 0),
-                  height: 4,
+                  margin: EdgeInsets.only(right: i < 3 ? rs(context, 4) : 0),
+                  height: rs(context, 4),
                   decoration: BoxDecoration(
                     color: i < strength ? color : Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(rs(context, 2)),
                   ),
                 ),
               );
             }),
           ),
           if (strength > 0) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: rsh(context, 4)),
             Text(_strengthLabel(strength),
                 style: GoogleFonts.poppins(
-                    fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+                    fontSize: rs(context, 11), color: color, fontWeight: FontWeight.w600)),
           ],
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildPasswordTip() {
-    return Container(
-      padding: const EdgeInsets.all(12),
+    return Builder(builder: (context) => Container(
+      padding: EdgeInsets.all(rs(context, 12)),
       decoration: BoxDecoration(
         color: _blue.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(rs(context, 12)),
         border: Border.all(color: _blue.withOpacity(0.08)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.lightbulb_rounded, color: _blue.withOpacity(0.6), size: 16),
-          const SizedBox(width: 8),
+          Icon(Icons.lightbulb_rounded, color: _blue.withOpacity(0.6), size: rs(context, 16)),
+          SizedBox(width: rs(context, 8)),
           Expanded(
             child: Text(
               "Use 8+ characters with uppercase letters, numbers and symbols (!@#\$) for a strong password.",
               style: GoogleFonts.poppins(
-                  fontSize: 11, color: _blue.withOpacity(0.7), height: 1.5),
+                  fontSize: rs(context, 11), color: _blue.withOpacity(0.7), height: 1.5),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildChangePwButton() {
-    return GestureDetector(
+    return Builder(builder: (context) => GestureDetector(
       onTap: _isSaving ? null : _changePassword,
       child: Container(
         width: double.infinity,
-        height: 52,
+        height: rsh(context, 52),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
           ),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(rs(context, 15)),
           boxShadow: [
             BoxShadow(
                 color: _teal.withOpacity(0.28),
@@ -289,27 +291,27 @@ class _SecurityScreenState extends State<SecurityScreen> {
         ),
         child: Center(
           child: _isSaving
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
+              ? SizedBox(
+                  width: rs(context, 20),
+                  height: rs(context, 20),
+                  child: const CircularProgressIndicator(
                       color: Colors.white, strokeWidth: 2.5))
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.lock_reset_rounded,
-                        color: Colors.white, size: 18),
-                    const SizedBox(width: 8),
+                    Icon(Icons.lock_reset_rounded,
+                        color: Colors.white, size: rs(context, 18)),
+                    SizedBox(width: rs(context, 8)),
                     Text("Update Password",
                         style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14)),
+                            fontSize: rs(context, 14))),
                   ],
                 ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildCard(List<Widget> children) {
@@ -345,24 +347,24 @@ class _SecurityScreenState extends State<SecurityScreen> {
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+        icon: Builder(builder: (context) => Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: rs(context, 20))),
         onPressed: () => Navigator.pop(context),
       ),
     );
   }
 
   Widget _sectionLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 4),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.only(bottom: rsh(context, 10), left: rs(context, 4)),
       child: Text(
         text,
         style: GoogleFonts.poppins(
-          fontSize: 11,
+          fontSize: rs(context, 11),
           fontWeight: FontWeight.w800,
           color: _blue.withOpacity(0.5),
           letterSpacing: 1.4,
         ),
       ),
-    );
+    ));
   }
 }

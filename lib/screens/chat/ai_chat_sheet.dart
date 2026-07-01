@@ -6,6 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
+import '../../core/app_sizes.dart';
+
 const _kSystemPrompt = '''
 You are Finalyze Assistant — an expert on:
 1. Fish freshness detection: how to identify fresh, moderate, or spoiled fish by smell, colour, eyes, gills, texture, and AI confidence scores.
@@ -143,7 +145,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
       curve: Curves.easeOut,
       padding: EdgeInsets.only(bottom: keyboardHeight),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.82,
+        height: sh(context, 0.82),
         decoration: const BoxDecoration(
           color: Color(0xFFF8FAFC),
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -163,13 +165,13 @@ class _AiChatSheetState extends State<AiChatSheet> {
 
   Widget _buildHandle() {
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
+      padding: EdgeInsets.only(top: rsh(context, 12)),
       child: Container(
-        width: 40,
-        height: 4,
+        width: rs(context, 40),
+        height: rsh(context, 4),
         decoration: BoxDecoration(
           color: Colors.blueGrey.shade200,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(rs(context, 4)),
         ),
       ),
     );
@@ -177,29 +179,29 @@ class _AiChatSheetState extends State<AiChatSheet> {
 
   Widget _buildHeader() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: EdgeInsets.fromLTRB(rs(context, 16), rsh(context, 12), rs(context, 16), 0),
+      padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 12)),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF0D2E5C), _blue, _ocean],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(rs(context, 18)),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: rs(context, 40),
+            height: rs(context, 40),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.set_meal_rounded,
-                color: Colors.white, size: 22),
+            child: Icon(Icons.set_meal_rounded,
+                color: Colors.white, size: rs(context, 22)),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: rs(context, 12)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,25 +210,25 @@ class _AiChatSheetState extends State<AiChatSheet> {
                     style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14)),
+                        fontSize: rs(context, 14))),
                 Text("Fish · Freshness · Recipes",
                     style: GoogleFonts.poppins(
-                        color: Colors.white60, fontSize: 11)),
+                        color: Colors.white60, fontSize: rs(context, 11))),
               ],
             ),
           ),
           Container(
-            width: 8,
-            height: 8,
+            width: rs(context, 8),
+            height: rs(context, 8),
             decoration: const BoxDecoration(
               color: _teal,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: rs(context, 6)),
           Text("Online",
               style:
-                  GoogleFonts.poppins(color: _teal, fontSize: 11)),
+                  GoogleFonts.poppins(color: _teal, fontSize: rs(context, 11))),
         ],
       ),
     );
@@ -236,7 +238,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
     return ListView.builder(
       controller: _scrollCtrl,
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: EdgeInsets.fromLTRB(rs(context, 16), rsh(context, 12), rs(context, 16), rsh(context, 8)),
       itemCount: _messages.length,
       itemBuilder: (_, i) => _buildBubble(_messages[i]),
     );
@@ -245,7 +247,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
   Widget _buildBubble(_Msg msg) {
     final isUser = msg.isUser;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: rsh(context, 12)),
       child: Row(
         mainAxisAlignment:
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -253,23 +255,23 @@ class _AiChatSheetState extends State<AiChatSheet> {
         children: [
           if (!isUser) ...[
             Container(
-              width: 30,
-              height: 30,
+              width: rs(context, 30),
+              height: rs(context, 30),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [_blue, _ocean],
                 ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.set_meal_rounded,
-                  color: Colors.white, size: 16),
+              child: Icon(Icons.set_meal_rounded,
+                  color: Colors.white, size: rs(context, 16)),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: rs(context, 8)),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(
+                  horizontal: rs(context, 14), vertical: rsh(context, 10)),
               decoration: BoxDecoration(
                 color: isUser
                     ? _blue
@@ -277,10 +279,10 @@ class _AiChatSheetState extends State<AiChatSheet> {
                         ? Colors.red.shade50
                         : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isUser ? 18 : 4),
-                  bottomRight: Radius.circular(isUser ? 4 : 18),
+                  topLeft: Radius.circular(rs(context, 18)),
+                  topRight: Radius.circular(rs(context, 18)),
+                  bottomLeft: Radius.circular(isUser ? rs(context, 18) : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : rs(context, 18)),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -296,7 +298,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
               child: Text(
                 msg.text,
                 style: GoogleFonts.poppins(
-                  fontSize: 13,
+                  fontSize: rs(context, 13),
                   color: isUser
                       ? Colors.white
                       : msg.isError
@@ -307,7 +309,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
               ),
             ),
           ),
-          if (isUser) const SizedBox(width: 8),
+          if (isUser) SizedBox(width: rs(context, 8)),
         ],
       ),
     );
@@ -315,25 +317,25 @@ class _AiChatSheetState extends State<AiChatSheet> {
 
   Widget _buildTypingIndicator() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 16, 4),
+      padding: EdgeInsets.fromLTRB(rs(context, 24), 0, rs(context, 16), rsh(context, 4)),
       child: Row(
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: rs(context, 30),
+            height: rs(context, 30),
             decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [_blue, _ocean]),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.set_meal_rounded,
-                color: Colors.white, size: 16),
+            child: Icon(Icons.set_meal_rounded,
+                color: Colors.white, size: rs(context, 16)),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: rs(context, 10)),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: rs(context, 14), vertical: rsh(context, 10)),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(rs(context, 18)),
               boxShadow: [
                 BoxShadow(
                     color: Colors.black.withOpacity(0.05), blurRadius: 8),
@@ -354,8 +356,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
 
   Widget _buildInputBar() {
     return Container(
-      padding: EdgeInsets.fromLTRB(
-          16, 10, 16, 10),
+      padding: EdgeInsets.fromLTRB(rs(context, 16), rsh(context, 10), rs(context, 16), rsh(context, 10)),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -371,32 +372,32 @@ class _AiChatSheetState extends State<AiChatSheet> {
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFF0F4F8),
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(rs(context, 24)),
               ),
               child: TextField(
                 controller: _ctrl,
                 onSubmitted: (_) => _send(),
                 textCapitalization: TextCapitalization.sentences,
-                style: GoogleFonts.poppins(fontSize: 13),
+                style: GoogleFonts.poppins(fontSize: rs(context, 13)),
                 decoration: InputDecoration(
                   hintText: "Ask about fish, freshness, recipes...",
                   hintStyle: GoogleFonts.poppins(
-                      color: Colors.blueGrey.shade300, fontSize: 12),
+                      color: Colors.blueGrey.shade300, fontSize: rs(context, 12)),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: rs(context, 18), vertical: rsh(context, 12)),
                 ),
                 maxLines: 4,
                 minLines: 1,
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: rs(context, 10)),
           GestureDetector(
             onTap: _send,
             child: Container(
-              width: 46,
-              height: 46,
+              width: rs(context, 46),
+              height: rs(context, 46),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [_blue, _ocean, _teal],
@@ -406,13 +407,13 @@ class _AiChatSheetState extends State<AiChatSheet> {
                 shape: BoxShape.circle,
               ),
               child: _loading
-                  ? const Padding(
-                      padding: EdgeInsets.all(13),
-                      child: CircularProgressIndicator(
+                  ? Padding(
+                      padding: EdgeInsets.all(rs(context, 13)),
+                      child: const CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2),
                     )
-                  : const Icon(Icons.send_rounded,
-                      color: Colors.white, size: 20),
+                  : Icon(Icons.send_rounded,
+                      color: Colors.white, size: rs(context, 20)),
             ),
           ),
         ],
@@ -465,9 +466,9 @@ class _BouncingDotState extends State<_BouncingDot>
     return AnimatedBuilder(
       animation: _anim,
       builder: (_, __) => Container(
-        width: 7,
-        height: 7,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        width: rs(context, 7),
+        height: rs(context, 7),
+        margin: EdgeInsets.symmetric(horizontal: rs(context, 2)),
         decoration: BoxDecoration(
           color: Color.lerp(Colors.blueGrey.shade200,
               const Color(0xFF0891B2), _anim.value),
