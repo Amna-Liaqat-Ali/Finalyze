@@ -70,6 +70,13 @@ class AuthService {
     );
   }
 
+  static Future<http.Response> deleteAccount(String userId) async {
+    return http.delete(
+      Uri.parse(ApiConfig.deleteAccount(userId)),
+      headers: {'Content-Type': 'application/json'},
+    );
+  }
+
   static Future<http.Response> resetPassword({
     required String email,
     required String otp,

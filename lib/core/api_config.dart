@@ -10,6 +10,7 @@ class ApiConfig {
   static String get saveScan => '$baseUrl/scan/save-scan';
   static String scanDetail(String scanId) => '$baseUrl/scan/detail/$scanId';
   static String userProfile(String userId) => '$baseUrl/auth/profile/$userId';
+  static String deleteAccount(String userId) => '$baseUrl/auth/delete/$userId';
   static String scanLimit(String userId) => '$baseUrl/scan/limit/$userId';
   static String scanLimitIncrement(String userId) => '$baseUrl/scan/limit/increment/$userId';
 }

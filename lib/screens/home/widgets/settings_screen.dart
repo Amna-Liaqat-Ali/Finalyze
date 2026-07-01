@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../auth/screens/services/auth_service.dart';
 import '../../../auth/screens/welcome_screen.dart';
 import '../../../core/user_session.dart';
 import '../../history/history_screen.dart';
@@ -119,6 +120,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       subtitle: "View all your past scans",
                       onTap: () => _push(
                           HistoryScreen(userId: UserSession.userId ?? '')),
+                    ),
+                  ]),
+                  const SizedBox(height: 20),
+
+                  _sectionLabel("DANGER ZONE"),
+                  _buildCard([
+                    _tile(
+                      icon: Icons.delete_forever_rounded,
+                      iconColor: Colors.redAccent,
+                      title: "Delete Account",
+                      subtitle: "Permanently remove your account and data",
+                      onTap: _confirmDeleteAccount,
                     ),
                   ]),
                   const SizedBox(height: 28),
@@ -457,6 +470,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
       indent: 70,
       endIndent: 16,
       color: Colors.blue.shade50);
+
+  Future<void> _confirmDeleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text("Delete Account",
+            style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold, color: Colors.redAccent)),
+        content: Text(
+          "This will permanently delete your account and all scan history. This action cannot be undone.",
+          style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text("Cancel", style: GoogleFonts.poppins(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text("Delete",
+                style: GoogleFonts.poppins(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final uid = UserSession.userId ?? '';
+    try {
+      final response = await AuthService.deleteAccount(uid);
+      if (response.statusCode == 200) {
+        await UserSession.clear();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthWrapper()),
+          (route) => false,
+        );
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to delete account. Try again.")),
+          );
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Connection error. Try again.")),
+        );
+      }
+    }
+  }
 
   Widget _buildSignOut() {
     return GestureDetector(

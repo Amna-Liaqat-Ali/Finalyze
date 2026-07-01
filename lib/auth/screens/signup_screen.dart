@@ -51,6 +51,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       AppToast.warning(context, "Please fill in all required fields");
       return;
     }
+    final emailRegex = RegExp(r'^[\w\.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$');
+    if (!emailRegex.hasMatch(email)) {
+      AppToast.warning(context, "Please enter a valid email address");
+      return;
+    }
     if (password.length < 6) {
       AppToast.warning(context, "Password must be at least 6 characters long");
       return;

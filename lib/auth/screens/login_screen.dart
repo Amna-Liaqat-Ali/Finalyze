@@ -4,12 +4,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/app_sizes.dart';
 import '../../auth/screens/forgot_password_screen.dart';
 import '../../auth/screens/otp_verification_screen.dart';
 import '../../auth/screens/services/auth_service.dart';
 import '../../core/user_session.dart';
 import '../../screens/Main/MainScreen.dart';
+import '../../screens/onboarding/onboarding_screen.dart';
 import '../../widgets/app_back_button.dart';
 import '../../widgets/app_toast.dart';
 
@@ -43,6 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       AppToast.warning(context, "Please enter both email and password");
+      return;
+    }
+    final emailRegex = RegExp(r'^[\w\.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$');
+    if (!emailRegex.hasMatch(email)) {
+      AppToast.warning(context, "Please enter a valid email address");
       return;
     }
 
@@ -295,11 +303,25 @@ class _LoginScreenState extends State<LoginScreen> {
         if (_showSuccess)
           Positioned.fill(
             child: LoginSuccessOverlay(
-              onComplete: () {
+              onComplete: () async {
+                if (!mounted) return;
+                final uid = UserSession.userId ?? '';
+                final prefs = await SharedPreferences.getInstance();
+                final seenKey = 'onboarding_seen_$uid';
+                final hasSeenOnboarding = prefs.getBool(seenKey) ?? false;
+
+                Widget destination;
+                if (!hasSeenOnboarding) {
+                  await prefs.setBool(seenKey, true);
+                  destination = const OnboardingScreen();
+                } else {
+                  destination = const MainScreen();
+                }
+
                 if (!mounted) return;
                 Navigator.of(context).pushAndRemoveUntil(
                   PageRouteBuilder(
-                    pageBuilder: (_, a, __) => const MainScreen(),
+                    pageBuilder: (_, a, __) => destination,
                     transitionsBuilder: (_, a, __, child) {
                       final slide = Tween<Offset>(
                         begin: const Offset(0, 0.06),

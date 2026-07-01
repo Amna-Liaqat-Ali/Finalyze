@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../core/user_session.dart';
-import '../../screens/onboarding/onboarding_screen.dart';
 import '../../widgets/app_back_button.dart';
 import '../../widgets/app_toast.dart';
 import 'services/auth_service.dart';
+import 'welcome_screen.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;
@@ -96,23 +95,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        await UserSession.initialize(
-          id: data['userId'].toString(),
-          userToken: data['token'].toString(),
-          userName: data['fullName']?.toString() ?? data['name']?.toString(),
-          userEmail: widget.email,
-        );
-
         if (!mounted) return;
-
-        AppToast.success(context, 'Email verified successfully!');
-
+        AppToast.success(context, 'Email verified! Please log in to continue.');
         await Future.delayed(const Duration(milliseconds: 600));
         if (!mounted) return;
-
         Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
-            pageBuilder: (_, animation, __) => const OnboardingScreen(),
+            pageBuilder: (_, animation, __) => const AuthWrapper(),
             transitionsBuilder: (_, animation, __, child) =>
                 FadeTransition(opacity: animation, child: child),
             transitionDuration: const Duration(milliseconds: 500),
