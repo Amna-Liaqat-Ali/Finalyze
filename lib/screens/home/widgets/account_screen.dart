@@ -50,6 +50,59 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
     if (picked != null) setState(() => _profileImage = File(picked.path));
   }
 
+  void _removeImage() {
+    setState(() => _profileImage = null);
+  }
+
+  void _showAvatarOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        padding: EdgeInsets.symmetric(
+            horizontal: rs(context, 20), vertical: rsh(context, 24)),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.only(bottom: rsh(context, 20)),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library_rounded, color: _blue),
+              title: Text("Change Photo",
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _pickImage();
+              },
+            ),
+            if (_profileImage != null)
+              ListTile(
+                leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                title: Text("Delete Photo",
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, color: Colors.redAccent)),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _removeImage();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
@@ -179,7 +232,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
       child: Column(
         children: [
           GestureDetector(
-            onTap: _pickImage,
+            onTap: _showAvatarOptions,
             child: Stack(
               children: [
                 Container(

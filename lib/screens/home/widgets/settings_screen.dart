@@ -84,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: Icons.lock_rounded,
                       iconColor: _ocean,
                       title: "Security & Password",
-                      subtitle: "Password, biometrics, 2FA",
+                      subtitle: "Password (biometrics & 2FA coming soon)",
                       onTap: () => _push(const SecurityScreen()),
                     ),
                   ]),

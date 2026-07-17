@@ -123,7 +123,7 @@ class GuideScreen extends StatelessWidget {
                     crossAxisCount: 2,
                     crossAxisSpacing: rs(context, 16),
                     mainAxisSpacing: rsh(context, 16),
-                    childAspectRatio: 0.85,
+                    childAspectRatio: 0.72,
                     children: [
                       _buildManualCard(
                         context,
@@ -373,6 +373,7 @@ class GuideScreen extends StatelessWidget {
         border: Border.all(color: lightBlueBg),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
@@ -383,13 +384,18 @@ class GuideScreen extends StatelessWidget {
           SizedBox(height: rsh(context, 12)),
           Text(
             title,
+            textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: rs(context, 14)),
           ),
           SizedBox(height: rsh(context, 8)),
-          Text(
-            desc,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(color: Colors.grey.shade600, fontSize: rs(context, 11), height: 1.4),
+          Flexible(
+            child: Text(
+              desc,
+              textAlign: TextAlign.center,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(color: Colors.grey.shade600, fontSize: rs(context, 11), height: 1.4),
+            ),
           ),
         ],
       ),

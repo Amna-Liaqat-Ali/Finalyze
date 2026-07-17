@@ -163,6 +163,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
               _buildPasswordTip(),
               SizedBox(height: rsh(context, 20)),
               _buildChangePwButton(),
+              SizedBox(height: rsh(context, 24)),
+              _sectionLabel("ADVANCED"),
+              _buildComingSoonNote(),
             ],
           ),
         ),
@@ -283,6 +286,31 @@ class _SecurityScreenState extends State<SecurityScreen> {
               "Use 8+ characters with uppercase letters, numbers and symbols (!@#\$) for a strong password.",
               style: GoogleFonts.poppins(
                   fontSize: rs(context, 11), color: _blue.withOpacity(0.7), height: 1.5),
+            ),
+          ),
+        ],
+      ),
+    ));
+  }
+
+  Widget _buildComingSoonNote() {
+    return Builder(builder: (context) => Container(
+      padding: EdgeInsets.all(rs(context, 14)),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(rs(context, 12)),
+        border: Border.all(color: Colors.orange.withOpacity(0.15)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline_rounded, color: Colors.orange.shade700, size: rs(context, 18)),
+          SizedBox(width: rs(context, 10)),
+          Expanded(
+            child: Text(
+              "Biometric login and two-factor authentication (2FA) are not available yet. Only password changes are supported at this time.",
+              style: GoogleFonts.poppins(
+                  fontSize: rs(context, 11.5), color: Colors.orange.shade800, height: 1.5),
             ),
           ),
         ],
