@@ -3,12 +3,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../auth/screens/services/auth_service.dart';
 import '../../../auth/screens/welcome_screen.dart';
+import '../../../core/account_actions.dart';
 import '../../../core/app_sizes.dart';
+import '../../../core/profile_image_store.dart';
 import '../../../core/user_session.dart';
 import '../../history/history_screen.dart';
 import '../../premium/premium_screen.dart';
@@ -24,7 +24,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   File? _profileImage;
-  final ImagePicker _picker = ImagePicker();
   bool _enhancedAnalysis = true;
   bool _notifications = true;
   bool _isPremium = false;
@@ -37,6 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _loadPrefs();
+    _loadProfileImage();
   }
 
   Future<void> _loadPrefs() async {
@@ -46,10 +46,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final XFile? picked =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (picked != null) setState(() => _profileImage = File(picked.path));
+  Future<void> _loadProfileImage() async {
+    final image = await ProfileImageStore.getImage();
+    if (mounted) setState(() => _profileImage = image);
+  }
+
+  Future<void> _openEditProfile() async {
+    await _push(const AccountDetailsScreen());
+    _loadProfileImage();
   }
 
   @override
@@ -66,6 +70,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildCard([
+                    _tile(
+                      icon: Icons.delete_forever_rounded,
+                      iconColor: Colors.redAccent,
+                      title: "Delete Account",
+                      subtitle: "Permanently remove your account and data",
+                      onTap: _confirmDeleteAccount,
+                    ),
+                  ]),
+                  SizedBox(height: rsh(context, 20)),
+
                   // Premium banner
                   _buildPremiumCard(),
                   SizedBox(height: rsh(context, 24)),
@@ -76,8 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: Icons.person_rounded,
                       iconColor: _blue,
                       title: "Edit Profile",
-                      subtitle: "Update your name and email",
-                      onTap: () => _push(const AccountDetailsScreen()),
+                      subtitle: "Update your name, email and photo",
+                      onTap: _openEditProfile,
                     ),
                     _divider(),
                     _tile(
@@ -121,18 +136,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       subtitle: "View all your past scans",
                       onTap: () => _push(
                           HistoryScreen(userId: UserSession.userId ?? '')),
-                    ),
-                  ]),
-                  SizedBox(height: rsh(context, 20)),
-
-                  _sectionLabel("DANGER ZONE"),
-                  _buildCard([
-                    _tile(
-                      icon: Icons.delete_forever_rounded,
-                      iconColor: Colors.redAccent,
-                      title: "Delete Account",
-                      subtitle: "Permanently remove your account and data",
-                      onTap: _confirmDeleteAccount,
                     ),
                   ]),
                   SizedBox(height: rsh(context, 28)),
@@ -199,9 +202,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  // Avatar + name
+                  // Avatar + name — read-only here; change it from Edit Profile.
                   GestureDetector(
-                    onTap: _pickImage,
+                    onTap: _openEditProfile,
                     child: Stack(
                       children: [
                         Container(
@@ -231,15 +234,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           bottom: 0,
                           right: 0,
                           child: Container(
-                            width: rs(context, 24),
-                            height: rs(context, 24),
+                            width: rs(context, 22),
+                            height: rs(context, 22),
                             decoration: BoxDecoration(
-                              color: _teal,
+                              color: Colors.white,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: _blue.withOpacity(0.15), width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 6,
+                                ),
+                              ],
                             ),
-                            child: Icon(Icons.camera_alt_rounded,
-                                color: Colors.white, size: rs(context, 12)),
+                            child: Icon(Icons.edit_rounded,
+                                color: _blue, size: rs(context, 11)),
                           ),
                         ),
                       ],
@@ -471,66 +480,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       endIndent: 16,
       color: Colors.blue.shade50);
 
-  Future<void> _confirmDeleteAccount() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text("Delete Account",
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold, color: Colors.redAccent)),
-        content: Text(
-          "This will permanently delete your account and all scan history. This action cannot be undone.",
-          style: GoogleFonts.poppins(fontSize: 13, color: Colors.blueGrey),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text("Cancel", style: GoogleFonts.poppins(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text("Delete",
-                style: GoogleFonts.poppins(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    final uid = UserSession.userId ?? '';
-    try {
-      final response = await AuthService.deleteAccount(uid);
-      if (response.statusCode == 200) {
-        await UserSession.clear();
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.clear();
-        if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const AuthWrapper()),
-          (route) => false,
-        );
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to delete account. Try again.")),
-          );
-        }
-      }
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Connection error. Try again.")),
-        );
-      }
-    }
-  }
+  Future<void> _confirmDeleteAccount() => confirmDeleteAccount(context);
 
   Widget _buildSignOut() {
     return GestureDetector(
@@ -609,7 +559,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _push(Widget screen) => Navigator.push(
+  Future<void> _push(Widget screen) => Navigator.push(
       context, MaterialPageRoute(builder: (_) => screen));
 
 }

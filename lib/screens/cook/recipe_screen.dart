@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/app_sizes.dart';
 import 'data/recipe_data.dart';
+import 'favorites_screen.dart';
 import 'models/recipe.dart';
+import 'services/recipe_interaction_store.dart';
 
 class RecipeScreen extends StatefulWidget {
   final String? freshnessStatus;
@@ -28,6 +30,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
   void initState() {
     super.initState();
     _applyFilter('All');
+    RecipeInteractionStore.hydrate(_allRecipes).then((_) {
+      if (mounted) _applyFilter(_selectedCategory);
+    });
   }
 
   void _applyFilter(String category) {
@@ -44,12 +49,19 @@ class _RecipeScreenState extends State<RecipeScreen> {
             base.where((r) => r.suitableFor.contains(widget.freshnessStatus)).toList();
         final others =
             base.where((r) => !r.suitableFor.contains(widget.freshnessStatus)).toList();
+        _sortByRating(matched);
+        _sortByRating(others);
         _displayRecipes = [...matched, ...others];
       } else {
         _displayRecipes = base;
+        _sortByRating(_displayRecipes);
       }
     });
   }
+
+  // Highest-rated recipes surface first within each group.
+  void _sortByRating(List<Recipe> list) =>
+      list.sort((a, b) => b.rating.compareTo(a.rating));
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +91,19 @@ class _RecipeScreenState extends State<RecipeScreen> {
               )
             : null,
         actions: [
+          IconButton(
+            icon: Icon(Icons.favorite_rounded, color: Colors.white, size: rs(context, 22)),
+            tooltip: 'Favorites',
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoritesScreen(allRecipes: _allRecipes),
+                ),
+              );
+              if (mounted) _applyFilter(_selectedCategory);
+            },
+          ),
           IconButton(
             icon: Icon(Icons.search_rounded, color: Colors.white, size: rs(context, 22)),
             onPressed: () => showSearch(
@@ -272,12 +297,15 @@ class _RecipeScreenState extends State<RecipeScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(rs(context, 20)),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RecipeDetailScreen(recipe: recipe),
-            ),
-          ),
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RecipeDetailScreen(recipe: recipe),
+              ),
+            );
+            if (mounted) _applyFilter(_selectedCategory);
+          },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -337,8 +365,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       top: 12,
                       right: 12,
                       child: GestureDetector(
-                        onTap: () => setState(
-                            () => recipe.isFavorite = !recipe.isFavorite),
+                        onTap: () {
+                          setState(() => recipe.isFavorite = !recipe.isFavorite);
+                          RecipeInteractionStore.setFavorite(recipe.id, recipe.isFavorite);
+                        },
                         child: Container(
                           padding: EdgeInsets.all(rs(context, 8)),
                           decoration: const BoxDecoration(
@@ -370,6 +400,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
                         color: primaryBlue,
                       ),
                     ),
+                    SizedBox(height: rsh(context, 8)),
+                    _buildRatingReadout(recipe.rating),
                     SizedBox(height: rsh(context, 12)),
                     Row(
                       children: [
@@ -395,6 +427,41 @@ class _RecipeScreenState extends State<RecipeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRatingReadout(double rating) {
+    if (rating <= 0) {
+      return Text(
+        "Not rated yet",
+        style: GoogleFonts.poppins(
+          fontSize: rs(context, 11),
+          color: Colors.blueGrey.shade300,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...List.generate(5, (i) {
+          final filled = i < rating.round();
+          return Icon(
+            filled ? Icons.star_rounded : Icons.star_border_rounded,
+            size: rs(context, 14),
+            color: Colors.amber,
+          );
+        }),
+        SizedBox(width: rs(context, 6)),
+        Text(
+          rating.toStringAsFixed(1),
+          style: GoogleFonts.poppins(
+            fontSize: rs(context, 11),
+            color: Colors.blueGrey,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 

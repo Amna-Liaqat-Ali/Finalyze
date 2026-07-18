@@ -32,9 +32,7 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
   double _dragStartL = 0, _dragStartT = 0, _dragStartR = 0, _dragStartB = 0;
   Offset _dragStartPos = Offset.zero;
 
-  double _brightness = 0.0;   
-  double _contrast = 1.0;     
-  double _saturation = 1.0;  
+  double _brightness = 0.0;
 
   bool _isProcessing = false;
 
@@ -88,18 +86,12 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
 
   List<double> _buildMatrix() {
     final b = _brightness;
-    final c = _contrast;
-    final s = _saturation;
-
-    final sr = (1 - s) * 0.2126;
-    final sg = (1 - s) * 0.7152;
-    final sb = (1 - s) * 0.0722;
 
     return [
-      c * (sr + s), c * sg,       c * sb,       0, b * 255,
-      c * sr,       c * (sg + s), c * sb,       0, b * 255,
-      c * sr,       c * sg,       c * (sb + s), 0, b * 255,
-      0,            0,            0,            1, 0,
+      1, 0, 0, 0, b * 255,
+      0, 1, 0, 0, b * 255,
+      0, 0, 1, 0, b * 255,
+      0, 0, 0, 1, 0,
     ];
   }
 
@@ -183,12 +175,12 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
       }
 
       // Apply enhance
-      if (_brightness != 0.0 || _contrast != 1.0 || _saturation != 1.0) {
+      if (_brightness != 0.0) {
         decoded = img.adjustColor(
           decoded,
-          brightness: _brightness,
-          contrast: _contrast,
-          saturation: _saturation,
+          // img.adjustColor treats brightness as a multiplicative scalar (1.0 = unchanged),
+          // but the slider is additive around 0, so remap before passing it in.
+          brightness: 1.0 + _brightness,
         );
       }
 
@@ -208,7 +200,7 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
 
   void _resetEdits() => setState(() {
     _cropL = 0.08; _cropT = 0.08; _cropR = 0.92; _cropB = 0.92;
-    _brightness = 0.0; _contrast = 1.0; _saturation = 1.0;
+    _brightness = 0.0;
   });
 
   @override
@@ -328,10 +320,6 @@ class _PhotoEditScreenState extends State<PhotoEditScreen> {
         children: [
           _enhanceSlider("Brightness", _brightness, -0.4, 0.4, Icons.brightness_6_rounded,
               (v) => setState(() => _brightness = v)),
-          _enhanceSlider("Contrast", _contrast - 1.0, -0.3, 0.5, Icons.contrast_rounded,
-              (v) => setState(() => _contrast = 1.0 + v)),
-          _enhanceSlider("Saturation", _saturation - 1.0, -0.5, 0.8, Icons.color_lens_rounded,
-              (v) => setState(() => _saturation = 1.0 + v)),
         ],
       ),
     );

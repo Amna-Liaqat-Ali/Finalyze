@@ -13,6 +13,7 @@ class Recipe {
   // 'fresh', 'moderate' — spoiled fish is never recommended
   final List<String> suitableFor;
   bool isFavorite;
+  double rating;
 
   Recipe({
     required this.id,
@@ -26,5 +27,6 @@ class Recipe {
     required this.instructions,
     this.suitableFor = const ['fresh', 'moderate'],
     this.isFavorite = false,
+    this.rating = 0.0,
   });
 }

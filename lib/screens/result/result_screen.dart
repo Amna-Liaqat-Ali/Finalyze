@@ -129,12 +129,6 @@ class _ResultScreenState extends State<ResultScreen> {
                   Row(
                     children: [
                       _buildChip(
-                        species,
-                        primaryBlue.withOpacity(0.08),
-                        primaryBlue,
-                      ),
-                      SizedBox(width: rs(context, 10)),
-                      _buildChip(
                         status,
                         statusColor.withOpacity(0.12),
                         statusColor,

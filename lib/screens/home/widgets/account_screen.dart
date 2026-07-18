@@ -7,7 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../auth/screens/services/auth_service.dart';
+import '../../../core/account_actions.dart';
 import '../../../core/app_sizes.dart';
+import '../../../core/profile_image_store.dart';
 import '../../../core/user_session.dart';
 import '../../../widgets/app_toast.dart';
 
@@ -35,6 +37,9 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
     super.initState();
     _nameCtrl = TextEditingController(text: UserSession.name ?? '');
     _emailCtrl = TextEditingController(text: UserSession.email ?? '');
+    ProfileImageStore.getImage().then((f) {
+      if (mounted && f != null) setState(() => _profileImage = f);
+    });
   }
 
   @override
@@ -47,11 +52,14 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   Future<void> _pickImage() async {
     final picked =
         await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
-    if (picked != null) setState(() => _profileImage = File(picked.path));
+    if (picked == null) return;
+    final saved = await ProfileImageStore.saveImage(File(picked.path));
+    if (mounted) setState(() => _profileImage = saved ?? File(picked.path));
   }
 
-  void _removeImage() {
-    setState(() => _profileImage = null);
+  Future<void> _removeImage() async {
+    await ProfileImageStore.deleteImage();
+    if (mounted) setState(() => _profileImage = null);
   }
 
   void _showAvatarOptions() {
@@ -208,6 +216,17 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
                     ]),
                     SizedBox(height: rsh(context, 32)),
                     _buildSaveButton(),
+                    SizedBox(height: rsh(context, 28)),
+                    _sectionLabel("DANGER ZONE"),
+                    _buildCard([
+                      _tile(
+                        icon: Icons.delete_forever_rounded,
+                        iconColor: Colors.redAccent,
+                        title: "Delete Account",
+                        subtitle: "Permanently remove your account and data",
+                        onTap: () => confirmDeleteAccount(context),
+                      ),
+                    ]),
                   ],
                 ),
               ),
@@ -359,6 +378,55 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
 
   Widget _fieldDivider() =>
       Divider(height: 1, indent: 68, endIndent: 16, color: Colors.grey.shade100);
+
+  Widget _tile({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    VoidCallback? onTap,
+  }) {
+    return Builder(builder: (context) => InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(rs(context, 18)),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: rs(context, 16), vertical: rsh(context, 14)),
+        child: Row(
+          children: [
+            Container(
+              width: rs(context, 40),
+              height: rs(context, 40),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(rs(context, 12)),
+              ),
+              child: Icon(icon, color: iconColor, size: rs(context, 20)),
+            ),
+            SizedBox(width: rs(context, 14)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: rs(context, 14),
+                          color: iconColor)),
+                  Text(subtitle,
+                      style: GoogleFonts.poppins(
+                          fontSize: rs(context, 11),
+                          color: Colors.blueGrey.shade400)),
+                ],
+              ),
+            ),
+            if (onTap != null)
+              Icon(Icons.arrow_forward_ios_rounded,
+                  size: rs(context, 13), color: Colors.blueGrey.withOpacity(0.3)),
+          ],
+        ),
+      ),
+    ));
+  }
 
   Widget _sectionLabel(String text) {
     return Builder(builder: (context) => Padding(

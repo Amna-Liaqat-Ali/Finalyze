@@ -6,15 +6,44 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/app_sizes.dart';
 import '../../../widgets/app_back_button.dart';
 import '../models/recipe.dart';
+import '../services/recipe_interaction_store.dart';
+import 'cooking_flow_screen.dart';
 
-class RecipeDetailScreen extends StatelessWidget {
+class RecipeDetailScreen extends StatefulWidget {
   final Recipe recipe;
 
   const RecipeDetailScreen({super.key, required this.recipe});
 
+  @override
+  State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
+}
+
+class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   static const primaryBlue = Color(0xFF1A5694);
   static const accentTeal = Color(0xFF2CB88E);
   static const softBg = Color(0xFFF8FAFC);
+
+  Recipe get recipe => widget.recipe;
+
+  void _toggleFavorite() {
+    setState(() => recipe.isFavorite = !recipe.isFavorite);
+    RecipeInteractionStore.setFavorite(recipe.id, recipe.isFavorite);
+  }
+
+  void _setRating(double value) {
+    setState(() => recipe.rating = value);
+    RecipeInteractionStore.setRating(recipe.id, value);
+  }
+
+  Future<void> _startCooking() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CookingFlowScreen(recipe: recipe),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +70,12 @@ class RecipeDetailScreen extends StatelessWidget {
               IconButton(
                 icon: _buildBlurCircle(
                   Icon(
-                    Icons.favorite_border_rounded,
-                    color: Colors.white,
+                    recipe.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    color: recipe.isFavorite ? const Color(0xFFFF1744) : Colors.white,
                     size: rs(context, 20),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: _toggleFavorite,
               ),
               SizedBox(width: rs(context, 16)),
             ],
@@ -99,57 +128,19 @@ class RecipeDetailScreen extends StatelessWidget {
                   SizedBox(height: rsh(context, 12)),
                   _buildCategoryBadge(context, recipe.category),
 
+                  SizedBox(height: rsh(context, 24)),
+
+                  _buildRatingSection(context),
+
                   SizedBox(height: rsh(context, 32)),
 
                   _buildStatsRow(context),
 
                   SizedBox(height: rsh(context, 40)),
 
-                  _buildSectionHeader(
-                    context,
-                    "Ingredients",
-                    "${recipe.ingredients.length} items",
-                  ),
-                  SizedBox(height: rsh(context, 16)),
-                  GridView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: recipe.ingredients.length,
-                    gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisExtent: rsh(context, 50),
-                          crossAxisSpacing: rs(context, 12),
-                          mainAxisSpacing: rsh(context, 12),
-                        ),
-                    itemBuilder: (context, index) =>
-                        _buildIngredientItem(context, recipe.ingredients[index]),
-                  ),
+                  _buildStartCookingButton(context),
 
-                  SizedBox(height: rsh(context, 40)),
-
-                  _buildSectionHeader(
-                    context,
-                    "Directions",
-                    "${recipe.instructions.length} steps",
-                  ),
-                  SizedBox(height: rsh(context, 20)),
-                  ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: recipe.instructions.length,
-                    itemBuilder: (context, index) {
-                      return _buildDirectionCard(
-                        context,
-                        index + 1,
-                        recipe.instructions[index],
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: rsh(context, 120)),
+                  SizedBox(height: rsh(context, 60)),
                 ],
               ),
             ),
@@ -188,6 +179,37 @@ class RecipeDetailScreen extends StatelessWidget {
           letterSpacing: 1.2,
         ),
       ),
+    );
+  }
+
+  Widget _buildRatingSection(BuildContext context) {
+    return Row(
+      children: [
+        ...List.generate(5, (i) {
+          final starValue = i + 1;
+          final filled = starValue <= recipe.rating.round();
+          return GestureDetector(
+            onTap: () => _setRating(starValue.toDouble()),
+            child: Padding(
+              padding: EdgeInsets.only(right: rs(context, 4)),
+              child: Icon(
+                filled ? Icons.star_rounded : Icons.star_border_rounded,
+                color: Colors.amber,
+                size: rs(context, 26),
+              ),
+            ),
+          );
+        }),
+        SizedBox(width: rs(context, 8)),
+        Text(
+          recipe.rating > 0 ? recipe.rating.toStringAsFixed(1) : "Tap to rate",
+          style: GoogleFonts.poppins(
+            fontSize: rs(context, 13),
+            color: Colors.blueGrey,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
@@ -260,106 +282,42 @@ class RecipeDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, String trailing) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontSize: rs(context, 20),
-            fontWeight: FontWeight.bold,
-            color: primaryBlue,
+  Widget _buildStartCookingButton(BuildContext context) {
+    return GestureDetector(
+      onTap: _startCooking,
+      child: Container(
+        width: double.infinity,
+        height: rsh(context, 56),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1A5694), Color(0xFF0891B2), Color(0xFF2CB88E)],
+          ),
+          borderRadius: BorderRadius.circular(rs(context, 16)),
+          boxShadow: [
+            BoxShadow(
+              color: accentTeal.withOpacity(0.30),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.restaurant_rounded, color: Colors.white, size: rs(context, 20)),
+              SizedBox(width: rs(context, 10)),
+              Text(
+                "Start Cooking",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: rs(context, 16),
+                ),
+              ),
+            ],
           ),
         ),
-        Text(
-          trailing,
-          style: GoogleFonts.poppins(
-            fontSize: rs(context, 13),
-            color: Colors.blueGrey,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIngredientItem(BuildContext context, String text) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: rs(context, 12)),
-      decoration: BoxDecoration(
-        color: softBg,
-        borderRadius: BorderRadius.circular(rs(context, 12)),
-        border: Border.all(color: Colors.blueGrey.shade50),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.add_circle_outline_rounded,
-            color: accentTeal,
-            size: rs(context, 18),
-          ),
-          SizedBox(width: rs(context, 10)),
-          Expanded(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.poppins(
-                fontSize: rs(context, 13),
-                color: primaryBlue.withOpacity(0.8),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDirectionCard(BuildContext context, int step, String text) {
-    return Container(
-      margin: EdgeInsets.only(bottom: rsh(context, 16)),
-      padding: EdgeInsets.all(rs(context, 16)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(rs(context, 16)),
-        border: Border.all(color: Colors.blueGrey.shade50),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: rs(context, 14),
-            backgroundColor: primaryBlue,
-            child: Text(
-              "$step",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: rs(context, 12),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(width: rs(context, 16)),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(
-                fontSize: rs(context, 14),
-                color: Colors.blueGrey.shade800,
-                height: 1.5,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
