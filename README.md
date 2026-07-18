@@ -32,15 +32,13 @@ This project was developed as a Final Year Project (FYP), combining computer vis
 
 | Home | Scan Result | Recipes |
 |:---:|:---:|:---:|
-| _screenshot placeholder_ | _screenshot placeholder_ | _screenshot placeholder_ |
+| ![Home Screen](assets/screenshots/Home%20Screen.jpeg) | ![Scan Result](assets/screenshots/Scan%20Result.jpeg) | ![Recipes](assets/screenshots/Recipes.jpeg) |
 
 | Cooking Flow | Scan History | Species Discovery |
 |:---:|:---:|:---:|
-| _screenshot placeholder_ | _screenshot placeholder_ | _screenshot placeholder_ |
+| ![Cooking Flow](assets/screenshots/Cooking%20flow.jpeg) | ![Scan History](assets/screenshots/Scan%20History.jpeg) | ![Species Discovery](assets/screenshots/Species%20Discovery.jpeg) |
 
 </div>
-
-> Add screenshots to an `assets/screenshots/` folder and reference them here, e.g. `![Home Screen](assets/screenshots/home.png)`.
 
 ---
 
