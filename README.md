@@ -2,8 +2,6 @@
 
 <img src="assets/images/splash_bg_banner.jpeg" alt="Finalyze cover" width="100%" />
 
-<img src="assets/icon/app_icon.png" alt="Finalyze logo" width="120" />
-
 # Finalyze
 
 ### AI-Powered Fish Freshness Detection & Recipe Companion
