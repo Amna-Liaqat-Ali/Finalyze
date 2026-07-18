@@ -32,11 +32,11 @@ This project was developed as a Final Year Project (FYP), combining computer vis
 
 | Home | Scan Result | Recipes |
 |:---:|:---:|:---:|
-| ![Home Screen](assets/screenshots/Home%20Screen.jpeg) | ![Scan Result](assets/screenshots/Scan%20Result.jpeg) | ![Recipes](assets/screenshots/Recipes.jpeg) |
+| ![Home Screen](assets/screenshots/HomeScreen.jpeg) | ![Scan Result](assets/screenshots/ScanResult.jpeg) | ![Recipes](assets/screenshots/Recipes.jpeg) |
 
 | Cooking Flow | Scan History | Species Discovery |
 |:---:|:---:|:---:|
-| ![Cooking Flow](assets/screenshots/Cooking%20flow.jpeg) | ![Scan History](assets/screenshots/Scan%20History.jpeg) | ![Species Discovery](assets/screenshots/Species%20Discovery.jpeg) |
+| ![Cooking Flow](assets/screenshots/Cookingflow.jpeg) | ![Scan History](assets/screenshots/ScanHistory.jpeg) | ![Species Discovery](assets/screenshots/SpeciesDiscovery.jpeg) |
 
 </div>
 
