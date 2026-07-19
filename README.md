@@ -77,7 +77,7 @@ The core of Finalyze is a fish species and freshness classifier trained via tran
 
 The model was trained on a custom-curated dataset of fish images labeled by species (Pomfret, Kingfish/Surmai) and freshness stage (fresh, moderate, spoiled), plus a `data_invalid` class to reject non-fish or irrelevant images.
 
-> **Dataset (Google Drive):** [ADD DATASET LINK HERE]
+> **Dataset (Google Drive):** https://drive.google.com/drive/folders/1DwNVGnlAEfRuMZBVtSURQhFyKf6zJBsC?usp=drive_link
 
 ### Model Assets
 
