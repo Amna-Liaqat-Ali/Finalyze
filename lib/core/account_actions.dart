@@ -6,8 +6,7 @@ import '../auth/screens/services/auth_service.dart';
 import '../auth/screens/welcome_screen.dart';
 import 'user_session.dart';
 
-/// Shared delete-account flow so every entry point (Settings, Edit Profile, ...)
-/// behaves identically and stays in sync.
+//Delete account fucntion so that Settings and edit screen can call exact same logic
 Future<void> confirmDeleteAccount(BuildContext context) async {
   final confirmed = await showDialog<bool>(
     context: context,
@@ -41,6 +40,7 @@ Future<void> confirmDeleteAccount(BuildContext context) async {
 
   if (confirmed != true) return;
 
+  // delete account from backend and clear all session data with back to login screen
   final uid = UserSession.userId ?? '';
   try {
     final response = await AuthService.deleteAccount(uid);

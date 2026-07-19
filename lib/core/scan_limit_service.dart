@@ -13,7 +13,6 @@ class ScanLimitService {
   static String _countKey(String uid) => 'scan_count_$uid';
   static String _windowKey(String uid) => 'scan_window_start_$uid';
 
-  // ── public API ────────────────────────────────────────────────
 
   static Future<ScanLimitStatus> getStatus() async {
     final uid = UserSession.userId;
@@ -77,7 +76,6 @@ class ScanLimitService {
     return _localIncrement(uid);
   }
 
-  // ── local helpers ─────────────────────────────────────────────
 
   static Future<ScanLimitStatus> _localStatus(String uid) async {
     final prefs = await SharedPreferences.getInstance();

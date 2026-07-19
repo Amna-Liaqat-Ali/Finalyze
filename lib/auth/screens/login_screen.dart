@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(
                                 0.3,
-                              ), // Lowered opacity
+                              ), 
                               borderRadius: BorderRadius.circular(rs(context, 24)),
                               border: Border.all(
                                 color: Colors.white.withOpacity(0.4),

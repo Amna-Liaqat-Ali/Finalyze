@@ -138,7 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
 
-            // 3. Scrollable UI Content Layer (This eliminates the overflow entirely)
             SafeArea(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -207,7 +206,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               SizedBox(height: rsh(context, 14)),
 
-                              // User Role Dropdown
                               Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: rs(context, 20),
