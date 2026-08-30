@@ -75,7 +75,7 @@ class _AiChatSheetState extends State<AiChatSheet> {
       _history.add({'role': 'user', 'content': text});
 
       final body = jsonEncode({
-        'model': 'llama-3.3-70b-versatile',
+        'model': 'openai/gpt-oss-120b',
         'messages': [
           {'role': 'system', 'content': _kSystemPrompt},
           ..._history,
